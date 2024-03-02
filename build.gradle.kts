@@ -12,7 +12,7 @@ group = "wisoft.io"
 version = "0.0.1-SNAPSHOT"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
@@ -20,6 +20,8 @@ repositories {
 }
 
 dependencies {
+    implementation("de.svenkubiak:jBCrypt:0.4.3")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -34,7 +36,7 @@ dependencies {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs += "-Xjsr305=strict"
-        jvmTarget = "21"
+        jvmTarget = "17"
     }
 }
 
