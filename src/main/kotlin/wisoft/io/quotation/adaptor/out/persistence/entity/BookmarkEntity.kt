@@ -1,5 +1,8 @@
 package wisoft.io.quotation.adaptor.out.persistence.entity
 
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.sql.Timestamp
 import java.util.UUID
@@ -14,12 +17,14 @@ import java.util.UUID
  * @property createdTime 생성된 시간
  * @property lastModifiedTime 마지막 수정 시간
  */
-@Table
-data class Bookmark(
+@Table(name = "bookmark")
+@Entity
+data class BookmarkEntity(
+    @Id
     val id: UUID = UUID.randomUUID(),
     val name: String,
     val userId: String,
-    val quotationsIds: List<UUID> = emptyList(),
+//    val quotationsIds: List<UUID> = emptyList(),
     val visibility: Boolean,
     val icon: String? = null,
     val createdTime: Timestamp,

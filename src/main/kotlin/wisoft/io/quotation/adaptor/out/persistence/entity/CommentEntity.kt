@@ -13,8 +13,9 @@ import java.util.UUID
  * @property lastModifiedTime 마지막 수정 시간
  * @property parentId 댓글의 상위 댓글 식별자
  */
-@Table
-data class Comment(
+@Table(name = "comment")
+@Entity
+data class CommentEntity(
     @Id
     val id: UUID = UUID.randomUUID(),
     val quotationId: UUID,

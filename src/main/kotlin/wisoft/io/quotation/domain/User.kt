@@ -1,8 +1,9 @@
 package wisoft.io.quotation.domain
 
 import jakarta.persistence.Id
-import jakarta.persistence.Table
+import org.mindrot.jbcrypt.BCrypt
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 /**
  * @property id 식별자
@@ -18,20 +19,26 @@ import java.sql.Timestamp
  * @property quotationAlarmTimes 명언 알람 시간들
  * @property createdTime 생성된 시간
  * @property lastModifiedTime 마지막 수정 시간
+ * @property identityVerificationQuestion 본인 확인 질문
+ * @property identityVerificationAnswer 본인 확인 답변
  */
 data class User(
     @Id
     val id: String,
-    val password: String,
+    var password: String = "",
     val nickname: String,
-    val profilePath: String?,
-    val favoriteQuotation: String?,
-    val favoriteAuthor: String?,
-    val likeQuotationCount: Long,
-    val bookmarkCount: Long,
-    val commentAlarm: Boolean,
-    val quotationAlarm: Boolean,
+    val profilePath: String? = null,
+    val favoriteQuotation: String? = null,
+    val favoriteAuthor: String? = null,
+    val commentAlarm: Boolean = false,
+    val quotationAlarm: Boolean = false,
     val quotationAlarmTimes: List<Timestamp> = emptyList(),
-    val createdTime: Timestamp,
+    val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
-)
+    val identityVerificationQuestion: String,
+    val identityVerificationAnswer: String
+) {
+    fun encryptPassword(password: String) {
+        this.password = BCrypt.hashpw(password, BCrypt.gensalt())
+    }
+}
