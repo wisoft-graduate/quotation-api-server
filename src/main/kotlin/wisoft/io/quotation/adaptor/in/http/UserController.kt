@@ -14,7 +14,8 @@ class UserController(val signUpUseCase: SignUpUseCase) {
     @PostMapping("/users")
     fun signUp(@RequestBody @Valid request: SignUpUseCase.SignUpRequest): ResponseEntity<SignUpUseCase.SignUpResponse> {
         val response = signUpUseCase.signUp(request)
-        return ResponseEntity.status(HttpStatus.CREATED).body(SignUpUseCase.SignUpResponse(id = response))
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(SignUpUseCase.SignUpResponse(data = SignUpUseCase.Data(id = response)))
     }
 
 }

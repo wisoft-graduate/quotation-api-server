@@ -20,6 +20,10 @@ interface SignUpUseCase {
     )
 
     data class SignUpResponse(
+        val data: Data
+    )
+
+    data class Data(
         val id: String
     )
 
