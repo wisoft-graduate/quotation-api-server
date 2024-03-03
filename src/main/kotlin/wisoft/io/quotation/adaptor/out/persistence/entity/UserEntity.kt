@@ -1,10 +1,8 @@
 package wisoft.io.quotation.adaptor.out.persistence.entity
 
-import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import org.springframework.data.annotation.TypeAlias
 import wisoft.io.quotation.domain.User
 import java.sql.Timestamp
 
@@ -26,7 +24,7 @@ import java.sql.Timestamp
 
 @Table(name = "account")
 @Entity
-data class AccountEntity(
+data class UserEntity(
     @Id
     val id: String,
     val password: String,
@@ -43,8 +41,8 @@ data class AccountEntity(
     val identityVerificationAnswer: String
 ) {
     companion object {
-        fun from(user: User): AccountEntity {
-            return AccountEntity(
+        fun from(user: User): UserEntity {
+            return UserEntity(
                 id = user.id,
                 password = user.password,
                 nickname = user.nickname,
