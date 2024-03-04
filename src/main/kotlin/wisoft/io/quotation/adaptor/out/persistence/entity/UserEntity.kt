@@ -58,5 +58,22 @@ data class UserEntity(
                 identityVerificationAnswer = user.identityVerificationAnswer,
             )
         }
+        fun to(userEntity: UserEntity): User {
+            return User(
+                id = userEntity.id,
+                password = userEntity.password,
+                nickname = userEntity.nickname,
+                profilePath = userEntity.profilePath,
+                favoriteAuthor = userEntity.favoriteAuthor,
+                favoriteQuotation = userEntity.favoriteQuotation,
+                commentAlarm = userEntity.commentAlarm,
+                quotationAlarm = userEntity.quotationAlarm,
+//                quotationAlarmTimes = userEntity.quotationAlarmTimes,
+                createdTime = userEntity.createdTime,
+                lastModifiedTime = userEntity.lastModifiedTime,
+                identityVerificationQuestion = userEntity.identityVerificationQuestion,
+                identityVerificationAnswer = userEntity.identityVerificationAnswer,
+            )
+        }
     }
 }

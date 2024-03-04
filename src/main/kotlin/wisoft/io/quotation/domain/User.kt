@@ -41,4 +41,7 @@ data class User(
     fun encryptPassword(password: String) {
         this.password = BCrypt.hashpw(password, BCrypt.gensalt())
     }
+    fun isCorrectPassword(inputPassword: String): Boolean {
+        return BCrypt.checkpw(inputPassword, this.password)
+    }
 }
