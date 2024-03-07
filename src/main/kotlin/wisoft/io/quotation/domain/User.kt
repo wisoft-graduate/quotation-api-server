@@ -26,7 +26,7 @@ data class User(
     @Id
     val id: String,
     var password: String = "",
-    val nickname: String,
+    var nickname: String,
     val profilePath: String? = null,
     val favoriteQuotation: String? = null,
     val favoriteAuthor: String? = null,
@@ -41,7 +41,16 @@ data class User(
     fun encryptPassword(password: String) {
         this.password = BCrypt.hashpw(password, BCrypt.gensalt())
     }
+
     fun isCorrectPassword(inputPassword: String): Boolean {
         return BCrypt.checkpw(inputPassword, this.password)
+    }
+
+    fun isEnrolled(): Boolean {
+        return !this.nickname.startsWith("leaved#")
+    }
+
+    fun resign(count: Number) {
+        this.nickname = "leaved#$count"
     }
 }
