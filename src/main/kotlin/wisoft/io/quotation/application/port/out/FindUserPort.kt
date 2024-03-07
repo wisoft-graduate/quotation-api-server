@@ -5,4 +5,6 @@ import wisoft.io.quotation.domain.User
 interface FindUserPort {
 
     fun findByIdOrNull(id: String): User
+    fun findLeaveUsersCount(): Long
+
 }

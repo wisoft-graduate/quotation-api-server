@@ -1,5 +1,6 @@
 package wisoft.io.quotation.adaptor.out.persistence
 
+import org.springframework.data.domain.Example
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
@@ -18,6 +19,10 @@ class UserAdaptor(val userRepository: UserRepository): SaveUserPort, FindUserPor
     override fun findByIdOrNull(id: String): User {
         val userEntity = userRepository.findByIdOrNull(id) ?: throw RuntimeException()
         return UserEntity.to(userEntity)
+    }
+
+    override fun findLeaveUsersCount(): Long {
+        return userRepository.countByNicknameStartingWith("leave#")
     }
 
 }
