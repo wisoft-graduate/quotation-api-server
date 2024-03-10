@@ -25,4 +25,8 @@ class UserAdaptor(val userRepository: UserRepository): SaveUserPort, FindUserPor
         return userRepository.countByNicknameStartingWith("leave#")
     }
 
+    override fun existUser(id: String): Boolean {
+        return userRepository.existsById(id)
+    }
+
 }
