@@ -1,6 +1,7 @@
 package wisoft.io.quotation.application.service
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import wisoft.io.quotation.application.port.`in`.ResignUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.SignUpUseCase
@@ -10,11 +11,15 @@ import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.util.JWTUtil
 
 @Service
+@Transactional(readOnly = true)
 class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort) : SignUpUseCase, SignInUseCase,
     ResignUseCase {
 
+    @Transactional
     override fun signUp(request: SignUpUseCase.SignUpRequest): String {
-        // TODO : 이전에 동일한 User 있는지 확인
+        val existUser = findUserPort.existUser(request.id)
+        if (existUser) throw RuntimeException()
+
         val user = request.run {
             User(
                 id = this.id,
@@ -28,6 +33,7 @@ class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort
         return saveUserPort.save(user)
     }
 
+    @Transactional
     override fun signIn(request: SignInUseCase.SignInRequest): SignInUseCase.UserTokenDto {
         val user = findUserPort.findByIdOrNull(request.id)
 
@@ -42,8 +48,9 @@ class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort
         return SignInUseCase.UserTokenDto(JWTUtil.generateAccessToken(user), JWTUtil.generateRefreshToken(user))
     }
 
+    @Transactional
     override fun resign(id: String): String {
-        val user = findUserPort.findByIdOrNull(id);
+        val user = findUserPort.findByIdOrNull(id)
         val leaveCount = findUserPort.findLeaveUsersCount()
 
         if (!user.isEnrolled()) {
@@ -54,4 +61,6 @@ class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort
 
         return saveUserPort.save(user)
     }
+
+
 }
