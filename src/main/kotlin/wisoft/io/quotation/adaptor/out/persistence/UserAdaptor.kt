@@ -10,7 +10,7 @@ import wisoft.io.quotation.application.port.out.SaveUserPort
 import wisoft.io.quotation.domain.User
 
 @Component
-class UserAdaptor(val userRepository: UserRepository): SaveUserPort, FindUserPort {
+class UserAdaptor(val userRepository: UserRepository) : SaveUserPort, FindUserPort {
 
     override fun save(user: User): String {
         return userRepository.save(UserEntity.from(user)).id
@@ -29,4 +29,7 @@ class UserAdaptor(val userRepository: UserRepository): SaveUserPort, FindUserPor
         return userRepository.existsById(id)
     }
 
+    override fun existUserByNickname(nickname: String): Boolean {
+        return userRepository.existsByNickname(nickname)
+    }
 }

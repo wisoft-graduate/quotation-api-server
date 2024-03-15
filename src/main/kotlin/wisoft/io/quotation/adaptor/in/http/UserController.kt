@@ -4,11 +4,13 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import wisoft.io.quotation.application.port.`in`.ExistUserUseCase
 import wisoft.io.quotation.application.port.`in`.ResignUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.SignUpUseCase
@@ -17,7 +19,8 @@ import wisoft.io.quotation.application.port.`in`.SignUpUseCase
 class UserController(
     val signUpUseCase: SignUpUseCase,
     val signInUseCase: SignInUseCase,
-    val resignUseCase: ResignUseCase
+    val resignUseCase: ResignUseCase,
+    val existUserUseCase: ExistUserUseCase
 ) {
 
     @PostMapping("/users")
@@ -41,6 +44,20 @@ class UserController(
             )
     }
 
+    @GetMapping("/users/exist")
+    fun exist(
+        @RequestParam("id") id: String,
+        @RequestParam("nickname") nickname: String
+    ): ResponseEntity<ExistUserUseCase.ExistUserResponse> {
+        val response = existUserUseCase.existUser(id, nickname)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(
+                ExistUserUseCase.ExistUserResponse(
+                    data = ExistUserUseCase.Data(exist = response)
+                )
+            )
+    }
+
     @DeleteMapping("/users/{id}")
     fun resign(@PathVariable("id") id: String): ResponseEntity<ResignUseCase.ResignResponse> {
         val response = resignUseCase.resign(id)
@@ -52,5 +69,6 @@ class UserController(
                 )
             )
     }
+
 
 }

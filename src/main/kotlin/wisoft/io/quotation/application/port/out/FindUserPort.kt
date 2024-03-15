@@ -6,7 +6,7 @@ interface FindUserPort {
 
     fun findByIdOrNull(id: String): User
     fun findLeaveUsersCount(): Long
-
     fun existUser(id: String): Boolean
+    fun existUserByNickname(nickname: String): Boolean
 
 }
