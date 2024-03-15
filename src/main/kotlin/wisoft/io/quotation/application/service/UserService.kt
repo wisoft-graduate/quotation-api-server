@@ -2,6 +2,7 @@ package wisoft.io.quotation.application.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import wisoft.io.quotation.application.port.`in`.ExistUserUseCase
 import wisoft.io.quotation.application.port.`in`.ResignUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.SignUpUseCase
@@ -13,7 +14,7 @@ import wisoft.io.quotation.util.JWTUtil
 @Service
 @Transactional(readOnly = true)
 class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort) : SignUpUseCase, SignInUseCase,
-    ResignUseCase {
+    ResignUseCase, ExistUserUseCase {
 
     @Transactional
     override fun signUp(request: SignUpUseCase.SignUpRequest): String {
@@ -62,5 +63,13 @@ class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort
         return saveUserPort.save(user)
     }
 
-
+    override fun existUser(id: String, nickname: String): Boolean {
+        if (id.isNotEmpty()) {
+            return findUserPort.existUser(id)
+        }
+        if (nickname.isNotEmpty()) {
+            return findUserPort.existUserByNickname(nickname)
+        }
+        return false
+    }
 }
