@@ -1,5 +1,6 @@
 package wisoft.io.quotation.adaptor.`in`.http
 
+import jakarta.validation.Valid
 import jakarta.websocket.server.PathParam
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -29,7 +30,6 @@ class QuotationController(
 
     @GetMapping("/{id}")
     fun getQuotation(@PathVariable("id") id: UUID): ResponseEntity<GetQuotationUseCase.GetQuotationResponse> {
-        println("들어옴")
         val response = getQuotationUseCase.getQuotation(id)
         return ResponseEntity.status(HttpStatus.OK)
             .body(GetQuotationUseCase.GetQuotationResponse(data = GetQuotationUseCase.Data(response)))
