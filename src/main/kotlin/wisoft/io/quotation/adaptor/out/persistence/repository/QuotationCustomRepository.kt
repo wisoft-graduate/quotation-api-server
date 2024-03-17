@@ -40,7 +40,7 @@ class QuotationCustomRepository(
             }
 
             request.paging?.run {
-                append("offset ${this.page} ")
+                append("offset ${(this.page -1) * count} ")
                 append("limit ${this.count} ")
             }
 
