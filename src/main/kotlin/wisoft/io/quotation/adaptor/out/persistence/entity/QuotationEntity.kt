@@ -3,6 +3,7 @@ package wisoft.io.quotation.adaptor.out.persistence.entity
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import wisoft.io.quotation.domain.Quotation
 import java.sql.Timestamp
 import java.util.UUID
 
@@ -30,4 +31,18 @@ data class QuotationEntity(
     val backgroundImagePath: String,
     val createdTime: Timestamp,
     val lastModifiedTime: Timestamp? = null,
-)
+) {
+    fun toDomain(): Quotation {
+        return Quotation(
+            id = id,
+            authorId = authorId,
+            content = content,
+            likeCount = likeCount,
+            shareCount = shareCount,
+            commentCount = commentCount,
+            backgroundImagePath = backgroundImagePath,
+            createdTime = createdTime,
+            lastModifiedTime = lastModifiedTime
+        )
+    }
+}
