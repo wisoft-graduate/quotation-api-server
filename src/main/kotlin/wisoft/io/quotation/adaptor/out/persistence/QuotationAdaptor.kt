@@ -22,7 +22,7 @@ class QuotationAdaptor(
     }
 
     override fun getQuotations(request: GetQuotationsUseCase.GetQuotationRequest): List<Quotation> {
-        val result = quotationCustomRepository.findQuotations(request)
+        val result = quotationCustomRepository.findQuotations(request).distinct()
         return result.map { it.toDomain() }
     }
 

@@ -16,14 +16,15 @@ class QuotationCustomRepository(
     fun findQuotations(request: GetQuotationsUseCase.GetQuotationRequest): List<QuotationEntity> {
         val parameterMap = mutableMapOf<String, Any>()
         val sql = buildString {
-            append("SELECT * FROM quotation WHERE 1=1 ")
+            append("SELECT q.* FROM quotation q, author a WHERE q.author_id = a.id ")
             request.searchWord?.run {
-                append("AND content LIKE :content ")
-                parameterMap.put("content", "%$this%")
+                append("AND content LIKE :searchWord ")
+                append("OR a.name LIKE :searchWord ")
+                parameterMap.put("searchWord", "%$this%")
             }
 
             request.ids?.run {
-                append("AND id in :ids ")
+                append("AND id IN :ids ")
                 parameterMap.put("ids", this)
             }
 
@@ -43,7 +44,6 @@ class QuotationCustomRepository(
                 append("offset ${(this.page -1) * count} ")
                 append("limit ${this.count} ")
             }
-
         }
 
         return entityManager
