@@ -23,8 +23,9 @@ class UserService(
 
     @Transactional
     override fun signUp(request: SignUpUseCase.SignUpRequest): String {
-        val existUser = existUserPort.existUser(request.id)
-        if (existUser) throw RuntimeException()
+        val existUserById = existUserPort.existUser(request.id)
+        val existUserByNickname = existUserByNicknamePort.existUserByNickname((request.nickname))
+        if (existUserById || existUserByNickname) throw RuntimeException()
 
         val user = request.run {
             User(

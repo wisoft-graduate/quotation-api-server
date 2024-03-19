@@ -6,6 +6,7 @@ interface ResignUseCase {
 
     data class ResignResponse(
         val data: Data,
+        val status: Int
     )
 
     data class Data(

@@ -1,5 +1,6 @@
 package wisoft.io.quotation.adaptor.`in`.http
 
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -24,10 +25,19 @@ class UserController(
 ) {
 
     @PostMapping("/users")
-    fun signUp(@RequestBody @Valid request: SignUpUseCase.SignUpRequest): ResponseEntity<SignUpUseCase.SignUpResponse> {
+    fun signUp(
+        servletRequest: HttpServletRequest,
+        @RequestBody @Valid request: SignUpUseCase.SignUpRequest
+    ): ResponseEntity<SignUpUseCase.SignUpResponse> {
         val response = signUpUseCase.signUp(request)
+        val responseUrl = servletRequest.requestURL.append("/").append(response).toString()
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(SignUpUseCase.SignUpResponse(data = SignUpUseCase.Data(id = response)))
+            .body(
+                SignUpUseCase.SignUpResponse(
+                    data = SignUpUseCase.Data(location = responseUrl),
+                    status = HttpStatus.CREATED.value()
+                )
+            )
     }
 
     @PostMapping("/users/sign-in")
@@ -39,7 +49,8 @@ class UserController(
                     data = SignInUseCase.UserTokenDto(
                         accessToken = response.accessToken,
                         refreshToken = response.refreshToken
-                    )
+                    ),
+                    status = HttpStatus.OK.value()
                 )
             )
     }
@@ -53,7 +64,8 @@ class UserController(
         return ResponseEntity.status(HttpStatus.OK)
             .body(
                 ExistUserUseCase.ExistUserResponse(
-                    data = ExistUserUseCase.Data(exist = response)
+                    data = ExistUserUseCase.Data(exist = response),
+                    status = HttpStatus.OK.value()
                 )
             )
     }
@@ -65,10 +77,12 @@ class UserController(
         return ResponseEntity.status(HttpStatus.ACCEPTED)
             .body(
                 ResignUseCase.ResignResponse(
-                    data = ResignUseCase.Data(id = response)
+                    data = ResignUseCase.Data(id = response),
+                    status = HttpStatus.ACCEPTED.value()
                 )
             )
     }
+
 
 
 }
