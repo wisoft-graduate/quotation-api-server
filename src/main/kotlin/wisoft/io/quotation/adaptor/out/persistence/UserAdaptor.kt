@@ -12,12 +12,12 @@ class UserAdaptor(val userRepository: UserRepository) : SaveUserPort, FindUserBy
     ExistUserPort, ExistUserByNicknamePort {
 
     override fun save(user: User): String {
-        return userRepository.save(UserEntity.from(user)).id
+        return userRepository.save(user.to()).id
     }
 
     override fun findByIdOrNull(id: String): User {
         val userEntity = userRepository.findByIdOrNull(id) ?: throw RuntimeException()
-        return UserEntity.to(userEntity)
+        return userEntity.to()
     }
 
     override fun findLeaveUsersCount(): Long {

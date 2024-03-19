@@ -2,6 +2,7 @@ package wisoft.io.quotation.domain
 
 import jakarta.persistence.Id
 import org.mindrot.jbcrypt.BCrypt
+import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
@@ -38,6 +39,24 @@ data class User(
     val identityVerificationQuestion: String,
     val identityVerificationAnswer: String
 ) {
+    fun to(): UserEntity {
+        return UserEntity(
+            id = this.id,
+            password = this.password,
+            nickname = this.nickname,
+            profilePath = this.profilePath,
+            favoriteAuthor = this.favoriteAuthor,
+            favoriteQuotation = this.favoriteQuotation,
+            commentAlarm = this.commentAlarm,
+            quotationAlarm = this.quotationAlarm,
+//                quotationAlarmTimes = this.quotationAlarmTimes,
+            createdTime = this.createdTime,
+            lastModifiedTime = this.lastModifiedTime,
+            identityVerificationQuestion = this.identityVerificationQuestion,
+            identityVerificationAnswer = this.identityVerificationAnswer,
+        )
+    }
+
     fun encryptPassword(password: String) {
         this.password = BCrypt.hashpw(password, BCrypt.gensalt())
     }
