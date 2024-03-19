@@ -2,7 +2,6 @@ package wisoft.io.quotation.adaptor.out.persistence
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
-import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User

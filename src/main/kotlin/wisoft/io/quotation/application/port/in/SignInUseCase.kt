@@ -6,7 +6,6 @@ interface SignInUseCase {
 
     fun signIn(request: SignInRequest): UserTokenDto
 
-    // Request DTO
     data class SignInRequest(
         @field:NotBlank
         val id: String,
@@ -14,12 +13,11 @@ interface SignInUseCase {
         val password: String,
     )
 
-    // Response DTO
     data class SignInResponse(
-        val data: UserTokenDto
+        val data: UserTokenDto,
+        val status: Int
     )
 
-    // Service DTO
     data class UserTokenDto(
         val accessToken: String,
         val refreshToken: String

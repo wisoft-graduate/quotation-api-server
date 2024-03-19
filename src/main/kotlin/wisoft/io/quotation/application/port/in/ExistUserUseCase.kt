@@ -5,7 +5,8 @@ interface ExistUserUseCase {
     fun existUser(id: String, nickname: String): Boolean
 
     data class ExistUserResponse(
-        val data: Data
+        val data: Data,
+        val status: Int
     )
 
     data class Data(
