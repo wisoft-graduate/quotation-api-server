@@ -6,19 +6,24 @@ import wisoft.io.quotation.application.port.`in`.ExistUserUseCase
 import wisoft.io.quotation.application.port.`in`.ResignUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.SignUpUseCase
-import wisoft.io.quotation.application.port.out.FindUserPort
-import wisoft.io.quotation.application.port.out.SaveUserPort
+import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.util.JWTUtil
 
 @Service
 @Transactional(readOnly = true)
-class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort) : SignUpUseCase, SignInUseCase,
+class UserService(
+    val saveUserPort: SaveUserPort,
+    val findUserByIdPort: FindUserByIdPort,
+    val findLeaveUserListCountPort: FindLeaveUserListCountPort,
+    val existUserPort: ExistUserPort,
+    val existUserByNicknamePort: ExistUserByNicknamePort
+) : SignUpUseCase, SignInUseCase,
     ResignUseCase, ExistUserUseCase {
 
     @Transactional
     override fun signUp(request: SignUpUseCase.SignUpRequest): String {
-        val existUser = findUserPort.existUser(request.id)
+        val existUser = existUserPort.existUser(request.id)
         if (existUser) throw RuntimeException()
 
         val user = request.run {
@@ -36,7 +41,7 @@ class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort
 
     @Transactional
     override fun signIn(request: SignInUseCase.SignInRequest): SignInUseCase.UserTokenDto {
-        val user = findUserPort.findByIdOrNull(request.id)
+        val user = findUserByIdPort.findByIdOrNull(request.id)
 
         if (!user.isCorrectPassword(request.password)) {
             throw RuntimeException()
@@ -51,8 +56,8 @@ class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort
 
     @Transactional
     override fun resign(id: String): String {
-        val user = findUserPort.findByIdOrNull(id)
-        val leaveCount = findUserPort.findLeaveUsersCount()
+        val user = findUserByIdPort.findByIdOrNull(id)
+        val leaveCount = findLeaveUserListCountPort.findLeaveUsersCount()
 
         if (!user.isEnrolled()) {
             throw RuntimeException()
@@ -65,10 +70,10 @@ class UserService(val saveUserPort: SaveUserPort, val findUserPort: FindUserPort
 
     override fun existUser(id: String, nickname: String): Boolean {
         if (id.isNotEmpty()) {
-            return findUserPort.existUser(id)
+            return existUserPort.existUser(id)
         }
         if (nickname.isNotEmpty()) {
-            return findUserPort.existUserByNickname(nickname)
+            return existUserByNicknamePort.existUserByNickname(nickname)
         }
         return false
     }
