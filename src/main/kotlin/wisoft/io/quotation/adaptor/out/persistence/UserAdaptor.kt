@@ -7,27 +7,28 @@ import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
 
 @Component
-class UserAdaptor(val userRepository: UserRepository) : SaveUserPort, FindUserByIdPort, FindLeaveUserListCountPort,
-    ExistUserPort, ExistUserByNicknamePort {
+class UserAdaptor(val userRepository: UserRepository) : SaveUserPort, GetUserByIdPort, GetLeaveUserListCountPort,
+    GetExistUserPort, GetExistUserByNicknamePort {
 
     override fun save(user: User): String {
         return userRepository.save(user.to()).id
     }
 
-    override fun findByIdOrNull(id: String): User {
-        val userEntity = userRepository.findByIdOrNull(id) ?: throw RuntimeException()
-        return userEntity.to()
+    override fun getByIdOrNull(id: String): User? {
+        val userEntity = userRepository.findByIdOrNull(id)
+        return userEntity?.to()
     }
 
-    override fun findLeaveUsersCount(): Long {
+    override fun getLeaveUsersCount(): Long {
         return userRepository.countByNicknameStartingWith("leave#")
     }
 
-    override fun existUser(id: String): Boolean {
+    override fun getExistUser(id: String): Boolean {
         return userRepository.existsById(id)
     }
 
-    override fun existUserByNickname(nickname: String): Boolean {
+    override fun getExistUserByNickname(nickname: String): Boolean {
         return userRepository.existsByNickname(nickname)
     }
+
 }

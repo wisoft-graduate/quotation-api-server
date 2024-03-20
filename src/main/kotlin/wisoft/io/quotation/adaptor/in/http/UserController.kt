@@ -11,30 +11,30 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import wisoft.io.quotation.application.port.`in`.ExistUserUseCase
-import wisoft.io.quotation.application.port.`in`.ResignUseCase
+import wisoft.io.quotation.application.port.`in`.GetExistUserUseCase
+import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
-import wisoft.io.quotation.application.port.`in`.SignUpUseCase
+import wisoft.io.quotation.application.port.`in`.CreateUseCase
 
 @RestController
 class UserController(
-    val signUpUseCase: SignUpUseCase,
+    val createUseCase: CreateUseCase,
     val signInUseCase: SignInUseCase,
-    val resignUseCase: ResignUseCase,
-    val existUserUseCase: ExistUserUseCase
+    val deleteUserUseCase: DeleteUserUseCase,
+    val getExistUserUseCase: GetExistUserUseCase
 ) {
 
     @PostMapping("/users")
-    fun signUp(
+    fun create(
         servletRequest: HttpServletRequest,
-        @RequestBody @Valid request: SignUpUseCase.SignUpRequest
-    ): ResponseEntity<SignUpUseCase.SignUpResponse> {
-        val response = signUpUseCase.signUp(request)
+        @RequestBody @Valid request: CreateUseCase.CreateUserRequest
+    ): ResponseEntity<CreateUseCase.CreateUserResponse> {
+        val response = createUseCase.createUser(request)
         val responseUrl = servletRequest.requestURL.append("/").append(response).toString()
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(
-                SignUpUseCase.SignUpResponse(
-                    data = SignUpUseCase.Data(location = responseUrl),
+                CreateUseCase.CreateUserResponse(
+                    data = CreateUseCase.Data(location = responseUrl),
                     status = HttpStatus.CREATED.value()
                 )
             )
@@ -56,31 +56,24 @@ class UserController(
     }
 
     @GetMapping("/users/exist")
-    fun exist(
+    fun getExist(
         @RequestParam("id") id: String,
         @RequestParam("nickname") nickname: String
-    ): ResponseEntity<ExistUserUseCase.ExistUserResponse> {
-        val response = existUserUseCase.existUser(id, nickname)
+    ): ResponseEntity<GetExistUserUseCase.GetExistUserResponse> {
+        val response = getExistUserUseCase.getExistUser(id, nickname)
         return ResponseEntity.status(HttpStatus.OK)
             .body(
-                ExistUserUseCase.ExistUserResponse(
-                    data = ExistUserUseCase.Data(exist = response),
+                GetExistUserUseCase.GetExistUserResponse(
+                    data = GetExistUserUseCase.Data(exist = response),
                     status = HttpStatus.OK.value()
                 )
             )
     }
 
     @DeleteMapping("/users/{id}")
-    fun resign(@PathVariable("id") id: String): ResponseEntity<ResignUseCase.ResignResponse> {
-        val response = resignUseCase.resign(id)
-        // FIXME : NO_CONTENT 는 본문 자체가 없어야 함.
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-            .body(
-                ResignUseCase.ResignResponse(
-                    data = ResignUseCase.Data(id = response),
-                    status = HttpStatus.ACCEPTED.value()
-                )
-            )
+    fun delete(@PathVariable("id") id: String): ResponseEntity<DeleteUserUseCase.DeleteUserResponse> {
+        deleteUserUseCase.deleteUser(id)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
 

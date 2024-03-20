@@ -1,10 +1,10 @@
 package wisoft.io.quotation.application.port.`in`
 
-interface ExistUserUseCase {
+interface GetExistUserUseCase {
 
-    fun existUser(id: String, nickname: String): Boolean
+    fun getExistUser(id: String, nickname: String): Boolean
 
-    data class ExistUserResponse(
+    data class GetExistUserResponse(
         val data: Data,
         val status: Int
     )

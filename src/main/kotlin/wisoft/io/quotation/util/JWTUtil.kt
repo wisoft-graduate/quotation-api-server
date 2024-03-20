@@ -2,13 +2,23 @@ package wisoft.io.quotation.util
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 import wisoft.io.quotation.domain.User
 import java.util.*
 
-object JWTUtil {
-    private const val SECRET_KEY = "8kTcEnj4ABscsjcWVOg06brYjyOwwVwdMB7s1BGwzBQDhmASi"
-    private const val ACCESS_TOKEN_EXPIRATION_TIME = 3600000 // 토큰 만료 시간 (1시간)
-    private const val REFRESH_TOKEN_EXPIRATION_TIME = 604800000 // 토큰 만료 시간 (1주일)
+@Component
+class JWTUtil
+{
+    @Value("\${environment.jwt.secret-key}")
+    lateinit var SECRET_KEY: String
+
+    @Value("\${environment.jwt.access-token-expiration-time}")
+    var ACCESS_TOKEN_EXPIRATION_TIME: Int = 0
+
+    @Value("\${environment.jwt.refresh-token-expiration-time}")
+    var REFRESH_TOKEN_EXPIRATION_TIME: Int = 0
+
 
     fun generateAccessToken(user: User): String {
         val expirationDate = Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME)
