@@ -2,11 +2,11 @@ package wisoft.io.quotation.application.port.`in`
 
 import jakarta.validation.constraints.NotBlank
 
-interface SignUpUseCase {
+interface CreateUseCase {
 
-    fun signUp(request: SignUpRequest): String
+    fun createUser(request: CreateUserRequest): String
     
-    data class SignUpRequest(
+    data class CreateUserRequest(
         @field:NotBlank
         val id: String,
         @field:NotBlank
@@ -19,7 +19,7 @@ interface SignUpUseCase {
         val identityVerificationAnswer: String
     )
 
-    data class SignUpResponse(
+    data class CreateUserResponse(
         val data: Data,
         val status: Int,
     )

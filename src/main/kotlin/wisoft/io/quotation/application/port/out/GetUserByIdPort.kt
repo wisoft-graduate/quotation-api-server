@@ -2,8 +2,8 @@ package wisoft.io.quotation.application.port.out
 
 import wisoft.io.quotation.domain.User
 
-interface FindUserByIdPort {
+interface GetUserByIdPort {
 
-    fun findByIdOrNull(id: String): User
+    fun getByIdOrNull(id: String): User?
 
 }

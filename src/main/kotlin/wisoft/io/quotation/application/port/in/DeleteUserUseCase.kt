@@ -1,10 +1,10 @@
 package wisoft.io.quotation.application.port.`in`
 
-interface ResignUseCase {
+interface DeleteUserUseCase {
 
-    fun resign(id: String): String
+    fun deleteUser(id: String): String
 
-    data class ResignResponse(
+    data class DeleteUserResponse(
         val data: Data,
         val status: Int
     )
