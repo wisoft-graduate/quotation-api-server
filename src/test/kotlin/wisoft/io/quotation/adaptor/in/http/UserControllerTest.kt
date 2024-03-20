@@ -16,7 +16,7 @@ import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.SignUpUseCase
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @ContextConfiguration(classes = [DatabaseContainerConfig::class])
 @Testcontainers
 @AutoConfigureMockMvc
