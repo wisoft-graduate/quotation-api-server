@@ -8,35 +8,49 @@ import wisoft.io.quotation.domain.User
 import java.util.*
 
 @Component
-class JWTUtil
-{
+class JWTUtil {
     @Value("\${environment.jwt.secret-key}")
-    lateinit var SECRET_KEY: String
+    lateinit var secretKey: String
 
     @Value("\${environment.jwt.access-token-expiration-time}")
-    var ACCESS_TOKEN_EXPIRATION_TIME: Int = 0
+    var accessTokenExpirationTime: Int = 0
 
     @Value("\${environment.jwt.refresh-token-expiration-time}")
-    var REFRESH_TOKEN_EXPIRATION_TIME: Int = 0
+    var refreshTokenExpirationTime: Int = 0
 
 
     fun generateAccessToken(user: User): String {
-        val expirationDate = Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME)
+        val expirationDate = Date(System.currentTimeMillis() + accessTokenExpirationTime)
         return Jwts.builder()
             .setSubject(user.nickname)
             .setIssuedAt(Date())
             .setExpiration(expirationDate)
-            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+            .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact()
     }
 
     fun generateRefreshToken(user: User): String {
-        val expirationDate = Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME)
+        val expirationDate = Date(System.currentTimeMillis() + refreshTokenExpirationTime)
         return Jwts.builder()
             .setSubject(user.nickname)
             .setIssuedAt(Date())
             .setExpiration(expirationDate)
-            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+            .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact()
+    }
+
+    fun verifyToken(token: String, currentDate: Date = Date()): Boolean {
+        return try {
+            val claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+            claims.body.expiration.after(currentDate)
+
+        } catch (e: Exception) {
+            println(e)
+            false
+        }
+
     }
 }

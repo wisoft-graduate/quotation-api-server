@@ -15,6 +15,7 @@ import wisoft.io.quotation.application.port.`in`.GetExistUserUseCase
 import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.CreateUseCase
+import wisoft.io.quotation.util.annotation.Authenticated
 
 @RestController
 class UserController(
@@ -71,6 +72,7 @@ class UserController(
     }
 
     @DeleteMapping("/users/{id}")
+    @Authenticated
     fun delete(@PathVariable("id") id: String): ResponseEntity<DeleteUserUseCase.DeleteUserResponse> {
         deleteUserUseCase.deleteUser(id)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
