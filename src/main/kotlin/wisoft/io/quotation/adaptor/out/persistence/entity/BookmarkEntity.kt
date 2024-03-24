@@ -1,9 +1,6 @@
 package wisoft.io.quotation.adaptor.out.persistence.entity
 
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.sql.Timestamp
 import java.util.UUID
 

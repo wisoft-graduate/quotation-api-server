@@ -21,7 +21,7 @@ class QuotationAdaptor(
         return quotationRepository.findByIdOrNull(id)?.toDomain() ?: throw RuntimeException()
     }
 
-    override fun getQuotations(request: GetQuotationsUseCase.GetQuotationRequest): List<Quotation> {
+    override fun getQuotations(request: GetQuotationsUseCase.GetQuotationsRequest): List<Quotation> {
         val result = quotationCustomRepository.findQuotations(request).distinct()
         return result.map { it.toDomain() }
     }
