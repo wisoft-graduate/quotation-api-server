@@ -15,7 +15,7 @@ class QuotationService(
 ) : GetQuotationsUseCase,
     GetQuotationUseCase {
 
-    override fun getQuotations(request: GetQuotationsUseCase.GetQuotationRequest): List<Quotation> {
+    override fun getQuotations(request: GetQuotationsUseCase.GetQuotationsRequest): List<Quotation> {
         return getQuotationsPort.getQuotations(request)
     }
 

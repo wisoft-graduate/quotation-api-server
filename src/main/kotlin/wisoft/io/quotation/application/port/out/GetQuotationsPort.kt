@@ -5,6 +5,6 @@ import wisoft.io.quotation.domain.Quotation
 
 interface GetQuotationsPort {
 
-    fun getQuotations(request: GetQuotationsUseCase.GetQuotationRequest): List<Quotation>
+    fun getQuotations(request: GetQuotationsUseCase.GetQuotationsRequest): List<Quotation>
 
 }

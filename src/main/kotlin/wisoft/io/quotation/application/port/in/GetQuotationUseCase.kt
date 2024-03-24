@@ -8,10 +8,7 @@ interface GetQuotationUseCase {
     fun getQuotation(id: UUID): Quotation
 
     data class GetQuotationResponse(
-        val data: Data
+        val data: Quotation
     )
 
-    data class Data(
-        val quotation: Quotation
-    )
 }
