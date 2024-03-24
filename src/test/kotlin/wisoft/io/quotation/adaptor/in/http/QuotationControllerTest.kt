@@ -68,12 +68,12 @@ class QuotationControllerTest(
         }
     }
 
-    context("getQuotations Test") {
-        test("getQuotations 성공") {
+    context("getQuotationList Test") {
+        test("getQuotationList 성공") {
             // given
             val author = authorRepository.save(getAuthorEntityFixture())
             val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
-            val request = GetQuotationsUseCase.GetQuotationsRequest(
+            val request = GetQuotationsUseCase.GetQuotationListRequest(
                 searchWord = quotation.content,
                 sortTarget = QuotationSortTarget.LIKE,
                 sortDirection = SortDirection.ASC,
@@ -98,7 +98,7 @@ class QuotationControllerTest(
             // then
             val actual = objectMapper.readValue(
                 result,
-                GetQuotationsUseCase.GetQuotationsResponse::class.java
+                GetQuotationsUseCase.GetQuotationListResponse::class.java
             ).data.quotations.first()
 
             actual.id shouldBe quotation.id
