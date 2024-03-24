@@ -21,7 +21,7 @@ class QuotationService(
         return runCatching {
             getQuotationsPort.getQuotationList(request)
         }.onFailure {
-            logger.error { "getQuotationList fail: request[$request]" }
+            logger.error { "getQuotationList fail: param[$request]" }
         }.getOrThrow()
     }
 
@@ -30,7 +30,7 @@ class QuotationService(
             // TODO ExceptionHandler pr 이후 다른 티켓에서 작업
             getQuotationPort.getQuotation(id) ?: throw RuntimeException()
         }.onFailure {
-            logger.error { "getQuotation fail: request[id: $id]" }
+            logger.error { "getQuotation fail: param[id: $id]" }
         }.getOrThrow()
     }
 }
