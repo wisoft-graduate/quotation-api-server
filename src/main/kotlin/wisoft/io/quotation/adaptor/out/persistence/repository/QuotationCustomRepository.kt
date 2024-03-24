@@ -13,7 +13,7 @@ class QuotationCustomRepository(
     private val entityManager: EntityManager
 ) {
 
-    fun findQuotations(request: GetQuotationsUseCase.GetQuotationsRequest): List<QuotationEntity> {
+    fun findQuotationList(request: GetQuotationsUseCase.GetQuotationListRequest): List<QuotationEntity> {
         val parameterMap = mutableMapOf<String, Any>()
         val sql = buildString {
             append("SELECT q.* FROM quotation q, author a WHERE q.author_id = a.id ")

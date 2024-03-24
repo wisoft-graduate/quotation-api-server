@@ -1,5 +1,6 @@
 package wisoft.io.quotation.application.service
 
+import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import wisoft.io.quotation.application.port.`in`.GetQuotationUseCase
 import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
@@ -15,11 +16,21 @@ class QuotationService(
 ) : GetQuotationsUseCase,
     GetQuotationUseCase {
 
-    override fun getQuotations(request: GetQuotationsUseCase.GetQuotationsRequest): List<Quotation> {
-        return getQuotationsPort.getQuotations(request)
+    val logger = KotlinLogging.logger {}
+    override fun getQuotationList(request: GetQuotationsUseCase.GetQuotationListRequest): List<Quotation> {
+        return runCatching {
+            getQuotationsPort.getQuotationList(request)
+        }.onFailure {
+            logger.error { "getQuotationList fail: request[$request]" }
+        }.getOrThrow()
     }
 
     override fun getQuotation(id: UUID): Quotation {
-        return getQuotationPort.getQuotation(id)
+        return runCatching {
+            // TODO ExceptionHandler pr 이후 다른 티켓에서 작업
+            getQuotationPort.getQuotation(id) ?: throw RuntimeException()
+        }.onFailure {
+            logger.error { "getQuotation fail: request[id: $id]" }
+        }.getOrThrow()
     }
 }

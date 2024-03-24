@@ -17,12 +17,12 @@ class QuotationAdaptor(
 ) : GetQuotationsPort,
     GetQuotationPort {
 
-    override fun getQuotation(id: UUID): Quotation {
-        return quotationRepository.findByIdOrNull(id)?.toDomain() ?: throw RuntimeException()
+    override fun getQuotation(id: UUID): Quotation? {
+        return quotationRepository.findByIdOrNull(id)?.toDomain()
     }
 
-    override fun getQuotations(request: GetQuotationsUseCase.GetQuotationsRequest): List<Quotation> {
-        val result = quotationCustomRepository.findQuotations(request).distinct()
+    override fun getQuotationList(request: GetQuotationsUseCase.GetQuotationListRequest): List<Quotation> {
+        val result = quotationCustomRepository.findQuotationList(request).distinct()
         return result.map { it.toDomain() }
     }
 

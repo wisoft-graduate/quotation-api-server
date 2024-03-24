@@ -18,15 +18,15 @@ class QuotationController(
 ) {
 
     @GetMapping
-    fun getQuotations(
+    fun getQuotationList(
         @RequestParam searchWord: String?,
         @RequestParam sortTarget: QuotationSortTarget?,
         @RequestParam sortDirection: SortDirection?,
         @ModelAttribute paging: Paging?,
         @RequestParam ids: List<UUID>?
-    ): ResponseEntity<GetQuotationsUseCase.GetQuotationsResponse> {
-        val response = getQuotationsUseCase.getQuotations(
-            GetQuotationsUseCase.GetQuotationsRequest(
+    ): ResponseEntity<GetQuotationsUseCase.GetQuotationListResponse> {
+        val response = getQuotationsUseCase.getQuotationList(
+            GetQuotationsUseCase.GetQuotationListRequest(
                 searchWord = searchWord,
                 sortTarget = sortTarget,
                 sortDirection = sortDirection,
@@ -35,7 +35,7 @@ class QuotationController(
             )
         )
         return ResponseEntity.status(HttpStatus.OK)
-            .body(GetQuotationsUseCase.GetQuotationsResponse(data = GetQuotationsUseCase.Data(quotations = response)))
+            .body(GetQuotationsUseCase.GetQuotationListResponse(data = GetQuotationsUseCase.Data(quotations = response)))
     }
 
     @GetMapping("/{id}")
