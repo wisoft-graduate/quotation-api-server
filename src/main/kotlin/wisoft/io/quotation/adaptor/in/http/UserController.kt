@@ -1,6 +1,5 @@
 package wisoft.io.quotation.adaptor.`in`.http
 
-import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,15 +25,13 @@ class UserController(
 
     @PostMapping("/users")
     fun createUser(
-        servletRequest: HttpServletRequest,
         @RequestBody @Valid request: CreateUserUseCase.CreateUserRequest
     ): ResponseEntity<CreateUserUseCase.CreateUserResponse> {
         val response = createUserUseCase.createUser(request)
-        val responseUrl = servletRequest.requestURL.append("/").append(response).toString()
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(
                 CreateUserUseCase.CreateUserResponse(
-                    data = CreateUserUseCase.Data(location = responseUrl),
+                    data = CreateUserUseCase.Data(id = response),
                 )
             )
     }
@@ -68,11 +65,10 @@ class UserController(
     }
 
     @DeleteMapping("/users/{id}")
-    fun deleteUser(@PathVariable("id") id: String): ResponseEntity<DeleteUserUseCase.DeleteUserResponse> {
+    fun deleteUser(@PathVariable("id") id: String): ResponseEntity<DeleteUserUseCase> {
         deleteUserUseCase.deleteUser(id)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
-
 
 
 }

@@ -24,7 +24,7 @@ interface CreateUserUseCase {
     )
 
     data class Data(
-        val location: String
+        val id: String
     )
 
 }
