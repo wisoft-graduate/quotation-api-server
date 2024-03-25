@@ -6,7 +6,6 @@ interface DeleteUserUseCase {
 
     data class DeleteUserResponse(
         val data: Data,
-        val status: Int
     )
 
     data class Data(

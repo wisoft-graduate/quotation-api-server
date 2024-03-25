@@ -6,7 +6,6 @@ interface GetExistUserUseCase {
 
     data class GetExistUserResponse(
         val data: Data,
-        val status: Int
     )
 
     data class Data(

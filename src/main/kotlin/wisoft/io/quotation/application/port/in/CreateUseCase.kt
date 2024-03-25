@@ -21,7 +21,6 @@ interface CreateUseCase {
 
     data class CreateUserResponse(
         val data: Data,
-        val status: Int,
     )
 
     data class Data(

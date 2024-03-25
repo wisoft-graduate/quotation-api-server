@@ -15,7 +15,6 @@ interface SignInUseCase {
 
     data class SignInResponse(
         val data: UserTokenDto,
-        val status: Int
     )
 
     data class UserTokenDto(

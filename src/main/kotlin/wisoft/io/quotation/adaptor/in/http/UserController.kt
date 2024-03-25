@@ -35,7 +35,6 @@ class UserController(
             .body(
                 CreateUseCase.CreateUserResponse(
                     data = CreateUseCase.Data(location = responseUrl),
-                    status = HttpStatus.CREATED.value()
                 )
             )
     }
@@ -50,7 +49,6 @@ class UserController(
                         accessToken = response.accessToken,
                         refreshToken = response.refreshToken
                     ),
-                    status = HttpStatus.OK.value()
                 )
             )
     }
@@ -65,7 +63,6 @@ class UserController(
             .body(
                 GetExistUserUseCase.GetExistUserResponse(
                     data = GetExistUserUseCase.Data(exist = response),
-                    status = HttpStatus.OK.value()
                 )
             )
     }
