@@ -14,27 +14,27 @@ import org.springframework.web.bind.annotation.RestController
 import wisoft.io.quotation.application.port.`in`.GetExistUserUseCase
 import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
-import wisoft.io.quotation.application.port.`in`.CreateUseCase
+import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
 
 @RestController
 class UserController(
-    val createUseCase: CreateUseCase,
+    val createUserUseCase: CreateUserUseCase,
     val signInUseCase: SignInUseCase,
     val deleteUserUseCase: DeleteUserUseCase,
     val getExistUserUseCase: GetExistUserUseCase
 ) {
 
     @PostMapping("/users")
-    fun create(
+    fun createUser(
         servletRequest: HttpServletRequest,
-        @RequestBody @Valid request: CreateUseCase.CreateUserRequest
-    ): ResponseEntity<CreateUseCase.CreateUserResponse> {
-        val response = createUseCase.createUser(request)
+        @RequestBody @Valid request: CreateUserUseCase.CreateUserRequest
+    ): ResponseEntity<CreateUserUseCase.CreateUserResponse> {
+        val response = createUserUseCase.createUser(request)
         val responseUrl = servletRequest.requestURL.append("/").append(response).toString()
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(
-                CreateUseCase.CreateUserResponse(
-                    data = CreateUseCase.Data(location = responseUrl),
+                CreateUserUseCase.CreateUserResponse(
+                    data = CreateUserUseCase.Data(location = responseUrl),
                 )
             )
     }
@@ -54,7 +54,7 @@ class UserController(
     }
 
     @GetMapping("/users/exist")
-    fun getExist(
+    fun getExistUser(
         @RequestParam("id") id: String,
         @RequestParam("nickname") nickname: String
     ): ResponseEntity<GetExistUserUseCase.GetExistUserResponse> {
@@ -68,7 +68,7 @@ class UserController(
     }
 
     @DeleteMapping("/users/{id}")
-    fun delete(@PathVariable("id") id: String): ResponseEntity<DeleteUserUseCase.DeleteUserResponse> {
+    fun deleteUser(@PathVariable("id") id: String): ResponseEntity<DeleteUserUseCase.DeleteUserResponse> {
         deleteUserUseCase.deleteUser(id)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }

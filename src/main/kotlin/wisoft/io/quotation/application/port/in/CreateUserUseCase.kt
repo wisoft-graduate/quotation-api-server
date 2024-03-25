@@ -2,7 +2,7 @@ package wisoft.io.quotation.application.port.`in`
 
 import jakarta.validation.constraints.NotBlank
 
-interface CreateUseCase {
+interface CreateUserUseCase {
 
     fun createUser(request: CreateUserRequest): String
     

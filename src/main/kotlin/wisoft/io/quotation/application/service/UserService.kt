@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import wisoft.io.quotation.application.port.`in`.GetExistUserUseCase
 import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
-import wisoft.io.quotation.application.port.`in`.CreateUseCase
+import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.util.JWTUtil
@@ -19,11 +19,11 @@ class UserService(
     val getLeaveUserListCountPort: GetLeaveUserListCountPort,
     val getExistUserPort: GetExistUserPort,
     val getExistUserByNicknamePort: GetExistUserByNicknamePort
-) : CreateUseCase, SignInUseCase,
+) : CreateUserUseCase, SignInUseCase,
     DeleteUserUseCase, GetExistUserUseCase {
 
     @Transactional
-    override fun createUser(request: CreateUseCase.CreateUserRequest): String {
+    override fun createUser(request: CreateUserUseCase.CreateUserRequest): String {
         val existUserById = getExistUserPort.getExistUser(request.id)
         val existUserByNickname = getExistUserByNicknamePort.getExistUserByNickname((request.nickname))
         if (existUserById || existUserByNickname) throw RuntimeException()
