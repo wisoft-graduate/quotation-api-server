@@ -5,12 +5,12 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import wisoft.io.quotation.application.port.`in`.GetExistUserUseCase
+import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
 import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
@@ -20,7 +20,7 @@ class UserController(
     val createUserUseCase: CreateUserUseCase,
     val signInUseCase: SignInUseCase,
     val deleteUserUseCase: DeleteUserUseCase,
-    val getExistUserUseCase: GetExistUserUseCase
+    val getUserListUseCase: GetUserListUseCase
 ) {
 
     @PostMapping("/users")
@@ -50,16 +50,15 @@ class UserController(
             )
     }
 
-    @GetMapping("/users/exist")
-    fun getExistUser(
-        @RequestParam("id") id: String,
-        @RequestParam("nickname") nickname: String
-    ): ResponseEntity<GetExistUserUseCase.GetExistUserResponse> {
-        val response = getExistUserUseCase.getExistUser(id, nickname)
+    @GetMapping("/users")
+    fun getUserList(
+        @ModelAttribute request: GetUserListUseCase.GetUserListRequest
+    ): ResponseEntity<GetUserListUseCase.GetUserListResponse> {
+        val response = getUserListUseCase.getUserList(request)
         return ResponseEntity.status(HttpStatus.OK)
             .body(
-                GetExistUserUseCase.GetExistUserResponse(
-                    data = GetExistUserUseCase.Data(exist = response),
+                GetUserListUseCase.GetUserListResponse(
+                    data = response,
                 )
             )
     }

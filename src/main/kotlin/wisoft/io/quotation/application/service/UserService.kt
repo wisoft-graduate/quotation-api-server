@@ -2,13 +2,14 @@ package wisoft.io.quotation.application.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import wisoft.io.quotation.application.port.`in`.GetExistUserUseCase
+import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
 import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.util.JWTUtil
+import java.util.LinkedList
 
 @Service
 @Transactional(readOnly = true)
@@ -17,16 +18,23 @@ class UserService(
     val saveUserPort: SaveUserPort,
     val getUserByIdPort: GetUserByIdPort,
     val getLeaveUserListCountPort: GetLeaveUserListCountPort,
-    val getExistUserPort: GetExistUserPort,
-    val getExistUserByNicknamePort: GetExistUserByNicknamePort
+    val getUserListPort: GetUserListPort,
 ) : CreateUserUseCase, SignInUseCase,
-    DeleteUserUseCase, GetExistUserUseCase {
+    DeleteUserUseCase, GetUserListUseCase {
 
     @Transactional
     override fun createUser(request: CreateUserUseCase.CreateUserRequest): String {
-        val existUserById = getExistUserPort.getExistUser(request.id)
-        val existUserByNickname = getExistUserByNicknamePort.getExistUserByNickname((request.nickname))
-        if (existUserById || existUserByNickname) throw RuntimeException()
+        val ids = LinkedList<String>()
+        ids.push(request.id)
+        val nicknameList = LinkedList<String>()
+        nicknameList.push(request.nickname)
+
+        val idsRequest = GetUserListUseCase.GetUserListRequest(ids = ids, nicknameList = null)
+        val nicknameListRequest = GetUserListUseCase.GetUserListRequest(ids = null, nicknameList = nicknameList)
+
+        val getUserById = getUserListPort.getUserList(idsRequest)
+        val getUserByNickname = getUserListPort.getUserList(nicknameListRequest)
+        if (getUserById.isNotEmpty() || getUserByNickname.isNotEmpty()) throw RuntimeException()
 
         val user = request.run {
             User(
@@ -70,13 +78,10 @@ class UserService(
         return saveUserPort.save(user)
     }
 
-    override fun getExistUser(id: String, nickname: String): Boolean {
-        if (id.isNotEmpty()) {
-            return getExistUserPort.getExistUser(id)
+    override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
+        val userList = getUserListPort.getUserList(request)
+        return userList.map {
+            GetUserListUseCase.UserDto(it.id, it.nickname)
         }
-        if (nickname.isNotEmpty()) {
-            return getExistUserByNicknamePort.getExistUserByNickname(nickname)
-        }
-        return false
     }
 }
