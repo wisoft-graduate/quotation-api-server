@@ -12,7 +12,7 @@ import wisoft.io.quotation.domain.User
 class UserAdaptor(
     val userRepository: UserRepository,
     val userCustomRepository: UserCustomRepository
-) : SaveUserPort, GetUserByIdPort, GetLeaveUserListCountPort,
+) : SaveUserPort, GetUserByIdPort,
     GetUserListPort {
 
     override fun save(user: User): String {
@@ -22,10 +22,6 @@ class UserAdaptor(
     override fun getByIdOrNull(id: String): User? {
         val userEntity = userRepository.findByIdOrNull(id)
         return userEntity?.to()
-    }
-
-    override fun getLeaveUsersCount(): Long {
-        return userRepository.countByNicknameStartingWith("leave#")
     }
 
     override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<User> {

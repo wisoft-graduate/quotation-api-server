@@ -12,17 +12,24 @@ class UserCustomRepository(
     private val entityManager: EntityManager
 ) {
 
-    fun getUserList(request: GetUserListUseCase.GetUserListRequest):List<UserEntity> {
+    fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<UserEntity> {
         val parameterMap = mutableMapOf<String, Any>()
+        var andCount = 0;
         val sql = buildString {
             append("SELECT * FROM account ")
 
             request.ids?.run {
-                append("AND id IN :ids ")
+                append("WHERE id IN :ids ")
                 parameterMap.put("ids", this)
+                andCount += 1
             }
             request.nicknameList?.run {
-                append("AND nickname IN :nicknameList")
+                if (andCount.equals(0)) {
+                    append("WHERE nickname IN :nicknameList ")
+                } else {
+                    append("AND nickname IN :nicknameList ")
+                    andCount += 1
+                }
                 parameterMap.put("nicknameList", this)
             }
         }
@@ -30,7 +37,7 @@ class UserCustomRepository(
         return entityManager
             .createNativeQuery(sql, UserEntity::class.java)
             .apply {
-                parameterMap.forEach{
+                parameterMap.forEach {
                     setParameter(it.key, it.value)
                 }
             }

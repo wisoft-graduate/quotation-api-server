@@ -69,7 +69,7 @@ data class User(
         return !this.nickname.startsWith("leaved#")
     }
 
-    fun resign(count: Number) {
-        this.nickname = "leaved#$count"
+    fun resign(identifier: String) {
+        this.nickname = "leaved#$identifier"
     }
 }

@@ -54,6 +54,7 @@ class UserController(
     fun getUserList(
         @ModelAttribute request: GetUserListUseCase.GetUserListRequest
     ): ResponseEntity<GetUserListUseCase.GetUserListResponse> {
+        println("request: $request")
         val response = getUserListUseCase.getUserList(request)
         return ResponseEntity.status(HttpStatus.OK)
             .body(
