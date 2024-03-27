@@ -17,7 +17,7 @@ data class ErrorMessage(
         fun from(httpStatus: HttpStatus, exception: Throwable, request: HttpServletRequest): ErrorMessage {
             return ErrorMessage(
                 status = httpStatus.value(),
-                error = httpStatus.name,
+                error = httpStatus.reasonPhrase,
                 path = request.requestURI,
                 message = when (exception) {
                     is MethodArgumentNotValidException -> {

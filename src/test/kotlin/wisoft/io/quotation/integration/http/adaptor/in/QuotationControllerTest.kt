@@ -73,8 +73,7 @@ class QuotationControllerTest(
 
         test("getQuotation 실패") {
             // given
-            val status = NOT_FOUND.value()
-            val error = NOT_FOUND.name
+            val status = HttpMessage.HTTP_404.status
             val id = UUID.randomUUID()
             val path = "/quotations/$id"
 
@@ -88,8 +87,8 @@ class QuotationControllerTest(
 
             // then
             val actual = objectMapper.readValue(result, ErrorMessage::class.java)
-            actual.status shouldBe status
-            actual.error shouldBe error
+            actual.status shouldBe status.value()
+            actual.error shouldBe status.reasonPhrase
             actual.path shouldBe path
             actual.message shouldBe id.toString() + HttpMessage.HTTP_404.message
         }

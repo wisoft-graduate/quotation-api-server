@@ -1,9 +1,6 @@
 package wisoft.io.quotation.adaptor.`in`.http
 
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.MediaType.APPLICATION_JSON_UTF8
-import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import wisoft.io.quotation.application.port.`in`.GetQuotationUseCase
