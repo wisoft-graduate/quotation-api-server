@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("io.github.microutils:kotlin-logging:3.0.5")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.8.1")
     testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")

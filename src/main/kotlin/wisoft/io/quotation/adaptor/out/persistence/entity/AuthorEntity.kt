@@ -4,6 +4,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.UUID
 
 
@@ -21,6 +22,6 @@ data class AuthorEntity(
     val id: UUID = UUID.randomUUID(),
     val name: String,
     val countryCode: String,
-    val createdTime: Timestamp,
+    val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
 )
