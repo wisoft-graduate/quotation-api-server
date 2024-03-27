@@ -1,8 +1,11 @@
 package wisoft.io.quotation.adaptor.out.persistence.entity
 
+import io.hypersistence.utils.hibernate.type.array.TimestampArrayType
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.Type
 import wisoft.io.quotation.domain.User
 import java.sql.Timestamp
 
@@ -34,7 +37,9 @@ data class UserEntity(
     val favoriteAuthor: String? = null,
     val commentAlarm: Boolean,
     val quotationAlarm: Boolean,
-//    val quotationAlarmTimes: List<Timestamp> = emptyList(),
+    @Type(value = TimestampArrayType::class)
+    @Column(columnDefinition = "timestamp[]")
+    val quotationAlarmTimes: List<Timestamp> = emptyList(),
     val createdTime: Timestamp,
     val lastModifiedTime: Timestamp? = null,
     val identityVerificationQuestion: String,
@@ -51,7 +56,7 @@ data class UserEntity(
                 favoriteQuotation = user.favoriteQuotation,
                 commentAlarm = user.commentAlarm,
                 quotationAlarm = user.quotationAlarm,
-//                quotationAlarmTimes = user.quotationAlarmTimes,
+                quotationAlarmTimes = user.quotationAlarmTimes,
                 createdTime = user.createdTime,
                 lastModifiedTime = user.lastModifiedTime,
                 identityVerificationQuestion = user.identityVerificationQuestion,
