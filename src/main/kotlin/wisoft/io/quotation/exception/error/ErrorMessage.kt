@@ -3,18 +3,18 @@ package wisoft.io.quotation.exception.error
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.MethodArgumentNotValidException
-import java.lang.Exception
+import java.sql.Timestamp
 import java.time.LocalDateTime
 
 data class ErrorMessage(
-    val timestamp: LocalDateTime = LocalDateTime.now(),
+    val timestamp: Timestamp = Timestamp(LocalDateTime.now().second.toLong()),
     val status: Int,
     val error: String,
     val path: String,
     var message: String
 ) {
     companion object {
-        fun from(httpStatus: HttpStatus, exception: Exception, request: HttpServletRequest): ErrorMessage {
+        fun from(httpStatus: HttpStatus, exception: Throwable, request: HttpServletRequest): ErrorMessage {
             return ErrorMessage(
                 status = httpStatus.value(),
                 error = httpStatus.name,
