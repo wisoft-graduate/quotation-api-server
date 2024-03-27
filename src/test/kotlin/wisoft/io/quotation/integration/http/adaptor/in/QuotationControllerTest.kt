@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
@@ -21,8 +22,11 @@ import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection
+import wisoft.io.quotation.exception.error.ErrorMessage
+import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
+import java.util.*
 
 @SpringBootTest
 @ContextConfiguration(classes = [DatabaseContainerConfig::class])
@@ -65,6 +69,29 @@ class QuotationControllerTest(
             actual.shareCount shouldBe quotation.shareCount
             actual.commentCount shouldBe quotation.commentCount
             actual.backgroundImagePath shouldBe quotation.backgroundImagePath
+        }
+
+        test("getQuotation 실패") {
+            // given
+            val status = NOT_FOUND.value()
+            val error = NOT_FOUND.name
+            val id = UUID.randomUUID()
+            val path = "/quotations/$id"
+
+            // when
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.get(path)
+            )
+                .andExpect(MockMvcResultMatchers.status().isNotFound)
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, ErrorMessage::class.java)
+            actual.status shouldBe status
+            actual.error shouldBe error
+            actual.path shouldBe path
+            actual.message shouldBe id.toString() + HttpMessage.HTTP_404.message
         }
     }
 

@@ -7,6 +7,7 @@ import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
 import wisoft.io.quotation.application.port.out.GetQuotationPort
 import wisoft.io.quotation.application.port.out.GetQuotationsPort
 import wisoft.io.quotation.domain.Quotation
+import wisoft.io.quotation.exception.error.QuotationNotFoundException
 import java.util.*
 
 @Service
@@ -27,8 +28,8 @@ class QuotationService(
 
     override fun getQuotation(id: UUID): Quotation {
         return runCatching {
-            // TODO ExceptionHandler pr 이후 다른 티켓에서 작업
-            getQuotationPort.getQuotation(id) ?: throw RuntimeException()
+            getQuotationPort.getQuotation(id)
+                ?: throw QuotationNotFoundException(id.toString())
         }.onFailure {
             logger.error { "getQuotation fail: param[id: $id]" }
         }.getOrThrow()

@@ -1,5 +1,10 @@
 server:
   port: 8888
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   application:
@@ -20,4 +25,5 @@ spring:
         show_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
+
 
