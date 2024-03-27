@@ -1,6 +1,8 @@
 package wisoft.io.quotation.adaptor.out.persistence.entity
 
+import io.hypersistence.utils.hibernate.type.array.UUIDArrayType
 import jakarta.persistence.*
+import org.hibernate.annotations.Type
 import java.sql.Timestamp
 import java.util.UUID
 
@@ -21,7 +23,9 @@ data class BookmarkEntity(
     val id: UUID = UUID.randomUUID(),
     val name: String,
     val userId: String,
-//    val quotationsIds: List<UUID> = emptyList(),
+    @Type(value = UUIDArrayType::class)
+    @Column(columnDefinition = "uuid[]")
+    val quotationsIds: List<UUID> = emptyList(),
     val visibility: Boolean,
     val icon: String? = null,
     val createdTime: Timestamp,
