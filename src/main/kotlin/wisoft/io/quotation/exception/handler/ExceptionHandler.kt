@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity.BodyBuilder
+import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.ErrorMessage
 import wisoft.io.quotation.exception.error.QuotationNotFoundException
 import wisoft.io.quotation.exception.error.http.HttpMessage
@@ -20,9 +21,9 @@ class ExceptionHandler {
     fun methodArgumentNotValidExceptionHandler(
         e: MethodArgumentNotValidException,
         request: HttpServletRequest
-    ): ResponseEntity<ErrorMessage> {
+    ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_400.status
-        val errorMessage = ErrorMessage.from(status, e, request)
+        val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
 
         return ResponseEntity
             .status(status)
@@ -33,9 +34,9 @@ class ExceptionHandler {
     fun quotationNotFoundExceptionHandler(
         e: QuotationNotFoundException,
         request: HttpServletRequest
-    ): ResponseEntity<ErrorMessage> {
+    ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_404.status
-        val errorMessage = ErrorMessage.from(status, e, request)
+        val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
 
         return ResponseEntity
             .status(status)
