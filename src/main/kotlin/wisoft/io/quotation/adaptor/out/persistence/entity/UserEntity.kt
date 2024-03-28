@@ -40,23 +40,21 @@ data class UserEntity(
     val identityVerificationQuestion: String,
     val identityVerificationAnswer: String
 ) {
-    companion object {
-        fun from(user: User): UserEntity {
-            return UserEntity(
-                id = user.id,
-                password = user.password,
-                nickname = user.nickname,
-                profilePath = user.profilePath,
-                favoriteAuthor = user.favoriteAuthor,
-                favoriteQuotation = user.favoriteQuotation,
-                commentAlarm = user.commentAlarm,
-                quotationAlarm = user.quotationAlarm,
-//                quotationAlarmTimes = user.quotationAlarmTimes,
-                createdTime = user.createdTime,
-                lastModifiedTime = user.lastModifiedTime,
-                identityVerificationQuestion = user.identityVerificationQuestion,
-                identityVerificationAnswer = user.identityVerificationAnswer,
-            )
-        }
+    fun to(): User {
+        return User(
+            id = this.id,
+            password = this.password,
+            nickname = this.nickname,
+            profilePath = this.profilePath,
+            favoriteAuthor = this.favoriteAuthor,
+            favoriteQuotation = this.favoriteQuotation,
+            commentAlarm = this.commentAlarm,
+            quotationAlarm = this.quotationAlarm,
+//                quotationAlarmTimes = this.quotationAlarmTimes,
+            createdTime = this.createdTime,
+            lastModifiedTime = this.lastModifiedTime,
+            identityVerificationQuestion = this.identityVerificationQuestion,
+            identityVerificationAnswer = this.identityVerificationAnswer,
+        )
     }
 }

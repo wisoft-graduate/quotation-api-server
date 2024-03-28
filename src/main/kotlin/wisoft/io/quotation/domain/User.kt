@@ -2,6 +2,7 @@ package wisoft.io.quotation.domain
 
 import jakarta.persistence.Id
 import org.mindrot.jbcrypt.BCrypt
+import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
@@ -26,7 +27,7 @@ data class User(
     @Id
     val id: String,
     var password: String = "",
-    val nickname: String,
+    var nickname: String,
     val profilePath: String? = null,
     val favoriteQuotation: String? = null,
     val favoriteAuthor: String? = null,
@@ -38,7 +39,37 @@ data class User(
     val identityVerificationQuestion: String,
     val identityVerificationAnswer: String
 ) {
+    fun to(): UserEntity {
+        return UserEntity(
+            id = this.id,
+            password = this.password,
+            nickname = this.nickname,
+            profilePath = this.profilePath,
+            favoriteAuthor = this.favoriteAuthor,
+            favoriteQuotation = this.favoriteQuotation,
+            commentAlarm = this.commentAlarm,
+            quotationAlarm = this.quotationAlarm,
+//                quotationAlarmTimes = this.quotationAlarmTimes,
+            createdTime = this.createdTime,
+            lastModifiedTime = this.lastModifiedTime,
+            identityVerificationQuestion = this.identityVerificationQuestion,
+            identityVerificationAnswer = this.identityVerificationAnswer,
+        )
+    }
+
     fun encryptPassword(password: String) {
         this.password = BCrypt.hashpw(password, BCrypt.gensalt())
+    }
+
+    fun isCorrectPassword(inputPassword: String): Boolean {
+        return BCrypt.checkpw(inputPassword, this.password)
+    }
+
+    fun isEnrolled(): Boolean {
+        return !this.nickname.startsWith("leaved#")
+    }
+
+    fun resign(identifier: String) {
+        this.nickname = "leaved#$identifier"
     }
 }
