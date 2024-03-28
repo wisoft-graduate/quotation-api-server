@@ -9,9 +9,9 @@ import java.util.UUID
 
 interface GetQuotationsUseCase {
 
-    fun getQuotations(request: GetQuotationRequest): List<Quotation>
+    fun getQuotationList(request: GetQuotationListRequest): List<Quotation>
 
-    data class GetQuotationRequest(
+    data class GetQuotationListRequest(
         val searchWord: String?,
         val sortTarget: QuotationSortTarget?,
         val sortDirection: SortDirection?,
@@ -19,7 +19,7 @@ interface GetQuotationsUseCase {
         val ids: List<UUID>?
     )
 
-    data class GetQuotationResponse(
+    data class GetQuotationListResponse(
         val data: Data
     )
 

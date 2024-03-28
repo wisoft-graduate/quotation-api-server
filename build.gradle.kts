@@ -31,6 +31,8 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
     runtimeOnly("org.postgresql:postgresql")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.8.1")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")

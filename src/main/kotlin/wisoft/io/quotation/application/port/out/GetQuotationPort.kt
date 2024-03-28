@@ -5,5 +5,5 @@ import java.util.UUID
 
 interface GetQuotationPort {
 
-    fun getQuotation(id: UUID): Quotation
+    fun getQuotation(id: UUID): Quotation?
 }

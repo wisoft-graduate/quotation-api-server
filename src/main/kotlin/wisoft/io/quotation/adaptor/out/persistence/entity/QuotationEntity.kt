@@ -5,6 +5,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 import wisoft.io.quotation.domain.Quotation
 import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.UUID
 
 /**
@@ -29,7 +30,7 @@ data class QuotationEntity(
     val shareCount: Long,
     val commentCount: Long,
     val backgroundImagePath: String,
-    val createdTime: Timestamp,
+    val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
 ) {
     fun toDomain(): Quotation {
