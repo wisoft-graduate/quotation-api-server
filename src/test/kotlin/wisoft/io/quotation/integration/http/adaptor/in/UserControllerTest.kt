@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
-import wisoft.io.quotation.application.port.`in`.SignUpUseCase
+import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
 
 @SpringBootTest
 @ContextConfiguration(classes = [DatabaseContainerConfig::class])
@@ -31,7 +31,7 @@ class UserControllerTest(val mockMvc: MockMvc, val repository: UserRepository) :
     context("signUp Test") {
         test("signUp 성공") {
             // given
-            val request = SignUpUseCase.SignUpRequest(
+            val request = CreateUserUseCase.CreateUserRequest(
                 id = "user123",
                 password = "password",
                 nickname = "nickname",
@@ -50,7 +50,7 @@ class UserControllerTest(val mockMvc: MockMvc, val repository: UserRepository) :
                 .response.contentAsString
 
             // then
-            val actual = objectMapper.readValue(result, SignUpUseCase.SignUpResponse::class.java)
+            val actual = objectMapper.readValue(result, CreateUserUseCase.CreateUserResponse::class.java)
             actual.data.id shouldBe request.id
         }
     }
