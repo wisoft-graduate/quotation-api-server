@@ -12,7 +12,11 @@ interface GetUserListUseCase {
     )
 
     data class GetUserListResponse(
-        val data: List<UserDto>,
+        val data: Data,
+    )
+
+    data class Data(
+        val users: List<UserDto>
     )
 
     data class UserDto(

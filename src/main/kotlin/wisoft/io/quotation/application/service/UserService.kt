@@ -34,7 +34,9 @@ class UserService(
         return runCatching {
             val getUserById = getUserListByIdPort.getUserListById(request.id)
             val getUserByNickname = getUserListByNicknamePort.getUserListByNickname(request.nickname);
-            if (getUserById.isNotEmpty() || getUserByNickname.isNotEmpty()) throw UserDuplicateException(request.toString())
+            if (getUserById.isNotEmpty() || getUserByNickname.isNotEmpty()) {
+                throw UserDuplicateException("id: ${request.id}, nickname: ${request.nickname}")
+            }
 
             val user = request.run {
                 User(
@@ -98,6 +100,7 @@ class UserService(
                 request.id?.isNotEmpty() == true && request.nickname?.isNotEmpty() == false -> {
                     getUserListByIdPort.getUserListById(request.id)
                 }
+
                 request.id?.isNotEmpty() == false && request.nickname?.isNotEmpty() == true -> {
                     getUserListByNicknamePort.getUserListByNickname(request.nickname)
                 }
