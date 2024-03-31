@@ -67,7 +67,7 @@ class UserService(
                 throw RuntimeException()
             }
 
-            if (!user.isEnrolled()) {
+            if (user.isDeleted()) {
                 throw RuntimeException()
             }
 
@@ -83,7 +83,7 @@ class UserService(
         return runCatching {
             val user = getUserByIdPort.getByIdOrNull(id) ?: throw RuntimeException()
 
-            if (!user.isEnrolled()) {
+            if (user.isDeleted()) {
                 throw RuntimeException()
             }
 

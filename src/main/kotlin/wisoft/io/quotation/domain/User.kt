@@ -66,8 +66,8 @@ data class User(
         return BCrypt.checkpw(inputPassword, this.password)
     }
 
-    fun isEnrolled(): Boolean {
-        return !this.nickname.startsWith("leaved#")
+    fun isDeleted(): Boolean {
+        return this.nickname.startsWith("leaved#")
     }
 
     fun resign(identifier: String) {
