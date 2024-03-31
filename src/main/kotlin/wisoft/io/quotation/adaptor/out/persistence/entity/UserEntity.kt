@@ -37,9 +37,10 @@ data class UserEntity(
     val favoriteAuthor: String? = null,
     val commentAlarm: Boolean,
     val quotationAlarm: Boolean,
-    @Type(value = TimestampArrayType::class)
-    @Column(columnDefinition = "timestamp[]")
-    val quotationAlarmTimes: List<Timestamp> = emptyList(),
+    // FIXME : 해당 부분 TestCode Error 발생
+//    @Type(value = TimestampArrayType::class)
+//    @Column(columnDefinition = "timestamp[]")
+//    val quotationAlarmTimes: List<Timestamp> = emptyList(),
     val createdTime: Timestamp,
     val lastModifiedTime: Timestamp? = null,
     val identityVerificationQuestion: String,
@@ -55,7 +56,7 @@ data class UserEntity(
             favoriteQuotation = this.favoriteQuotation,
             commentAlarm = this.commentAlarm,
             quotationAlarm = this.quotationAlarm,
-            quotationAlarmTimes = this.quotationAlarmTimes,
+//            quotationAlarmTimes = this.quotationAlarmTimes,
             createdTime = this.createdTime,
             lastModifiedTime = this.lastModifiedTime,
             identityVerificationQuestion = this.identityVerificationQuestion,

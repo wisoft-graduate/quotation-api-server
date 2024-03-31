@@ -34,7 +34,7 @@ data class User(
     val commentAlarm: Boolean = false,
     val quotationAlarm: Boolean = false,
     // FIXME: EmptyList Casting 문제 - java.lang.ClassCastException: class kotlin.collections.EmptyList cannot be cast to class
-    val quotationAlarmTimes: List<Timestamp> = emptyList(),
+//    val quotationAlarmTimes: List<Timestamp> = emptyList(),
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
     val identityVerificationQuestion: String,
@@ -50,7 +50,7 @@ data class User(
             favoriteQuotation = this.favoriteQuotation,
             commentAlarm = this.commentAlarm,
             quotationAlarm = this.quotationAlarm,
-//                quotationAlarmTimes = this.quotationAlarmTimes,
+//            quotationAlarmTimes = this.quotationAlarmTimes,
             createdTime = this.createdTime,
             lastModifiedTime = this.lastModifiedTime,
             identityVerificationQuestion = this.identityVerificationQuestion,

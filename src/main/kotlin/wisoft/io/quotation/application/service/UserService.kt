@@ -9,6 +9,9 @@ import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
+import wisoft.io.quotation.exception.error.InvalidRequestParameterException
+import wisoft.io.quotation.exception.error.UserDuplicateException
+import wisoft.io.quotation.exception.error.UserNotFoundException
 import wisoft.io.quotation.util.JWTUtil
 import wisoft.io.quotation.util.SaltUtil
 import java.time.Instant
@@ -31,7 +34,7 @@ class UserService(
         return runCatching {
             val getUserById = getUserListByIdPort.getUserListById(request.id)
             val getUserByNickname = getUserListByNicknamePort.getUserListByNickname(request.nickname);
-            if (getUserById.isNotEmpty() || getUserByNickname.isNotEmpty()) throw RuntimeException()
+            if (getUserById.isNotEmpty() || getUserByNickname.isNotEmpty()) throw UserDuplicateException(request.toString())
 
             val user = request.run {
                 User(
@@ -53,14 +56,14 @@ class UserService(
     @Transactional
     override fun signIn(request: SignInUseCase.SignInRequest): SignInUseCase.UserTokenDto {
         return runCatching {
-            val user = getUserByIdPort.getByIdOrNull(request.id) ?: throw RuntimeException()
+            val user = getUserByIdPort.getByIdOrNull(request.id) ?: throw UserNotFoundException(request.id)
 
             if (!user.isCorrectPassword(request.password)) {
-                throw RuntimeException()
+                throw UserNotFoundException(request.id)
             }
 
             if (user.isDeleted()) {
-                throw RuntimeException()
+                throw UserNotFoundException(request.id)
             }
 
             SignInUseCase.UserTokenDto(jwtUtil.generateAccessToken(user), jwtUtil.generateRefreshToken(user))
@@ -73,10 +76,10 @@ class UserService(
     @Transactional
     override fun deleteUser(id: String): String {
         return runCatching {
-            val user = getUserByIdPort.getByIdOrNull(id) ?: throw RuntimeException()
+            val user = getUserByIdPort.getByIdOrNull(id) ?: throw UserNotFoundException(id)
 
             if (user.isDeleted()) {
-                throw RuntimeException()
+                throw UserNotFoundException(id)
             }
 
             val identifier = Instant.now().epochSecond.toString() + saltUtil.generateSalt(4)
@@ -99,7 +102,7 @@ class UserService(
                     getUserListByNicknamePort.getUserListByNickname(request.nickname)
                 }
                 else -> {
-                    throw RuntimeException()
+                    throw InvalidRequestParameterException(request.toString())
                 }
             }
             userList.map { GetUserListUseCase.UserDto(it.id, it.nickname) }
