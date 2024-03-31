@@ -12,7 +12,6 @@ import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.util.JWTUtil
 import wisoft.io.quotation.util.SaltUtil
 import java.time.Instant
-import java.util.LinkedList
 
 @Service
 @Transactional(readOnly = true)
@@ -21,7 +20,8 @@ class UserService(
     val saltUtil: SaltUtil,
     val saveUserPort: SaveUserPort,
     val getUserByIdPort: GetUserByIdPort,
-    val getUserListPort: GetUserListPort,
+    val getUserListByNicknamePort: GetUserListByNicknamePort,
+    val getUserListByIdPort: GetUserListByIdPort
 ) : CreateUserUseCase, SignInUseCase,
     DeleteUserUseCase, GetUserListUseCase {
     val logger = KotlinLogging.logger {}
@@ -29,16 +29,8 @@ class UserService(
     @Transactional
     override fun createUser(request: CreateUserUseCase.CreateUserRequest): String {
         return runCatching {
-            val ids = LinkedList<String>()
-            ids.push(request.id)
-            val nicknameList = LinkedList<String>()
-            nicknameList.push(request.nickname)
-
-            val idsRequest = GetUserListUseCase.GetUserListRequest(ids = ids, nicknameList = null)
-            val nicknameListRequest = GetUserListUseCase.GetUserListRequest(ids = null, nicknameList = nicknameList)
-
-            val getUserById = getUserListPort.getUserList(idsRequest)
-            val getUserByNickname = getUserListPort.getUserList(nicknameListRequest)
+            val getUserById = getUserListByIdPort.getUserListById(request.id)
+            val getUserByNickname = getUserListByNicknamePort.getUserListByNickname(request.nickname);
             if (getUserById.isNotEmpty() || getUserByNickname.isNotEmpty()) throw RuntimeException()
 
             val user = request.run {
@@ -99,10 +91,18 @@ class UserService(
 
     override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
         return runCatching {
-            val userList = getUserListPort.getUserList(request)
-            userList.map {
-                GetUserListUseCase.UserDto(it.id, it.nickname)
+            val userList: List<User> = when {
+                request.id?.isNotEmpty() == true && request.nickname?.isNotEmpty() == false -> {
+                    getUserListByIdPort.getUserListById(request.id)
+                }
+                request.id?.isNotEmpty() == false && request.nickname?.isNotEmpty() == true -> {
+                    getUserListByNicknamePort.getUserListByNickname(request.nickname)
+                }
+                else -> {
+                    throw RuntimeException()
+                }
             }
+            userList.map { GetUserListUseCase.UserDto(it.id, it.nickname) }
         }.onFailure {
             logger.error { "getUserList fail: param[${request}]" }
         }.getOrThrow()

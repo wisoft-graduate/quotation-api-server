@@ -7,8 +7,8 @@ interface GetUserListUseCase {
     fun getUserList(request: GetUserListRequest): List<UserDto>
 
     data class GetUserListRequest(
-        val ids: List<String>?,
-        val nicknameList: List<String>?
+        val id: String?,
+        val nickname: String?
     )
 
     data class GetUserListResponse(

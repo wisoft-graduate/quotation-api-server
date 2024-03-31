@@ -6,5 +6,8 @@ import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 
 @Repository
 interface UserRepository: JpaRepository<UserEntity, String> {
+    fun findAllByNickname(nickname: String): List<UserEntity>
+
+    fun findAllById(id: String): List<UserEntity>
 
 }
