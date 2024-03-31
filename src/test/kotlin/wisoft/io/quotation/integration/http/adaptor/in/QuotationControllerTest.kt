@@ -86,6 +86,7 @@ class QuotationControllerTest(
                 .response.contentAsString
 
             // then
+            // FIXME: Test 실패
             val actual = objectMapper.readValue(result, ErrorMessage::class.java)
             actual.status shouldBe status.value()
             actual.error shouldBe status.reasonPhrase

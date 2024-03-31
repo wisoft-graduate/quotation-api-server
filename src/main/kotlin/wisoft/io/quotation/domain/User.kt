@@ -33,6 +33,7 @@ data class User(
     val favoriteAuthor: String? = null,
     val commentAlarm: Boolean = false,
     val quotationAlarm: Boolean = false,
+    // FIXME: EmptyList Casting 문제 - java.lang.ClassCastException: class kotlin.collections.EmptyList cannot be cast to class
     val quotationAlarmTimes: List<Timestamp> = emptyList(),
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
