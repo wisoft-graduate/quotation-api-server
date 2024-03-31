@@ -19,6 +19,7 @@ import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
 import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
+import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.ErrorMessage
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
@@ -64,34 +65,34 @@ class UserControllerTest(
             val actual = objectMapper.readValue(result, CreateUserUseCase.CreateUserResponse::class.java)
             actual.data.id shouldBe request.id
         }
-//        test("createUser 실패 - 아이디 중복") {
-//            // given
-//            val expectStatus = HttpMessage.HTTP_400.status
-//
-//            val existUser = repository.save(getUserEntityFixture())
-//            val request = CreateUserUseCase.CreateUserRequest(
-//                id = existUser.id,
-//                password = "password",
-//                nickname = "nickname",
-//                identityVerificationQuestion = "question",
-//                identityVerificationAnswer = "answer"
-//            )
-//
-//            // when
-//            val createUserRequestJson = objectMapper.writeValueAsString(request)
-//            val result = mockMvc.perform(
-//                MockMvcRequestBuilders.post("/users")
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .content(createUserRequestJson)
-//            )
-//                .andExpect(MockMvcResultMatchers.status().isBadRequest)
-//                .andReturn()
-//                .response.contentAsString
-//
-//            // then
-//            val actual = objectMapper.readValue(result, ErrorMessage::class.java)
-//            actual.status shouldBe expectStatus.value()
-//        }
+        test("createUser 실패 - 아이디 중복") {
+            // given
+            val expectStatus = HttpMessage.HTTP_400.status
+
+            val existUser = repository.save(getUserEntityFixture())
+            val request = CreateUserUseCase.CreateUserRequest(
+                id = existUser.id,
+                password = "password",
+                nickname = "nickname",
+                identityVerificationQuestion = "question",
+                identityVerificationAnswer = "answer"
+            )
+
+            // when
+            val createUserRequestJson = objectMapper.writeValueAsString(request)
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(createUserRequestJson)
+            )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, ErrorData::class.java)
+            actual.data.status shouldBe expectStatus.value()
+        }
     }
 
     context("signIn Test") {

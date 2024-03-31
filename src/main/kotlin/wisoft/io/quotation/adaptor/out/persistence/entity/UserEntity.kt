@@ -37,7 +37,6 @@ data class UserEntity(
     val favoriteAuthor: String? = null,
     val commentAlarm: Boolean,
     val quotationAlarm: Boolean,
-    // FIXME : 해당 부분 TestCode Error 발생
 //    @Type(value = TimestampArrayType::class)
 //    @Column(columnDefinition = "timestamp[]")
 //    val quotationAlarmTimes: List<Timestamp> = emptyList(),
