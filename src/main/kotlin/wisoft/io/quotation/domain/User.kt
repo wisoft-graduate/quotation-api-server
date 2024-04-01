@@ -1,6 +1,5 @@
 package wisoft.io.quotation.domain
 
-import jakarta.persistence.Id
 import org.mindrot.jbcrypt.BCrypt
 import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 import java.sql.Timestamp
@@ -24,7 +23,6 @@ import java.time.LocalDateTime
  * @property identityVerificationAnswer 본인 확인 답변
  */
 data class User(
-    @Id
     val id: String,
     var password: String = "",
     var nickname: String,
@@ -39,7 +37,7 @@ data class User(
     val identityVerificationQuestion: String,
     val identityVerificationAnswer: String
 ) {
-    fun to(): UserEntity {
+    fun toEntity(): UserEntity {
         return UserEntity(
             id = this.id,
             password = this.password,

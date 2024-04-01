@@ -1,7 +1,8 @@
 package wisoft.io.quotation.domain
 
-import jakarta.persistence.Table
+import wisoft.io.quotation.adaptor.out.persistence.entity.BookmarkEntity
 import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.UUID
 
 /**
@@ -21,6 +22,18 @@ data class Bookmark(
     val quotations: List<Quotation> = emptyList(),
     val visibility: Boolean,
     val icon: String? = null,
-    val createdTime: Timestamp,
+    val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
-)
+) {
+    fun toEntity(): BookmarkEntity {
+        return BookmarkEntity(
+            id = this.id,
+            name = this.name,
+            userId = this.userId,
+            quotationIds = this.quotations.map { it.id },
+            visibility = this.visibility,
+            icon = this.icon,
+            createdTime = this.createdTime
+        )
+    }
+}

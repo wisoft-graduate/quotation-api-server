@@ -16,7 +16,7 @@ class UserAdaptor(
     GetUserListPort {
 
     override fun save(user: User): String {
-        return userRepository.save(user.to()).id
+        return userRepository.save(user.toEntity()).id
     }
 
     override fun getByIdOrNull(id: String): User? {

@@ -10,7 +10,7 @@ import java.util.UUID
  * @property id 식별자
  * @property name 북마크 이름
  * @property userId 북마크를 생성한 사용자의 식별자
- * @property quotationsIds 북마크에 포함된 명언 식별자 목록
+ * @property quotationIds 북마크에 포함된 명언 식별자 목록
  * @property visibility 북마크를 외부 노출
  * @property icon 북마크 icon
  * @property createdTime 생성된 시간
@@ -25,7 +25,7 @@ data class BookmarkEntity(
     val userId: String,
     @Type(value = UUIDArrayType::class)
     @Column(columnDefinition = "uuid[]")
-    val quotationsIds: List<UUID> = emptyList(),
+    val quotationIds: List<UUID> = emptyList(),
     val visibility: Boolean,
     val icon: String? = null,
     val createdTime: Timestamp,
