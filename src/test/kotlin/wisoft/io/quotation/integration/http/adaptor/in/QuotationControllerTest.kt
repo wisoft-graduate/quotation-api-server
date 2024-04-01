@@ -16,12 +16,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.AuthorRepository
+import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationCustomRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.application.port.`in`.GetQuotationUseCase
 import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection
+import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.ErrorMessage
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
@@ -35,6 +37,7 @@ import java.util.*
 class QuotationControllerTest(
     val mockMvc: MockMvc,
     val quotationRepository: QuotationRepository,
+    val quotationCustomRepository: QuotationCustomRepository,
     val authorRepository: AuthorRepository
 ) : FunSpec({
 
@@ -86,7 +89,7 @@ class QuotationControllerTest(
                 .response.contentAsString
 
             // then
-            val actual = objectMapper.readValue(result, ErrorMessage::class.java)
+            val actual = objectMapper.readValue(result, ErrorData::class.java).data
             actual.status shouldBe status.value()
             actual.error shouldBe status.reasonPhrase
             actual.path shouldBe path
@@ -136,4 +139,5 @@ class QuotationControllerTest(
             actual.backgroundImagePath shouldBe quotation.backgroundImagePath
         }
     }
+
 })
