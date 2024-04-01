@@ -60,7 +60,7 @@ class BookmarkControllerTest(
             actual.data.id shouldBe request.id
         }
 
-        test("createBookmark 실패") {
+        test("createBookmark 실패 - 등록되지 않은 유저") {
             // given
             val status = HttpMessage.HTTP_404.status
             val userId = "test"

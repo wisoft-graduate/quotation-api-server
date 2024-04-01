@@ -46,7 +46,6 @@ class UUIDListType : UserType<List<UUID>> {
         if (value == null) {
             st?.setNull(index, Types.ARRAY)
         } else {
-            // session.doWork()를 사용하여 JDBC Connection 객체에 접근합니다.
             session?.doWork { connection ->
                 val array = connection.createArrayOf("uuid", value.toTypedArray())
                 st?.setArray(index, array)
