@@ -19,4 +19,12 @@ interface CreateBookmarkUseCase {
         val icon: String
     )
 
+    data class CreateBookmarkResponse(
+        val data: Data
+    )
+
+    data class Data(
+        val id: UUID
+    )
+
 }
