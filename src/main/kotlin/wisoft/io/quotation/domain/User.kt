@@ -47,7 +47,7 @@ data class User(
             favoriteQuotation = this.favoriteQuotation,
             commentAlarm = this.commentAlarm,
             quotationAlarm = this.quotationAlarm,
-//                quotationAlarmTimes = this.quotationAlarmTimes,
+            quotationAlarmTimes = this.quotationAlarmTimes.toTypedArray(),
             createdTime = this.createdTime,
             lastModifiedTime = this.lastModifiedTime,
             identityVerificationQuestion = this.identityVerificationQuestion,

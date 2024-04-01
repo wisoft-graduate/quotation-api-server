@@ -21,12 +21,12 @@ class UserAdaptor(
 
     override fun getByIdOrNull(id: String): User? {
         val userEntity = userRepository.findByIdOrNull(id)
-        return userEntity?.to()
+        return userEntity?.toDomain()
     }
 
     override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<User> {
         val userList = userCustomRepository.getUserList(request)
-        return userList.map { it.to() }
+        return userList.map { it.toDomain() }
     }
 
 }

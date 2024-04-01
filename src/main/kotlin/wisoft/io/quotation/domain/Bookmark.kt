@@ -30,7 +30,7 @@ data class Bookmark(
             id = this.id,
             name = this.name,
             userId = this.userId,
-            quotationIds = this.quotations.map { it.id },
+            quotationIds = this.quotations.map { it.id }.toTypedArray(),
             visibility = this.visibility,
             icon = this.icon,
             createdTime = this.createdTime

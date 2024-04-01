@@ -21,6 +21,7 @@ data class ErrorMessage(
                 path = request.requestURI,
                 message = when (exception) {
                     is MethodArgumentNotValidException -> {
+                        println("test")
                         exception
                             .bindingResult
                             .fieldErrors

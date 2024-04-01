@@ -8,12 +8,12 @@ interface CreateBookmarkUseCase {
     fun createBookmark(request: CreateBookmarkRequest): UUID
 
     data class CreateBookmarkRequest(
+        val id: UUID? = null,
         @field:NotBlank
         val userId: String,
         @field:NotBlank
         val name: String,
         val quotationIds: List<UUID> = emptyList(),
-        @field:NotBlank
         val visibility: Boolean,
         @field:NotBlank
         val icon: String
