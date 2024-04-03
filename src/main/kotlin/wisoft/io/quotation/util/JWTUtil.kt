@@ -50,7 +50,7 @@ class JWTUtil {
                 .parseClaimsJws(token)
             claims.body.expiration.after(currentDate)
         }.onFailure {
-            logger.error { "verifyToken fail : param[token: ${token}]" }
+            logger.error { "verifyToken fail: param[token: ${token}]" }
         }.getOrThrow()
     }
 
@@ -61,7 +61,7 @@ class JWTUtil {
                 .build()
                 .parseClaimsJws(token).body.subject.toString()
         }.onFailure {
-            logger.error { "verifyToken fail : param[token: ${token}]" }
+            logger.error { "verifyToken fail: param[token: ${token}]" }
         }.getOrThrow()
     }
 }

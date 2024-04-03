@@ -50,7 +50,7 @@ class UserService(
 
             saveUserPort.save(user)
         }.onFailure {
-            logger.error { "createUser Fail : param[$request]" }
+            logger.error { "createUser fail: param[$request]" }
         }.getOrThrow()
 
     }
@@ -70,7 +70,7 @@ class UserService(
 
             SignInUseCase.UserTokenDto(jwtUtil.generateAccessToken(user), jwtUtil.generateRefreshToken(user))
         }.onFailure {
-            logger.error { "signIn fail : param[$request]" }
+            logger.error { "signIn fail: param[$request]" }
         }.getOrThrow()
 
     }
@@ -89,7 +89,7 @@ class UserService(
 
             saveUserPort.save(user)
         }.onFailure {
-            logger.error { "deleteUser fail : parma[id: $id]" }
+            logger.error { "deleteUser fail: parma[id: $id]" }
         }.getOrThrow()
 
     }
