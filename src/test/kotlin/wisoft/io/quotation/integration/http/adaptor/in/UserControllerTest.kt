@@ -1,7 +1,6 @@
 package wisoft.io.quotation.integration.http.adaptor.`in`
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -17,10 +16,9 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
-import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
+import wisoft.io.quotation.application.port.`in`.GetUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.exception.error.ErrorData
-import wisoft.io.quotation.exception.error.ErrorMessage
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
 import wisoft.io.quotation.util.JWTUtil
@@ -123,32 +121,29 @@ class UserControllerTest(
         }
     }
 
-//    context("getUserList Test") {
-//        test("getUserList 성공") {
-//            // given
-//            val existUser = repository.save(getUserEntityFixture())
-//            val request = GetUserListUseCase.GetUserListRequest(
-//                existUser.id, null
-//            )
-//
-//            // when
-//            val result = mockMvc.get("/users") {
-//                param("id", request.id!!)
-//                accept = MediaType.APPLICATION_JSON
-//            }
-//                .andExpect { MockMvcResultMatchers.status().isOk }
-//                .andReturn()
-//                .response.contentAsString
-//
-//            // then
-//            val actual = objectMapper.readValue(result, GetUserListUseCase.GetUserListResponse::class.java)
-//            actual.data.users.size shouldBe 1
-//            val actualUser = actual.data.users.first()
-//            actualUser.id shouldBe existUser.id
-//            actualUser.nickname shouldBe existUser.nickname
-//
-//        }
-//    }
+    context("getUserList Test") {
+        test("getUserList 성공") {
+            // given
+            val existUser = repository.save(getUserEntityFixture())
+            val request = GetUserUseCase.GetUserByIdOrNicknameRequest(
+                existUser.id, null
+            )
+
+            // when
+            val result = mockMvc.get("/users") {
+                param("id", request.id!!)
+                accept = MediaType.APPLICATION_JSON
+            }
+                .andExpect { MockMvcResultMatchers.status().isOk }
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, GetUserUseCase.GetUserByIdOrNicknameResponse::class.java)
+            actual.data.id shouldBe existUser.id
+            actual.data.nickname shouldBe existUser.nickname
+        }
+    }
 
     context("deleteUser Test") {
         test("deleteUser 성공") {
@@ -163,6 +158,5 @@ class UserControllerTest(
             // TODO : 반환하지 않더라도, DB 조회해서 확인 여부
         }
     }
-
 
 })

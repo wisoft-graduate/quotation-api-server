@@ -3,7 +3,7 @@ package wisoft.io.quotation.application.service
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
+import wisoft.io.quotation.application.port.`in`.GetUserUseCase
 import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
@@ -20,22 +20,21 @@ import java.time.Instant
 @Transactional(readOnly = true)
 class UserService(
     val jwtUtil: JWTUtil,
-    val saltUtil: SaltUtil,
     val saveUserPort: SaveUserPort,
     val getUserByIdPort: GetUserByIdPort,
-    val getUserListByNicknamePort: GetUserListByNicknamePort,
-    val getUserListByIdPort: GetUserListByIdPort
+    val getUserByNicknamePort: GetUserByNicknamePort,
 ) : CreateUserUseCase, SignInUseCase,
-    DeleteUserUseCase, GetUserListUseCase {
+    DeleteUserUseCase, GetUserUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
     override fun createUser(request: CreateUserUseCase.CreateUserRequest): String {
         return runCatching {
-            val getUserById = getUserListByIdPort.getUserListById(request.id)
-            val getUserByNickname = getUserListByNicknamePort.getUserListByNickname(request.nickname);
-            if (getUserById.isNotEmpty() || getUserByNickname.isNotEmpty()) {
-                throw UserDuplicateException("id: ${request.id}, nickname: ${request.nickname}")
+            getUserByIdPort.getByIdOrNull(request.id)?.let {
+                throw UserDuplicateException("id: ${request.id}")
+            }
+            getUserByNicknamePort.getByNicknameOrNull((request.nickname))?.let {
+                throw UserDuplicateException("nickname: ${request.nickname}")
             }
 
             val user = request.run {
@@ -84,7 +83,7 @@ class UserService(
                 throw UserNotFoundException(id)
             }
 
-            val identifier = Instant.now().epochSecond.toString() + saltUtil.generateSalt(4)
+            val identifier = Instant.now().epochSecond.toString() + SaltUtil.generateSalt(4)
             user.resign(identifier)
 
             saveUserPort.save(user)
@@ -94,21 +93,21 @@ class UserService(
 
     }
 
-    override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
+    override fun getUserByIdOrNickname(request: GetUserUseCase.GetUserByIdOrNicknameRequest): GetUserUseCase.UserDto {
         return runCatching {
-            val userList: List<User> = when {
-                request.id?.isNotEmpty() == true && request.nickname?.isNotEmpty() == false -> {
-                    getUserListByIdPort.getUserListById(request.id)
-                }
+            if (request.id === null && request.nickname === null ) throw InvalidRequestParameterException(request.toString())
+            else if (request.id !== null && request.nickname !== null ) throw InvalidRequestParameterException(request.toString())
 
-                request.id?.isNotEmpty() == false && request.nickname?.isNotEmpty() == true -> {
-                    getUserListByNicknamePort.getUserListByNickname(request.nickname)
-                }
-                else -> {
-                    throw InvalidRequestParameterException(request.toString())
-                }
+            val user: User = if (request.id !== null ) {
+                request.id.run {
+                    getUserByIdPort.getByIdOrNull(this)
+                } ?: throw UserNotFoundException("id: ${request.id}")
+            } else{
+                request.nickname?.run {
+                    getUserByNicknamePort.getByNicknameOrNull(this)
+                } ?: throw UserNotFoundException("nickname: ${request.nickname}")
             }
-            userList.map { GetUserListUseCase.UserDto(it.id, it.nickname) }
+            GetUserUseCase.UserDto(user.id, user.nickname)
         }.onFailure {
             logger.error { "getUserList fail: param[${request}]" }
         }.getOrThrow()

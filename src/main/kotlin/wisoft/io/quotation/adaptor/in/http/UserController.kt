@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
+import wisoft.io.quotation.application.port.`in`.GetUserUseCase
 import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
@@ -20,7 +20,7 @@ class UserController(
     val createUserUseCase: CreateUserUseCase,
     val signInUseCase: SignInUseCase,
     val deleteUserUseCase: DeleteUserUseCase,
-    val getUserListUseCase: GetUserListUseCase
+    val getUserUseCase: GetUserUseCase
 ) {
 
     @PostMapping("/users")
@@ -52,13 +52,13 @@ class UserController(
 
     @GetMapping("/users")
     fun getUserList(
-        @ModelAttribute request: GetUserListUseCase.GetUserListRequest
-    ): ResponseEntity<GetUserListUseCase.GetUserListResponse> {
-        val response = getUserListUseCase.getUserList(request)
+        @ModelAttribute request: GetUserUseCase.GetUserByIdOrNicknameRequest
+    ): ResponseEntity<GetUserUseCase.GetUserByIdOrNicknameResponse> {
+        val response = getUserUseCase.getUserByIdOrNickname(request)
         return ResponseEntity.status(HttpStatus.OK)
             .body(
-                GetUserListUseCase.GetUserListResponse(
-                    data = GetUserListUseCase.Data(users = response),
+                GetUserUseCase.GetUserByIdOrNicknameResponse(
+                    data = GetUserUseCase.UserDto(id = response.id, nickname = response.nickname),
                 )
             )
     }

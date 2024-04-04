@@ -2,7 +2,7 @@ package wisoft.io.quotation.application.port.out
 
 import wisoft.io.quotation.domain.User
 
-interface GetUserListByIdPort {
+interface GetUserByNicknamePort {
 
-    fun getUserListById(id: String): List<User>
+    fun getByNicknameOrNull(nickname: String): User?
 }
