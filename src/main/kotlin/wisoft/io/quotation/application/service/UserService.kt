@@ -19,8 +19,7 @@ import java.time.Instant
 @Service
 @Transactional(readOnly = true)
 class UserService(
-    val jwtUtil: JWTUtil,
-    val saveUserPort: SaveUserPort,
+    val createUserPort: CreateUserPort,
     val getUserByIdPort: GetUserByIdPort,
     val getUserByNicknamePort: GetUserByNicknamePort,
 ) : CreateUserUseCase, SignInUseCase,
@@ -47,7 +46,7 @@ class UserService(
             }
             user.encryptPassword(request.password)
 
-            saveUserPort.save(user)
+            createUserPort.create(user)
         }.onFailure {
             logger.error { "createUser fail: param[$request]" }
         }.getOrThrow()
@@ -67,7 +66,7 @@ class UserService(
                 throw UserNotFoundException(request.id)
             }
 
-            SignInUseCase.UserTokenDto(jwtUtil.generateAccessToken(user), jwtUtil.generateRefreshToken(user))
+            SignInUseCase.UserTokenDto(JWTUtil.generateAccessToken(user), JWTUtil.generateRefreshToken(user))
         }.onFailure {
             logger.error { "signIn fail: param[$request]" }
         }.getOrThrow()
@@ -86,7 +85,7 @@ class UserService(
             val identifier = Instant.now().epochSecond.toString() + SaltUtil.generateSalt(4)
             user.resign(identifier)
 
-            saveUserPort.save(user)
+            createUserPort.create(user)
         }.onFailure {
             logger.error { "deleteUser fail: parma[id: $id]" }
         }.getOrThrow()

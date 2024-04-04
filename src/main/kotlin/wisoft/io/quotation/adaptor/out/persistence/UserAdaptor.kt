@@ -9,10 +9,10 @@ import wisoft.io.quotation.domain.User
 @Component
 class UserAdaptor(
     val userRepository: UserRepository,
-) : SaveUserPort, GetUserByIdPort,
+) : CreateUserPort, GetUserByIdPort,
     GetUserByNicknamePort{
 
-    override fun save(user: User): String {
+    override fun create(user: User): String {
         return userRepository.save(user.to()).id
     }
 

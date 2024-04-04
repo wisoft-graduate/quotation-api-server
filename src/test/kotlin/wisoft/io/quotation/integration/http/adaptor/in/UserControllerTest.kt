@@ -28,7 +28,7 @@ import wisoft.io.quotation.util.JWTUtil
 @Testcontainers
 @AutoConfigureMockMvc
 class UserControllerTest(
-    val mockMvc: MockMvc, val repository: UserRepository, val jwtUtil: JWTUtil
+    val mockMvc: MockMvc, val repository: UserRepository
 ) : FunSpec({
 
     val objectMapper = ObjectMapper().registerKotlinModule()
@@ -65,7 +65,7 @@ class UserControllerTest(
         }
         test("createUser 실패 - 아이디 중복") {
             // given
-            val expectStatus = HttpMessage.HTTP_400.status
+            val expectedStatus = HttpMessage.HTTP_400.status
 
             val existUser = repository.save(getUserEntityFixture())
             val request = CreateUserUseCase.CreateUserRequest(
@@ -89,7 +89,7 @@ class UserControllerTest(
 
             // then
             val actual = objectMapper.readValue(result, ErrorData::class.java)
-            actual.data.status shouldBe expectStatus.value()
+            actual.data.status shouldBe expectedStatus.value()
         }
     }
 
@@ -114,8 +114,8 @@ class UserControllerTest(
             // then
             val actual = objectMapper.readValue(result, SignInUseCase.SignInResponse::class.java)
 
-            val userIdByAccessToken = jwtUtil.extractUserIdByToken(actual.data.accessToken)
-            val userIdByRefreshToken = jwtUtil.extractUserIdByToken(actual.data.refreshToken)
+            val userIdByAccessToken = JWTUtil.extractUserIdByToken(actual.data.accessToken)
+            val userIdByRefreshToken = JWTUtil.extractUserIdByToken(actual.data.refreshToken)
             userIdByAccessToken shouldBe existUser.nickname
             userIdByRefreshToken shouldBe existUser.nickname
         }
@@ -155,7 +155,6 @@ class UserControllerTest(
                     .contentType(MediaType.APPLICATION_JSON)
             )
                 .andExpect(MockMvcResultMatchers.status().isNoContent)
-            // TODO : 반환하지 않더라도, DB 조회해서 확인 여부
         }
     }
 
