@@ -150,13 +150,13 @@ class UserControllerTest(
         test("deleteUser 성공") {
             // given
             val existUserEntity = repository.save(getUserEntityFixture())
-            val existUser = existUserEntity.to()
+            val existUser = existUserEntity.toDomain()
             val accessToken = JWTUtil.generateAccessToken(existUser)
 
             val result = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/${existUserEntity.id}")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", accessToken)
+                    .header("Authorization", "Bearer $accessToken")
             )
                 .andExpect(MockMvcResultMatchers.status().isNoContent)
         }
@@ -168,7 +168,7 @@ class UserControllerTest(
                 MockMvcRequestBuilders.delete("/users/${existUser.id}")
                     .contentType(MediaType.APPLICATION_JSON)
             )
-                .andExpect( MockMvcResultMatchers.status().isUnauthorized)
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
         }
         test("deleteUser 실패 - 인증 정보 불일치 사용자") {
             // given

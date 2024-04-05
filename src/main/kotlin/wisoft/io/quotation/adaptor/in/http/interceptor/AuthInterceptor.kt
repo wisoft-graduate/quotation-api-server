@@ -6,7 +6,6 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
-import wisoft.io.quotation.exception.error.InvalidJwtTokenException
 import wisoft.io.quotation.exception.error.UnauthorizedUserException
 import wisoft.io.quotation.util.JWTUtil
 import wisoft.io.quotation.util.annotation.Authenticated
@@ -19,8 +18,10 @@ class AuthInterceptor : HandlerInterceptor {
         handler.getMethodAnnotation(Authenticated::class.java) ?: return true
 
         return runCatching {
-            val authToken = request.getHeader("Authorization") ?: throw UnauthorizedUserException("")
-            JWTUtil.verifyToken(authToken)
+            val authHeader = request.getHeader("Authorization") ?: throw UnauthorizedUserException("Authorization Not Found")
+            val token = authHeader.substringAfter("Bearer ")
+
+            JWTUtil.verifyToken(token)
         }.onFailure {
             logger.error { "preHandle fail" }
         }.getOrThrow()
