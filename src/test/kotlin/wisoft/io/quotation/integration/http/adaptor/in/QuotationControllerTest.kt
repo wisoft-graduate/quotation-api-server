@@ -6,7 +6,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
@@ -16,7 +15,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.AuthorRepository
-import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationCustomRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.application.port.`in`.GetQuotationUseCase
 import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
@@ -24,7 +22,6 @@ import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection
 import wisoft.io.quotation.exception.error.ErrorData
-import wisoft.io.quotation.exception.error.ErrorMessage
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
@@ -37,7 +34,6 @@ import java.util.*
 class QuotationControllerTest(
     val mockMvc: MockMvc,
     val quotationRepository: QuotationRepository,
-    val quotationCustomRepository: QuotationCustomRepository,
     val authorRepository: AuthorRepository
 ) : FunSpec({
 
