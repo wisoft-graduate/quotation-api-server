@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import mu.KotlinLogging
 import wisoft.io.quotation.domain.User
+import wisoft.io.quotation.exception.error.InvalidJwtTokenException
 import java.io.File
 import java.util.*
 
@@ -55,6 +56,7 @@ object JWTUtil {
             claims.body.expiration.after(currentDate)
         }.onFailure {
             logger.error { "verifyToken fail: param[token: ${token}]" }
+            throw InvalidJwtTokenException(it.toString())
         }.getOrThrow()
     }
 
