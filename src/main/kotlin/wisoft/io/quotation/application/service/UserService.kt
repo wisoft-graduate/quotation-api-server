@@ -3,43 +3,38 @@ package wisoft.io.quotation.application.service
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
+import wisoft.io.quotation.application.port.`in`.GetUserUseCase
 import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
+import wisoft.io.quotation.exception.error.InvalidRequestParameterException
+import wisoft.io.quotation.exception.error.UserDuplicateException
+import wisoft.io.quotation.exception.error.UserNotFoundException
 import wisoft.io.quotation.util.JWTUtil
 import wisoft.io.quotation.util.SaltUtil
 import java.time.Instant
-import java.util.LinkedList
 
 @Service
 @Transactional(readOnly = true)
 class UserService(
-    val jwtUtil: JWTUtil,
-    val saltUtil: SaltUtil,
-    val saveUserPort: SaveUserPort,
+    val createUserPort: CreateUserPort,
     val getUserByIdPort: GetUserByIdPort,
-    val getUserListPort: GetUserListPort,
+    val getUserByNicknamePort: GetUserByNicknamePort,
 ) : CreateUserUseCase, SignInUseCase,
-    DeleteUserUseCase, GetUserListUseCase {
+    DeleteUserUseCase, GetUserUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
     override fun createUser(request: CreateUserUseCase.CreateUserRequest): String {
         return runCatching {
-            val ids = LinkedList<String>()
-            ids.push(request.id)
-            val nicknameList = LinkedList<String>()
-            nicknameList.push(request.nickname)
-
-            val idsRequest = GetUserListUseCase.GetUserListRequest(ids = ids, nicknameList = null)
-            val nicknameListRequest = GetUserListUseCase.GetUserListRequest(ids = null, nicknameList = nicknameList)
-
-            val getUserById = getUserListPort.getUserList(idsRequest)
-            val getUserByNickname = getUserListPort.getUserList(nicknameListRequest)
-            if (getUserById.isNotEmpty() || getUserByNickname.isNotEmpty()) throw RuntimeException()
+            getUserByIdPort.getByIdOrNull(request.id)?.let {
+                throw UserDuplicateException("id: ${request.id}")
+            }
+            getUserByNicknamePort.getByNicknameOrNull((request.nickname))?.let {
+                throw UserDuplicateException("nickname: ${request.nickname}")
+            }
 
             val user = request.run {
                 User(
@@ -51,9 +46,9 @@ class UserService(
             }
             user.encryptPassword(request.password)
 
-            saveUserPort.save(user)
+            createUserPort.create(user)
         }.onFailure {
-            logger.error { "createUser Fail : param[$request]" }
+            logger.error { "createUser fail: param[$request]" }
         }.getOrThrow()
 
     }
@@ -61,19 +56,19 @@ class UserService(
     @Transactional
     override fun signIn(request: SignInUseCase.SignInRequest): SignInUseCase.UserTokenDto {
         return runCatching {
-            val user = getUserByIdPort.getByIdOrNull(request.id) ?: throw RuntimeException()
+            val user = getUserByIdPort.getByIdOrNull(request.id) ?: throw UserNotFoundException(request.id)
 
             if (!user.isCorrectPassword(request.password)) {
-                throw RuntimeException()
+                throw UserNotFoundException(request.id)
             }
 
-            if (!user.isEnrolled()) {
-                throw RuntimeException()
+            if (user.isDeleted()) {
+                throw UserNotFoundException(request.id)
             }
 
-            SignInUseCase.UserTokenDto(jwtUtil.generateAccessToken(user), jwtUtil.generateRefreshToken(user))
+            SignInUseCase.UserTokenDto(JWTUtil.generateAccessToken(user), JWTUtil.generateRefreshToken(user))
         }.onFailure {
-            logger.error { "signIn fail : param[$request]" }
+            logger.error { "signIn fail: param[$request]" }
         }.getOrThrow()
 
     }
@@ -81,28 +76,37 @@ class UserService(
     @Transactional
     override fun deleteUser(id: String): String {
         return runCatching {
-            val user = getUserByIdPort.getByIdOrNull(id) ?: throw RuntimeException()
+            val user = getUserByIdPort.getByIdOrNull(id) ?: throw UserNotFoundException(id)
 
-            if (!user.isEnrolled()) {
-                throw RuntimeException()
+            if (user.isDeleted()) {
+                throw UserNotFoundException(id)
             }
 
-            val identifier = Instant.now().epochSecond.toString() + saltUtil.generateSalt(4)
+            val identifier = Instant.now().epochSecond.toString() + SaltUtil.generateSalt(4)
             user.resign(identifier)
 
-            saveUserPort.save(user)
+            createUserPort.create(user)
         }.onFailure {
-            logger.error { "deleteUser fail : parma[id: $id]" }
+            logger.error { "deleteUser fail: parma[id: $id]" }
         }.getOrThrow()
 
     }
 
-    override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
+    override fun getUserByIdOrNickname(request: GetUserUseCase.GetUserByIdOrNicknameRequest): GetUserUseCase.UserDto {
         return runCatching {
-            val userList = getUserListPort.getUserList(request)
-            userList.map {
-                GetUserListUseCase.UserDto(it.id, it.nickname)
+            if (request.id === null && request.nickname === null ) throw InvalidRequestParameterException(request.toString())
+            else if (request.id !== null && request.nickname !== null ) throw InvalidRequestParameterException(request.toString())
+
+            val user: User = if (request.id !== null ) {
+                request.id.run {
+                    getUserByIdPort.getByIdOrNull(this)
+                } ?: throw UserNotFoundException("id: ${request.id}")
+            } else{
+                request.nickname?.run {
+                    getUserByNicknamePort.getByNicknameOrNull(this)
+                } ?: throw UserNotFoundException("nickname: ${request.nickname}")
             }
+            GetUserUseCase.UserDto(user.id, user.nickname)
         }.onFailure {
             logger.error { "getUserList fail: param[${request}]" }
         }.getOrThrow()

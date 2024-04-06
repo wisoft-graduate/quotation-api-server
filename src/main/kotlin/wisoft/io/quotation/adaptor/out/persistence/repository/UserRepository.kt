@@ -6,6 +6,6 @@ import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 
 @Repository
 interface UserRepository: JpaRepository<UserEntity, String> {
-    fun countByNicknameStartingWith(prefix: String): Long
+    fun findByNickname(nickname: String): UserEntity?
 
 }
