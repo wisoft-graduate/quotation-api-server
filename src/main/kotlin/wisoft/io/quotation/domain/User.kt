@@ -1,6 +1,5 @@
 package wisoft.io.quotation.domain
 
-import jakarta.persistence.Id
 import org.mindrot.jbcrypt.BCrypt
 import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 import java.sql.Timestamp
@@ -24,7 +23,6 @@ import java.time.LocalDateTime
  * @property identityVerificationAnswer 본인 확인 답변
  */
 data class User(
-    @Id
     val id: String,
     var password: String = "",
     var nickname: String,
@@ -33,14 +31,13 @@ data class User(
     val favoriteAuthor: String? = null,
     val commentAlarm: Boolean = false,
     val quotationAlarm: Boolean = false,
-    // : EmptyList Casting 문제 - java.lang.ClassCastException: class kotlin.collections.EmptyList cannot be cast to class
-//    val quotationAlarmTimes: List<Timestamp> = emptyList(),
+    val quotationAlarmTimes: List<Timestamp> = emptyList(),
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
     val identityVerificationQuestion: String,
     val identityVerificationAnswer: String
 ) {
-    fun to(): UserEntity {
+    fun toEntity(): UserEntity {
         return UserEntity(
             id = this.id,
             password = this.password,
@@ -50,7 +47,7 @@ data class User(
             favoriteQuotation = this.favoriteQuotation,
             commentAlarm = this.commentAlarm,
             quotationAlarm = this.quotationAlarm,
-//            quotationAlarmTimes = this.quotationAlarmTimes,
+            quotationAlarmTimes = this.quotationAlarmTimes.toTypedArray(),
             createdTime = this.createdTime,
             lastModifiedTime = this.lastModifiedTime,
             identityVerificationQuestion = this.identityVerificationQuestion,

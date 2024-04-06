@@ -6,7 +6,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
@@ -22,7 +21,7 @@ import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection
-import wisoft.io.quotation.exception.error.ErrorMessage
+import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
@@ -86,7 +85,7 @@ class QuotationControllerTest(
                 .response.contentAsString
 
             // then
-            val actual = objectMapper.readValue(result, ErrorMessage::class.java)
+            val actual = objectMapper.readValue(result, ErrorData::class.java).data
             actual.status shouldBe status.value()
             actual.error shouldBe status.reasonPhrase
             actual.path shouldBe path
@@ -136,4 +135,5 @@ class QuotationControllerTest(
             actual.backgroundImagePath shouldBe quotation.backgroundImagePath
         }
     }
+
 })

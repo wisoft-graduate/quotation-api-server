@@ -37,15 +37,15 @@ data class UserEntity(
     val favoriteAuthor: String? = null,
     val commentAlarm: Boolean,
     val quotationAlarm: Boolean,
-//    @Type(value = TimestampArrayType::class)
-//    @Column(columnDefinition = "timestamp[]")
-//    val quotationAlarmTimes: List<Timestamp> = emptyList(),
+    @Type(value = TimestampArrayType::class)
+    @Column(columnDefinition = "timestamp[]")
+    val quotationAlarmTimes: Array<Timestamp> = emptyArray(),
     val createdTime: Timestamp,
     val lastModifiedTime: Timestamp? = null,
     val identityVerificationQuestion: String,
     val identityVerificationAnswer: String
 ) {
-    fun to(): User {
+    fun toDomain(): User {
         return User(
             id = this.id,
             password = this.password,
@@ -55,11 +55,51 @@ data class UserEntity(
             favoriteQuotation = this.favoriteQuotation,
             commentAlarm = this.commentAlarm,
             quotationAlarm = this.quotationAlarm,
-//            quotationAlarmTimes = this.quotationAlarmTimes,
+            quotationAlarmTimes = this.quotationAlarmTimes.toList(),
             createdTime = this.createdTime,
             lastModifiedTime = this.lastModifiedTime,
             identityVerificationQuestion = this.identityVerificationQuestion,
             identityVerificationAnswer = this.identityVerificationAnswer,
         )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as UserEntity
+
+        if (id != other.id) return false
+        if (password != other.password) return false
+        if (nickname != other.nickname) return false
+        if (profilePath != other.profilePath) return false
+        if (favoriteQuotation != other.favoriteQuotation) return false
+        if (favoriteAuthor != other.favoriteAuthor) return false
+        if (commentAlarm != other.commentAlarm) return false
+        if (quotationAlarm != other.quotationAlarm) return false
+        if (!quotationAlarmTimes.contentEquals(other.quotationAlarmTimes)) return false
+        if (createdTime != other.createdTime) return false
+        if (lastModifiedTime != other.lastModifiedTime) return false
+        if (identityVerificationQuestion != other.identityVerificationQuestion) return false
+        if (identityVerificationAnswer != other.identityVerificationAnswer) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + password.hashCode()
+        result = 31 * result + nickname.hashCode()
+        result = 31 * result + (profilePath?.hashCode() ?: 0)
+        result = 31 * result + (favoriteQuotation?.hashCode() ?: 0)
+        result = 31 * result + (favoriteAuthor?.hashCode() ?: 0)
+        result = 31 * result + commentAlarm.hashCode()
+        result = 31 * result + quotationAlarm.hashCode()
+        result = 31 * result + quotationAlarmTimes.contentHashCode()
+        result = 31 * result + createdTime.hashCode()
+        result = 31 * result + (lastModifiedTime?.hashCode() ?: 0)
+        result = 31 * result + identityVerificationQuestion.hashCode()
+        result = 31 * result + identityVerificationAnswer.hashCode()
+        return result
     }
 }

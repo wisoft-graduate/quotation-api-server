@@ -111,4 +111,5 @@ class UserService(
             logger.error { "getUserList fail: param[${request}]" }
         }.getOrThrow()
     }
+
 }
