@@ -22,6 +22,7 @@ import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
 import wisoft.io.quotation.util.JWTUtil
+import wisoft.io.quotation.util.SaltUtil
 
 @SpringBootTest
 @ContextConfiguration(classes = [DatabaseContainerConfig::class])
@@ -148,13 +149,38 @@ class UserControllerTest(
     context("deleteUser Test") {
         test("deleteUser 성공") {
             // given
+            val existUserEntity = repository.save(getUserEntityFixture())
+            val existUser = existUserEntity.toDomain()
+            val accessToken = JWTUtil.generateAccessToken(existUser)
+
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/users/${existUserEntity.id}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", "Bearer $accessToken")
+            )
+                .andExpect(MockMvcResultMatchers.status().isNoContent)
+        }
+        test("deleteUser 실패 - 비 인가된 사용자") {
+            // given
             val existUser = repository.save(getUserEntityFixture())
 
             val result = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/${existUser.id}")
                     .contentType(MediaType.APPLICATION_JSON)
             )
-                .andExpect(MockMvcResultMatchers.status().isNoContent)
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        }
+        test("deleteUser 실패 - 인증 정보 불일치 사용자") {
+            // given
+            val existUser = repository.save(getUserEntityFixture())
+            val accessToken = "testToken"
+
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/users/${existUser.id}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", accessToken)
+            )
+                .andExpect(MockMvcResultMatchers.status().isForbidden)
         }
     }
 

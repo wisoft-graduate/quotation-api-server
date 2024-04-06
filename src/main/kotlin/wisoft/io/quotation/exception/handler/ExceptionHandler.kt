@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import wisoft.io.quotation.exception.error.*
 import wisoft.io.quotation.exception.error.http.HttpMessage
+import wisoft.io.quotation.exception.error.http.UnauthorizedException
 
 @RestControllerAdvice
 class ExceptionHandler {
@@ -70,6 +71,32 @@ class ExceptionHandler {
         request: HttpServletRequest
     ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_400.status
+        val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
+
+        return ResponseEntity
+            .status(status)
+            .body(errorMessage)
+    }
+
+    @ExceptionHandler(UnauthorizedUserException::class)
+    fun unauthorizedUserExceptionHandler(
+        e: UnauthorizedUserException,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorData> {
+        val status = HttpMessage.HTTP_401.status
+        val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
+
+        return ResponseEntity
+            .status(status)
+            .body(errorMessage)
+    }
+
+    @ExceptionHandler(InvalidJwtTokenException::class)
+    fun invalidJwtTokenExceptionExceptionHandler(
+        e: InvalidJwtTokenException,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorData> {
+        val status = HttpMessage.HTTP_403.status
         val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
 
         return ResponseEntity
