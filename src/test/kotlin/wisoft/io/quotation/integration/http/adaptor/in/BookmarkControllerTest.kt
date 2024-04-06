@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
-import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
+import wisoft.io.quotation.adaptor.out.persistence.repository.BookmarkRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.CreateBookmarkUseCase
 import wisoft.io.quotation.exception.error.ErrorData
@@ -28,9 +28,15 @@ import java.util.*
 class BookmarkControllerTest(
     val mockMvc: MockMvc,
     val userRepository: UserRepository,
+    val bookmarkRepository: BookmarkRepository
 ) : FunSpec({
 
     val objectMapper = ObjectMapper().registerKotlinModule()
+
+    afterEach {
+        bookmarkRepository.deleteAll()
+        userRepository.deleteAll()
+    }
 
     context("createBookmark Test") {
         test("createBookmark 성공") {
