@@ -209,8 +209,9 @@ class UserControllerTest(
         test("updateUser 성공 ") {
             // given
             val existUser = repository.save(getUserEntityFixture())
+            val expectedNickname = "updatedNickname"
             val request = UpdateUserUseCase.UpdateUserRequest(
-                nickname = "updatedNickname",
+                nickname = expectedNickname,
                 null,
                 null,
                 null,
@@ -232,6 +233,13 @@ class UserControllerTest(
             // then
             val actual = objectMapper.readValue(result, UpdateUserUseCase.UpdateUserResponse::class.java)
             actual.data.id shouldBe existUser.id
+
+            val actualUser = repository.findById(existUser.id).get()
+            println(actualUser)
+
+            actualUser.nickname shouldBe expectedNickname
         }
     }
+
+
 })
