@@ -3,10 +3,7 @@ package wisoft.io.quotation.application.service
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import wisoft.io.quotation.application.port.`in`.GetUserUseCase
-import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
-import wisoft.io.quotation.application.port.`in`.SignInUseCase
-import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
+import wisoft.io.quotation.application.port.`in`.*
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.exception.error.InvalidRequestParameterException
@@ -22,8 +19,10 @@ class UserService(
     val createUserPort: CreateUserPort,
     val getUserByIdPort: GetUserByIdPort,
     val getUserByNicknamePort: GetUserByNicknamePort,
+    val getBookmarkCountByUserIdPort: GetBookmarkCountByUserIdPort,
+    val getLikeCountByUserIdPort: GetLikeCountByUserIdPort,
 ) : CreateUserUseCase, SignInUseCase,
-    DeleteUserUseCase, GetUserUseCase {
+    DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -94,14 +93,14 @@ class UserService(
 
     override fun getUserByIdOrNickname(request: GetUserUseCase.GetUserByIdOrNicknameRequest): GetUserUseCase.UserDto {
         return runCatching {
-            if (request.id === null && request.nickname === null ) throw InvalidRequestParameterException(request.toString())
-            else if (request.id !== null && request.nickname !== null ) throw InvalidRequestParameterException(request.toString())
+            if (request.id === null && request.nickname === null) throw InvalidRequestParameterException(request.toString())
+            else if (request.id !== null && request.nickname !== null) throw InvalidRequestParameterException(request.toString())
 
-            val user: User = if (request.id !== null ) {
+            val user: User = if (request.id !== null) {
                 request.id.run {
                     getUserByIdPort.getByIdOrNull(this)
                 } ?: throw UserNotFoundException("id: ${request.id}")
-            } else{
+            } else {
                 request.nickname?.run {
                     getUserByNicknamePort.getByNicknameOrNull(this)
                 } ?: throw UserNotFoundException("nickname: ${request.nickname}")
@@ -111,5 +110,27 @@ class UserService(
             logger.error { "getUserList fail: param[${request}]" }
         }.getOrThrow()
     }
+
+    override fun getUserDetailById(request: GetUserDetailUseCase.GetUserDetailByIdRequest): GetUserDetailUseCase.UserDetailDto {
+        return runCatching {
+            val user = getUserByIdPort.getByIdOrNull(request.id) ?: throw UserNotFoundException("id: ${request.id}")
+            val bookmarkCount = getBookmarkCountByUserIdPort.getBookmarkCountByUserId(request.id)
+            val likeCount = getLikeCountByUserIdPort.getLikeCountByUserId(request.id)
+            GetUserDetailUseCase.UserDetailDto(
+                user.id,
+                user.nickname,
+                user.profilePath,
+                user.favoriteQuotation,
+                user.favoriteAuthor,
+                user.commentAlarm,
+                user.quotationAlarm,
+                bookmarkCount,
+                likeCount
+            )
+        }.onFailure {
+            logger.error { "getUserDetailById fail: param[${request}]" }
+        }.getOrThrow()
+    }
+
 
 }

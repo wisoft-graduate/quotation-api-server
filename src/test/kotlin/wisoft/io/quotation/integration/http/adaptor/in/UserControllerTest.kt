@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
+import wisoft.io.quotation.application.port.`in`.GetUserDetailUseCase
 import wisoft.io.quotation.application.port.`in`.GetUserUseCase
 import wisoft.io.quotation.application.port.`in`.SignInUseCase
 import wisoft.io.quotation.exception.error.ErrorData
@@ -175,12 +176,39 @@ class UserControllerTest(
             val existUser = repository.save(getUserEntityFixture())
             val accessToken = "testToken"
 
+            // when, then
             val result = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/${existUser.id}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", accessToken)
             )
                 .andExpect(MockMvcResultMatchers.status().isForbidden)
+        }
+    }
+
+    context("getUserDetail Test") {
+        test("getUserDetail 성공") {
+            // given
+            val existUser = repository.save(getUserEntityFixture())
+            // when
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/${existUser.id}")
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect { MockMvcResultMatchers.status().isOk }
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, GetUserDetailUseCase.GetUserDetailByIdResponse::class.java)
+            actual.data.id shouldBe existUser.id
+            actual.data.nickname shouldBe existUser.nickname
+            actual.data.bookmarkCount shouldBe 0
+            actual.data.likeQuotationCount shouldBe 0
+
+
+
+
         }
     }
 

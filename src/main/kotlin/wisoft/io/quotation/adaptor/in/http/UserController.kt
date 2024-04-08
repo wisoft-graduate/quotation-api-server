@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import wisoft.io.quotation.application.port.`in`.GetUserUseCase
-import wisoft.io.quotation.application.port.`in`.DeleteUserUseCase
-import wisoft.io.quotation.application.port.`in`.SignInUseCase
-import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
+import wisoft.io.quotation.application.port.`in`.*
 import wisoft.io.quotation.util.annotation.Authenticated
 
 @RestController
@@ -21,7 +18,8 @@ class UserController(
     val createUserUseCase: CreateUserUseCase,
     val signInUseCase: SignInUseCase,
     val deleteUserUseCase: DeleteUserUseCase,
-    val getUserUseCase: GetUserUseCase
+    val getUserUseCase: GetUserUseCase,
+    val getUserDetailUseCase: GetUserDetailUseCase
 ) {
 
     @PostMapping("/users")
@@ -52,7 +50,7 @@ class UserController(
     }
 
     @GetMapping("/users")
-    fun getUserList(
+    fun getUser(
         @ModelAttribute request: GetUserUseCase.GetUserByIdOrNicknameRequest
     ): ResponseEntity<GetUserUseCase.GetUserByIdOrNicknameResponse> {
         val response = getUserUseCase.getUserByIdOrNickname(request)
@@ -60,6 +58,17 @@ class UserController(
             .body(
                 GetUserUseCase.GetUserByIdOrNicknameResponse(
                     data = GetUserUseCase.UserDto(id = response.id, nickname = response.nickname),
+                )
+            )
+    }
+
+    @GetMapping("/users/{id}")
+    fun getUserDetail(@PathVariable("id") id: String): ResponseEntity<GetUserDetailUseCase.GetUserDetailByIdResponse> {
+        val response = getUserDetailUseCase.getUserDetailById(GetUserDetailUseCase.GetUserDetailByIdRequest(id))
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(
+                GetUserDetailUseCase.GetUserDetailByIdResponse(
+                    data = response
                 )
             )
     }
