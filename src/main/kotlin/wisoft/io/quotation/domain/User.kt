@@ -2,6 +2,8 @@ package wisoft.io.quotation.domain
 
 import org.mindrot.jbcrypt.BCrypt
 import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
+import wisoft.io.quotation.application.port.`in`.UpdateUserUseCase
+import wisoft.io.quotation.domain.dto.RelatedUserDto
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
@@ -26,16 +28,16 @@ data class User(
     val id: String,
     var password: String = "",
     var nickname: String,
-    val profilePath: String? = null,
-    val favoriteQuotation: String? = null,
-    val favoriteAuthor: String? = null,
-    val commentAlarm: Boolean = false,
-    val quotationAlarm: Boolean = false,
-    val quotationAlarmTimes: List<Timestamp> = emptyList(),
+    var profilePath: String? = null,
+    var favoriteQuotation: String? = null,
+    var favoriteAuthor: String? = null,
+    var commentAlarm: Boolean = false,
+    var quotationAlarm: Boolean = false,
+    var quotationAlarmTimes: List<Timestamp> = emptyList(),
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
-    val lastModifiedTime: Timestamp? = null,
-    val identityVerificationQuestion: String,
-    val identityVerificationAnswer: String
+    var lastModifiedTime: Timestamp? = null,
+    var identityVerificationQuestion: String,
+    var identityVerificationAnswer: String
 ) {
     fun toEntity(): UserEntity {
         return UserEntity(
@@ -70,4 +72,14 @@ data class User(
     fun resign(identifier: String) {
         this.nickname = "leaved#$identifier"
     }
+
+    fun update(dto: RelatedUserDto.UpdateUserDto) {
+        dto.nickname?.let { this.nickname = it }
+        dto.profile?.let { this.profilePath = it }
+        dto.favoriteAuthor?.let { this.favoriteAuthor = it }
+        dto.favoriteQuotation?.let { this.favoriteQuotation = it }
+        dto.alarm?.let { this.quotationAlarm = it }
+    }
+
+
 }

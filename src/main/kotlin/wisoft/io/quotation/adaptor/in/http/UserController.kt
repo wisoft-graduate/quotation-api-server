@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import wisoft.io.quotation.application.port.`in`.*
@@ -19,7 +20,8 @@ class UserController(
     val signInUseCase: SignInUseCase,
     val deleteUserUseCase: DeleteUserUseCase,
     val getUserUseCase: GetUserUseCase,
-    val getUserDetailUseCase: GetUserDetailUseCase
+    val getUserDetailUseCase: GetUserDetailUseCase,
+    val updateUserUseCase: UpdateUserUseCase
 ) {
 
     @PostMapping("/users")
@@ -71,6 +73,20 @@ class UserController(
                     data = response
                 )
             )
+    }
+
+    @PutMapping("/users/{id}")
+    @Authenticated
+    fun updateUser(
+        @PathVariable("id") id: String,
+        @RequestBody @Valid request: UpdateUserUseCase.UpdateUserRequest
+    ): ResponseEntity<UpdateUserUseCase.UpdateUserResponse> {
+        val response = updateUserUseCase.updateUser(id, request)
+        return ResponseEntity.status(HttpStatus.OK).body(
+            UpdateUserUseCase.UpdateUserResponse(
+                data = UpdateUserUseCase.Data(response)
+            )
+        )
     }
 
     @DeleteMapping("/users/{id}")

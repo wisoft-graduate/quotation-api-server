@@ -15,10 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
-import wisoft.io.quotation.application.port.`in`.CreateUserUseCase
-import wisoft.io.quotation.application.port.`in`.GetUserDetailUseCase
-import wisoft.io.quotation.application.port.`in`.GetUserUseCase
-import wisoft.io.quotation.application.port.`in`.SignInUseCase
+import wisoft.io.quotation.application.port.`in`.*
 import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
@@ -205,11 +202,36 @@ class UserControllerTest(
             actual.data.nickname shouldBe existUser.nickname
             actual.data.bookmarkCount shouldBe 0
             actual.data.likeQuotationCount shouldBe 0
-
-
-
-
         }
     }
 
+    context("updateUser Test") {
+        test("updateUser 성공 ") {
+            // given
+            val existUser = repository.save(getUserEntityFixture())
+            val request = UpdateUserUseCase.UpdateUserRequest(
+                nickname = "updatedNickname",
+                null,
+                null,
+                null,
+                null
+            )
+            val accessToken = JWTUtil.generateAccessToken(existUser.toDomain())
+            // when
+            val requestToJson = objectMapper.writeValueAsString(request)
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.put("/users/${existUser.id}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", "Bearer $accessToken")
+                    .content(requestToJson)
+            ).andExpect(
+                MockMvcResultMatchers.status().isOk
+            ).andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, UpdateUserUseCase.UpdateUserResponse::class.java)
+            actual.data.id shouldBe existUser.id
+        }
+    }
 })
