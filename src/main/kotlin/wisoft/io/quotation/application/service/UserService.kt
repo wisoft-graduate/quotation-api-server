@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import wisoft.io.quotation.application.port.`in`.*
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
+import wisoft.io.quotation.domain.dto.RelatedUserDto
 import wisoft.io.quotation.exception.error.InvalidRequestParameterException
 import wisoft.io.quotation.exception.error.UserDuplicateException
 import wisoft.io.quotation.exception.error.UserNotFoundException
@@ -21,8 +22,9 @@ class UserService(
     val getUserByNicknamePort: GetUserByNicknamePort,
     val getBookmarkCountByUserIdPort: GetBookmarkCountByUserIdPort,
     val getLikeCountByUserIdPort: GetLikeCountByUserIdPort,
+    val updateUserPort: UpdateUserPort
 ) : CreateUserUseCase, SignInUseCase,
-    DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase {
+    DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase, UpdateUserUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -129,6 +131,24 @@ class UserService(
             )
         }.onFailure {
             logger.error { "getUserDetailById fail: param[${request}]" }
+        }.getOrThrow()
+    }
+
+    @Transactional
+    override fun updateUser(id: String, request: UpdateUserUseCase.UpdateUserRequest): String {
+        return runCatching {
+            val user = getUserByIdPort.getByIdOrNull(id) ?: throw UserNotFoundException("id: ${id}")
+            val dto = RelatedUserDto.UpdateUserDto(
+                request.nickname,
+                request.profile,
+                request.alarm,
+                request.favoriteQuotation,
+                request.favoriteAuthor
+            )
+            user.update(dto)
+            updateUserPort.update(user)
+        }.onFailure {
+            logger.error { "updateUser fail: param[id: ${id}, request: ${request}]" }
         }.getOrThrow()
     }
 
