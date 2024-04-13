@@ -138,12 +138,16 @@ class UserService(
     override fun updateUser(id: String, request: UpdateUserUseCase.UpdateUserRequest): String {
         return runCatching {
             val user = getUserByIdPort.getByIdOrNull(id) ?: throw UserNotFoundException("id: ${id}")
+            user.copy()
             val dto = RelatedUserDto.UpdateUserDto(
                 request.nickname,
                 request.profile,
-                request.alarm,
                 request.favoriteQuotation,
-                request.favoriteAuthor
+                request.favoriteAuthor,
+                request.quotationAlarm,
+                request.commentAlarm,
+                request.identityVerificationQuestion,
+                request.identityVerificationAnswer,
             )
             user.update(dto)
             updateUserPort.update(user)

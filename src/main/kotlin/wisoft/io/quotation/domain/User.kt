@@ -78,7 +78,10 @@ data class User(
         dto.profile?.let { this.profilePath = it }
         dto.favoriteAuthor?.let { this.favoriteAuthor = it }
         dto.favoriteQuotation?.let { this.favoriteQuotation = it }
-        dto.alarm?.let { this.quotationAlarm = it }
+        dto.quotationAlarm?.let { this.quotationAlarm = it }
+        dto.commentAlarm?.let { this.commentAlarm = it }
+        dto.identityVerificationQuestion?.let { this.identityVerificationQuestion = it }
+        dto.identityVerificationAnswer?.let { this.identityVerificationAnswer = it }
     }
 
 

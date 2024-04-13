@@ -217,6 +217,9 @@ class UserControllerTest(
                 null,
                 null,
                 null,
+                null,
+                null,
+                null,
                 null
             )
             val accessToken = JWTUtil.generateAccessToken(existUser.toDomain())
