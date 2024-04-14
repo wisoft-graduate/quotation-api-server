@@ -6,8 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import wisoft.io.quotation.exception.error.*
-import wisoft.io.quotation.exception.error.http.HttpMessage
-import wisoft.io.quotation.exception.error.http.UnauthorizedException
+import wisoft.io.quotation.exception.error.http.*
 
 @RestControllerAdvice
 class ExceptionHandler {
@@ -25,49 +24,9 @@ class ExceptionHandler {
             .body(errorMessage)
     }
 
-    @ExceptionHandler(InvalidRequestParameterException::class)
-    fun invalidRequestParameterExceptionHandler(
-        e: MethodArgumentNotValidException,
-        request: HttpServletRequest
-    ): ResponseEntity<ErrorData> {
-        val status = HttpMessage.HTTP_400.status
-        val errorMessage = ErrorData(ErrorMessage.from(status,e,request))
-
-        return ResponseEntity
-            .status(status)
-            .body(errorMessage)
-    }
-
-
-    @ExceptionHandler(QuotationNotFoundException::class)
-    fun quotationNotFoundExceptionHandler(
-        e: QuotationNotFoundException,
-        request: HttpServletRequest
-    ): ResponseEntity<ErrorData> {
-        val status = HttpMessage.HTTP_404.status
-        val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
-
-        return ResponseEntity
-            .status(status)
-            .body(errorMessage)
-    }
-
-    @ExceptionHandler(UserNotFoundException::class)
-    fun userNotFoundExceptionHandler(
-        e: UserNotFoundException,
-        request: HttpServletRequest
-    ): ResponseEntity<ErrorData> {
-        val status = HttpMessage.HTTP_404.status
-        val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
-
-        return ResponseEntity
-            .status(status)
-            .body(errorMessage)
-    }
-
-    @ExceptionHandler(UserDuplicateException::class)
-    fun userDuplicateExceptionHandler(
-        e: UserDuplicateException,
+    @ExceptionHandler(BadRequestException::class)
+    fun badRequestExceptionHandler(
+        e: BadRequestException,
         request: HttpServletRequest
     ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_400.status
@@ -78,9 +37,22 @@ class ExceptionHandler {
             .body(errorMessage)
     }
 
-    @ExceptionHandler(UnauthorizedUserException::class)
-    fun unauthorizedUserExceptionHandler(
-        e: UnauthorizedUserException,
+    @ExceptionHandler(NotFoundException::class)
+    fun notFoundExceptionHandler(
+        e: NotFoundException,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorData> {
+        val status = HttpMessage.HTTP_404.status
+        val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
+
+        return ResponseEntity
+            .status(status)
+            .body(errorMessage)
+    }
+
+    @ExceptionHandler(UnauthorizedException::class)
+    fun unauthorizedExceptionExceptionHandler(
+        e: UnauthorizedException,
         request: HttpServletRequest
     ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_401.status
@@ -91,9 +63,9 @@ class ExceptionHandler {
             .body(errorMessage)
     }
 
-    @ExceptionHandler(InvalidJwtTokenException::class)
-    fun invalidJwtTokenExceptionExceptionHandler(
-        e: InvalidJwtTokenException,
+    @ExceptionHandler(ForbiddenException::class)
+    fun forbiddenExceptionHandler(
+        e: ForbiddenException,
         request: HttpServletRequest
     ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_403.status
@@ -103,4 +75,5 @@ class ExceptionHandler {
             .status(status)
             .body(errorMessage)
     }
+
 }

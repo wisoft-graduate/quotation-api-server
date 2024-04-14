@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
@@ -18,6 +19,7 @@ import wisoft.io.quotation.adaptor.out.persistence.repository.BookmarkRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.CreateBookmarkUseCase
 import wisoft.io.quotation.application.port.`in`.GetBookmarkListUseCase
+import wisoft.io.quotation.application.port.`in`.UpdateBookmarkUseCase
 import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getBookmarkEntityFixture
@@ -130,6 +132,72 @@ class BookmarkControllerTest(
             actual.icon shouldBe bookmark.icon
             actual.visibility shouldBe bookmark.visibility
             actual.quotationIds shouldBe bookmark.quotationIds
+        }
+    }
+
+    context("updateBookmark Test") {
+        test("updateBookmark 성공") {
+            // given
+            val user = userRepository.save(getUserEntityFixture())
+            val bookmark = bookmarkRepository.save(getBookmarkEntityFixture(user.id))
+            val request = UpdateBookmarkUseCase.UpdateBookmarkRequest(
+                name = "updated bookmark",
+                quotationIds = listOf(),
+                visibility = false,
+                icon = "updated icon"
+            )
+
+            // when
+            val updateBookmarkRequestJson = objectMapper.writeValueAsString(request)
+            mockMvc.perform(
+                MockMvcRequestBuilders
+                    .put("/bookmark/${bookmark.id}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(updateBookmarkRequestJson)
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = bookmarkRepository.findById(bookmark.id).get()
+            actual.id shouldBe bookmark.id
+            actual.name shouldBe request.name
+            actual.quotationIds shouldBe request.quotationIds
+            actual.visibility shouldBe request.visibility
+            actual.icon shouldBe request.icon
+        }
+
+        test("updateBookmark 실패") {
+            // given
+            val request = UpdateBookmarkUseCase.UpdateBookmarkRequest(
+                name = "updated bookmark",
+                quotationIds = listOf(),
+                visibility = false,
+                icon = "updated icon"
+            )
+
+            // when, // then
+            val updateBookmarkRequestJson = objectMapper.writeValueAsString(request)
+            mockMvc.perform(
+                MockMvcRequestBuilders
+                    .put("/bookmark/${UUID.randomUUID()}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(updateBookmarkRequestJson)
+            )
+                .andExpect(MockMvcResultMatchers.status().isNotFound)
+        }
+    }
+
+    context("deleteBookmark Test") {
+        test("deleteBookmark 성공") {
+            // given
+            val user = userRepository.save(getUserEntityFixture())
+            val bookmark = bookmarkRepository.save(getBookmarkEntityFixture(user.id))
+
+            // when, then
+            mockMvc.perform(MockMvcRequestBuilders.delete("/bookmark/${bookmark.id}"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent)
         }
     }
 

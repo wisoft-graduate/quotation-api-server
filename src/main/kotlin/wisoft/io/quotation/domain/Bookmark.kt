@@ -1,6 +1,7 @@
 package wisoft.io.quotation.domain
 
 import wisoft.io.quotation.adaptor.out.persistence.entity.BookmarkEntity
+import wisoft.io.quotation.application.port.`in`.UpdateBookmarkUseCase
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
@@ -34,6 +35,15 @@ data class Bookmark(
             visibility = this.visibility,
             icon = this.icon,
             createdTime = this.createdTime
+        )
+    }
+
+    fun update(dto: UpdateBookmarkUseCase.UpdateBookmarkRequest): Bookmark {
+        return this.copy(
+            name = dto.name ?: this.name,
+            quotationIds = dto.quotationIds ?: this.quotationIds,
+            visibility = dto.visibility ?: this.visibility,
+            icon = dto.icon ?: this.icon,
         )
     }
 }
