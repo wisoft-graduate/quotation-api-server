@@ -3,22 +3,22 @@ package wisoft.io.quotation.application.service
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import wisoft.io.quotation.application.port.`in`.GetQuotationUseCase
-import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
+import wisoft.io.quotation.application.port.`in`.GetQuotationListUseCase
 import wisoft.io.quotation.application.port.out.GetQuotationPort
-import wisoft.io.quotation.application.port.out.GetQuotationsPort
+import wisoft.io.quotation.application.port.out.GetQuotationListPort
 import wisoft.io.quotation.domain.Quotation
 import wisoft.io.quotation.exception.error.QuotationNotFoundException
 import java.util.*
 
 @Service
 class QuotationService(
-    val getQuotationsPort: GetQuotationsPort,
+    val getQuotationsPort: GetQuotationListPort,
     val getQuotationPort: GetQuotationPort
-) : GetQuotationsUseCase,
+) : GetQuotationListUseCase,
     GetQuotationUseCase {
 
     val logger = KotlinLogging.logger {}
-    override fun getQuotationList(request: GetQuotationsUseCase.GetQuotationListRequest): List<Quotation> {
+    override fun getQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<Quotation> {
         return runCatching {
             getQuotationsPort.getQuotationList(request)
         }.onFailure {

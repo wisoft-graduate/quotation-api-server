@@ -3,7 +3,9 @@ package wisoft.io.quotation.application.service
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import wisoft.io.quotation.application.port.`in`.CreateBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.GetBookmarkListUseCase
 import wisoft.io.quotation.application.port.out.CreateBookmarkPort
+import wisoft.io.quotation.application.port.out.GetBookmarkListPort
 import wisoft.io.quotation.application.port.out.GetUserByIdPort
 import wisoft.io.quotation.domain.Bookmark
 import wisoft.io.quotation.exception.error.UserNotFoundException
@@ -12,8 +14,10 @@ import java.util.*
 @Service
 class BookmarkService(
     val getUserByIdPort: GetUserByIdPort,
-    val createBookmarkPort: CreateBookmarkPort
-    ) : CreateBookmarkUseCase {
+    val createBookmarkPort: CreateBookmarkPort,
+    val getBookmarkListPort: GetBookmarkListPort,
+) : CreateBookmarkUseCase,
+    GetBookmarkListUseCase {
     val logger = KotlinLogging.logger {}
 
     override fun createBookmark(request: CreateBookmarkUseCase.CreateBookmarkRequest): UUID {
@@ -32,6 +36,14 @@ class BookmarkService(
             }
         }.onFailure {
             logger.error { "createBookmark fail: param[$request]" }
+        }.getOrThrow()
+    }
+
+    override fun getBookmarkList(request: GetBookmarkListUseCase.GetBookmarkListRequest): List<Bookmark> {
+        return runCatching {
+            getBookmarkListPort.getBookmarkList(request.userId)
+        }.onFailure {
+            logger.error { "getBookmarkList fail: param[$request]" }
         }.getOrThrow()
     }
 

@@ -7,5 +7,7 @@ import java.util.*
 
 @Repository
 interface BookmarkRepository: JpaRepository<BookmarkEntity, UUID>{
-    fun countAlLByUserId(userId: String): Long
+    fun countAllByUserId(userId: String): Long
+
+    fun findByUserId(userId: String): List<BookmarkEntity>
 }

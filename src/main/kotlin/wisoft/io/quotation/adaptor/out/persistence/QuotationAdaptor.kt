@@ -4,9 +4,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationCustomRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
-import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
+import wisoft.io.quotation.application.port.`in`.GetQuotationListUseCase
 import wisoft.io.quotation.application.port.out.GetQuotationPort
-import wisoft.io.quotation.application.port.out.GetQuotationsPort
+import wisoft.io.quotation.application.port.out.GetQuotationListPort
 import wisoft.io.quotation.domain.Quotation
 import java.util.*
 
@@ -14,14 +14,14 @@ import java.util.*
 class QuotationAdaptor(
     val quotationRepository: QuotationRepository,
     val quotationCustomRepository: QuotationCustomRepository
-) : GetQuotationsPort,
+) : GetQuotationListPort,
     GetQuotationPort {
 
     override fun getQuotation(id: UUID): Quotation? {
         return quotationRepository.findByIdOrNull(id)?.toDomain()
     }
 
-    override fun getQuotationList(request: GetQuotationsUseCase.GetQuotationListRequest): List<Quotation> {
+    override fun getQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<Quotation> {
         val result = quotationCustomRepository.findQuotationList(request).distinct()
         return result.map { it.toDomain() }
     }

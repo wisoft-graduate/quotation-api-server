@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -16,8 +17,10 @@ import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.BookmarkRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.CreateBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.GetBookmarkListUseCase
 import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
+import wisoft.io.quotation.fixture.entity.getBookmarkEntityFixture
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
 import java.util.*
 
@@ -53,9 +56,11 @@ class BookmarkControllerTest(
 
             // when
             val createBookmarkRequestJson = objectMapper.writeValueAsString(request)
-            val result = mockMvc.perform(MockMvcRequestBuilders.post("/bookmark")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createBookmarkRequestJson))
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/bookmark")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(createBookmarkRequestJson)
+            )
                 .andExpect(MockMvcResultMatchers.status().isCreated)
                 .andReturn()
                 .response.contentAsString
@@ -81,9 +86,11 @@ class BookmarkControllerTest(
 
             // when
             val createBookmarkRequestJson = objectMapper.writeValueAsString(request)
-            val result = mockMvc.perform(MockMvcRequestBuilders.post(path)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createBookmarkRequestJson))
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.post(path)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(createBookmarkRequestJson)
+            )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
                 .response.contentAsString
@@ -94,6 +101,35 @@ class BookmarkControllerTest(
             actual.error shouldBe status.reasonPhrase
             actual.path shouldBe path
             actual.message shouldBe userId + HttpMessage.HTTP_404.message
+        }
+    }
+
+    context("getBookmarkList Test") {
+        test("getBookmarkList 성공") {
+            // given
+            val user = userRepository.save(getUserEntityFixture())
+            val bookmark = bookmarkRepository.save(getBookmarkEntityFixture(user.id))
+
+            // when
+            val result = mockMvc.get("/bookmark") {
+                param("userId", user.id)
+                accept = MediaType.APPLICATION_JSON
+            }
+                .andExpect { MockMvcResultMatchers.status().isOk }
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(
+                result,
+                GetBookmarkListUseCase.GetBookmarkListResponse::class.java
+            ).data.bookmarks.first()
+
+            actual.id shouldBe bookmark.id
+            actual.name shouldBe bookmark.name
+            actual.icon shouldBe bookmark.icon
+            actual.visibility shouldBe bookmark.visibility
+            actual.quotationIds shouldBe bookmark.quotationIds
         }
     }
 

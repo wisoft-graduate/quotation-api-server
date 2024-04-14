@@ -6,7 +6,7 @@ import com.linecorp.kotlinjdsl.spring.data.listQuery
 import org.springframework.stereotype.Repository
 import wisoft.io.quotation.adaptor.out.persistence.entity.AuthorEntity
 import wisoft.io.quotation.adaptor.out.persistence.entity.QuotationEntity
-import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
+import wisoft.io.quotation.application.port.`in`.GetQuotationListUseCase
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection
 
@@ -14,7 +14,7 @@ import wisoft.io.quotation.domain.SortDirection
 class QuotationCustomRepository(
     val queryFactory: SpringDataQueryFactory
 ) {
-    fun findQuotationList(request: GetQuotationsUseCase.GetQuotationListRequest): List<QuotationEntity> {
+    fun findQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<QuotationEntity> {
         return queryFactory.listQuery<QuotationEntity> {
             select(QuotationEntity::class.java)
             from(entity(QuotationEntity::class))

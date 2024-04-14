@@ -7,7 +7,7 @@ import wisoft.io.quotation.domain.SortDirection
 import java.util.UUID
 
 
-interface GetQuotationsUseCase {
+interface GetQuotationListUseCase {
 
     fun getQuotationList(request: GetQuotationListRequest): List<Quotation>
 
