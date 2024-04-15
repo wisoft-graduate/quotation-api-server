@@ -199,6 +199,15 @@ class BookmarkControllerTest(
             mockMvc.perform(MockMvcRequestBuilders.delete("/bookmark/${bookmark.id}"))
                 .andExpect(MockMvcResultMatchers.status().isNoContent)
         }
+
+        test("deleteBookmark 실패") {
+            // given
+            val randomUUID = UUID.randomUUID()
+
+            // when, then
+            mockMvc.perform(MockMvcRequestBuilders.delete("/bookmark/$randomUUID"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound)
+        }
     }
 
 })

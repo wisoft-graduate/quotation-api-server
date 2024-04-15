@@ -56,6 +56,7 @@ class BookmarkService(
 
     override fun deleteBookmark(id: UUID) {
         runCatching {
+            val bookmark = getBookmarkPort.getBookmark(id) ?: throw BookmarkNotFoundException(id.toString())
             deleteBookmarkPort.deleteBookmark(id)
         }.onFailure {
             logger.error { "deleteBookmark fail: param[id: $id]" }
