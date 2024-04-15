@@ -158,6 +158,7 @@ class UserControllerTest(
             )
                 .andExpect(MockMvcResultMatchers.status().isNoContent)
         }
+
         test("deleteUser 실패 - 비 인가된 사용자") {
             // given
             val existUser = repository.save(getUserEntityFixture())
@@ -168,6 +169,7 @@ class UserControllerTest(
             )
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
         }
+
         test("deleteUser 실패 - 인증 정보 불일치 사용자") {
             // given
             val existUser = repository.save(getUserEntityFixture())

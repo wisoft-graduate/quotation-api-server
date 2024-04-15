@@ -17,7 +17,7 @@ import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.AuthorRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.application.port.`in`.GetQuotationUseCase
-import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
+import wisoft.io.quotation.application.port.`in`.GetQuotationListUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection
@@ -98,7 +98,7 @@ class QuotationControllerTest(
             // given
             val author = authorRepository.save(getAuthorEntityFixture())
             val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
-            val request = GetQuotationsUseCase.GetQuotationListRequest(
+            val request = GetQuotationListUseCase.GetQuotationListRequest(
                 searchWord = quotation.content,
                 sortTarget = QuotationSortTarget.LIKE,
                 sortDirection = SortDirection.ASC,
@@ -123,7 +123,7 @@ class QuotationControllerTest(
             // then
             val actual = objectMapper.readValue(
                 result,
-                GetQuotationsUseCase.GetQuotationListResponse::class.java
+                GetQuotationListUseCase.GetQuotationListResponse::class.java
             ).data.quotations.first()
 
             actual.id shouldBe quotation.id

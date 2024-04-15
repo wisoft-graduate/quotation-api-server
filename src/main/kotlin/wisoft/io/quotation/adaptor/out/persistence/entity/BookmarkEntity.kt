@@ -1,9 +1,12 @@
 package wisoft.io.quotation.adaptor.out.persistence.entity
 
+import io.hypersistence.utils.hibernate.type.array.ListArrayType
 import io.hypersistence.utils.hibernate.type.array.UUIDArrayType
 import jakarta.persistence.*
 import org.hibernate.annotations.Type
+import wisoft.io.quotation.domain.Bookmark
 import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.UUID
 
 /**
@@ -23,41 +26,23 @@ data class BookmarkEntity(
     val id: UUID = UUID.randomUUID(),
     val name: String,
     val userId: String,
-    @Type(value = UUIDArrayType::class)
+    @Type(value = ListArrayType::class)
     @Column(columnDefinition = "uuid[]")
-    val quotationIds: Array<UUID> = emptyArray(),
+    val quotationIds: List<UUID> = listOf(),
     val visibility: Boolean,
     val icon: String? = null,
-    val createdTime: Timestamp,
+    val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as BookmarkEntity
-
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (userId != other.userId) return false
-        if (!quotationIds.contentEquals(other.quotationIds)) return false
-        if (visibility != other.visibility) return false
-        if (icon != other.icon) return false
-        if (createdTime != other.createdTime) return false
-        if (lastModifiedTime != other.lastModifiedTime) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + name.hashCode()
-        result = 31 * result + userId.hashCode()
-        result = 31 * result + quotationIds.contentHashCode()
-        result = 31 * result + visibility.hashCode()
-        result = 31 * result + (icon?.hashCode() ?: 0)
-        result = 31 * result + createdTime.hashCode()
-        result = 31 * result + (lastModifiedTime?.hashCode() ?: 0)
-        return result
+    fun toDomain(): Bookmark {
+        return Bookmark(
+            id = this.id,
+            name = this.name,
+            userId = this.userId,
+            quotationIds = this.quotationIds,
+            visibility = this.visibility,
+            icon = this.icon,
+            createdTime = this.createdTime
+        )
     }
 }

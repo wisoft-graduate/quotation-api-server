@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import wisoft.io.quotation.application.port.`in`.GetQuotationUseCase
-import wisoft.io.quotation.application.port.`in`.GetQuotationsUseCase
+import wisoft.io.quotation.application.port.`in`.GetQuotationListUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection
@@ -13,7 +13,7 @@ import java.util.UUID
 @RestController
 @RequestMapping("/quotations")
 class QuotationController(
-    val getQuotationsUseCase: GetQuotationsUseCase,
+    val getQuotationsUseCase: GetQuotationListUseCase,
     val getQuotationUseCase: GetQuotationUseCase
 ) {
 
@@ -24,9 +24,9 @@ class QuotationController(
         @RequestParam sortDirection: SortDirection?,
         @ModelAttribute paging: Paging?,
         @RequestParam ids: List<UUID>?
-    ): ResponseEntity<GetQuotationsUseCase.GetQuotationListResponse> {
+    ): ResponseEntity<GetQuotationListUseCase.GetQuotationListResponse> {
         val response = getQuotationsUseCase.getQuotationList(
-            GetQuotationsUseCase.GetQuotationListRequest(
+            GetQuotationListUseCase.GetQuotationListRequest(
                 searchWord = searchWord,
                 sortTarget = sortTarget,
                 sortDirection = sortDirection,
@@ -35,7 +35,7 @@ class QuotationController(
             )
         )
         return ResponseEntity.status(HttpStatus.OK)
-            .body(GetQuotationsUseCase.GetQuotationListResponse(data = GetQuotationsUseCase.Data(quotations = response)))
+            .body(GetQuotationListUseCase.GetQuotationListResponse(data = GetQuotationListUseCase.Data(quotations = response)))
     }
 
     @GetMapping("/{id}")
