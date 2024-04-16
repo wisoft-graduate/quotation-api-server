@@ -6,7 +6,7 @@ interface UpdateUserUseCase {
 
     data class UpdateUserRequest(
         val nickname: String?,
-        val profile: String?,
+        val profilePath: String?,
         val favoriteQuotation: String?,
         val favoriteAuthor: String?,
         val quotationAlarm: Boolean?,

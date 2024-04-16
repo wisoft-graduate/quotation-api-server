@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional
 import wisoft.io.quotation.application.port.`in`.*
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
-import wisoft.io.quotation.domain.dto.RelatedUserDto
 import wisoft.io.quotation.exception.error.InvalidRequestParameterException
 import wisoft.io.quotation.exception.error.UserDuplicateException
 import wisoft.io.quotation.exception.error.UserNotFoundException
@@ -22,7 +21,8 @@ class UserService(
     val getUserByNicknamePort: GetUserByNicknamePort,
     val getBookmarkCountByUserIdPort: GetBookmarkCountByUserIdPort,
     val getLikeCountByUserIdPort: GetLikeCountByUserIdPort,
-    val updateUserPort: UpdateUserPort
+    val updateUserPort: UpdateUserPort,
+    val deleteUserPort: DeleteUserPort
 ) : CreateUserUseCase, SignInUseCase,
     DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase, UpdateUserUseCase {
     val logger = KotlinLogging.logger {}
@@ -75,7 +75,7 @@ class UserService(
     }
 
     @Transactional
-    override fun deleteUser(id: String): String {
+    override fun deleteUser(id: String) {
         return runCatching {
             val user = getUserByIdPort.getByIdOrNull(id) ?: throw UserNotFoundException(id)
 
@@ -84,9 +84,9 @@ class UserService(
             }
 
             val identifier = Instant.now().epochSecond.toString() + SaltUtil.generateSalt(4)
-            user.resign(identifier)
+            val deletedUser = user.resign(identifier)
 
-            createUserPort.create(user)
+            deleteUserPort.delete(deletedUser)
         }.onFailure {
             logger.error { "deleteUser fail: parma[id: $id]" }
         }.getOrThrow()
@@ -138,19 +138,8 @@ class UserService(
     override fun updateUser(id: String, request: UpdateUserUseCase.UpdateUserRequest): String {
         return runCatching {
             val user = getUserByIdPort.getByIdOrNull(id) ?: throw UserNotFoundException("id: ${id}")
-            user.copy()
-            val dto = RelatedUserDto.UpdateUserDto(
-                request.nickname,
-                request.profile,
-                request.favoriteQuotation,
-                request.favoriteAuthor,
-                request.quotationAlarm,
-                request.commentAlarm,
-                request.identityVerificationQuestion,
-                request.identityVerificationAnswer,
-            )
-            user.update(dto)
-            updateUserPort.update(user)
+            val updatedUser = user.update(request)
+            updateUserPort.update(updatedUser)
         }.onFailure {
             logger.error { "updateUser fail: param[id: ${id}, request: ${request}]" }
         }.getOrThrow()
