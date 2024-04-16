@@ -4,6 +4,6 @@ import wisoft.io.quotation.domain.User
 
 interface DeleteUserPort {
 
-    fun delete(user: User)
+    fun deleteUser(user: User)
 
 }

@@ -14,7 +14,7 @@ import java.util.*
 
 @Service
 class BookmarkService(
-    val getUserByIdPort: GetUserByIdPort,
+    val getUserPort: GetUserPort,
     val createBookmarkPort: CreateBookmarkPort,
     val getBookmarkListPort: GetBookmarkListPort,
     val getBookmarkPort: GetBookmarkPort,
@@ -28,7 +28,7 @@ class BookmarkService(
 
     override fun createBookmark(request: CreateBookmarkUseCase.CreateBookmarkRequest): UUID {
         return runCatching {
-            getUserByIdPort.getByIdOrNull(request.userId) ?: throw UserNotFoundException(request.userId)
+            getUserPort.getUserById(request.userId) ?: throw UserNotFoundException(request.userId)
             request.run {
                 createBookmarkPort.createBookmark(
                     Bookmark(

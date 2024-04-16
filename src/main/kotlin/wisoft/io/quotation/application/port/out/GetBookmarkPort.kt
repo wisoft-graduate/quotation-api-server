@@ -6,4 +6,5 @@ import java.util.*
 interface GetBookmarkPort {
 
     fun getBookmark(id: UUID): Bookmark?
+
 }
