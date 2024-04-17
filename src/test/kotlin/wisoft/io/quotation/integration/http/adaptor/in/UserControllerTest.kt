@@ -212,12 +212,22 @@ class UserControllerTest(
             // given
             val existUser = repository.save(getUserEntityFixture())
             val expectedNickname = "updatedNickname"
+            val expectedProfilePath = "updatedProfile"
+            val expectedFavoriteQuotation = "updatedFavoriteQuotation"
+            val expectedFavoriteAuthor = "updatedFavoriteAuthor"
+            val expectedQuotationAlarm = true
+            val expectedCommentAlarm = true
+            val expectedIdentityVerificationQuestion = "updatedIdentityVerificationQuestion"
+            val expectedIdentityVerificationAnswer = "updatedIdentityVerificationAnswer"
             val request = UpdateUserUseCase.UpdateUserRequest(
                 nickname = expectedNickname,
-                null,
-                null,
-                null,
-                null
+                profilePath = expectedProfilePath,
+                favoriteQuotation = expectedFavoriteQuotation,
+                favoriteAuthor = expectedFavoriteAuthor,
+                quotationAlarm = expectedQuotationAlarm,
+                commentAlarm = expectedCommentAlarm,
+                identityVerificationQuestion = expectedIdentityVerificationQuestion,
+                identityVerificationAnswer = expectedIdentityVerificationAnswer,
             )
             val accessToken = JWTUtil.generateAccessToken(existUser.toDomain())
             // when
@@ -237,9 +247,17 @@ class UserControllerTest(
             actual.data.id shouldBe existUser.id
 
             val actualUser = repository.findById(existUser.id).get()
-            println(actualUser)
 
             actualUser.nickname shouldBe expectedNickname
+            actualUser.profilePath shouldBe expectedProfilePath
+            actualUser.favoriteQuotation shouldBe expectedFavoriteQuotation
+            actualUser.favoriteAuthor shouldBe expectedFavoriteAuthor
+            actualUser.quotationAlarm shouldBe expectedQuotationAlarm
+            actualUser.commentAlarm shouldBe expectedCommentAlarm
+            actualUser.identityVerificationQuestion shouldBe expectedIdentityVerificationQuestion
+            actualUser.identityVerificationAnswer shouldBe expectedIdentityVerificationAnswer
+
+
         }
     }
 

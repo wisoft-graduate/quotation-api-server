@@ -9,23 +9,27 @@ import wisoft.io.quotation.domain.User
 @Component
 class UserAdaptor(
     val userRepository: UserRepository,
-) : GetUserByIdPort, CreateUserPort, GetUserByNicknamePort, UpdateUserPort {
+) : GetUserPort, CreateUserPort, UpdateUserPort, DeleteUserPort {
 
     override fun create(user: User): String {
         return userRepository.save(user.toEntity()).id
     }
 
-    override fun getByIdOrNull(id: String): User? {
+    override fun getUserById(id: String): User? {
         val userEntity = userRepository.findByIdOrNull(id)
         return userEntity?.toDomain()
     }
 
-    override fun getByNicknameOrNull(nickname: String): User? {
+    override fun getUserByNickname(nickname: String): User? {
         val userEntity = userRepository.findByNickname(nickname)
         return userEntity?.toDomain()
     }
 
-    override fun update(user: User): String {
+    override fun updateUser(user: User): String {
         return userRepository.save(user.toEntity()).id
+    }
+
+    override fun deleteUser(user: User) {
+        userRepository.save(user.toEntity())
     }
 }

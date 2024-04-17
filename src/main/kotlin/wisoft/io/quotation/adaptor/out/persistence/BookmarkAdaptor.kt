@@ -10,7 +10,6 @@ import java.util.*
 @Component
 class BookmarkAdaptor(val bookmarkRepository: BookmarkRepository) :
     CreateBookmarkPort,
-    GetBookmarkCountByUserIdPort,
     GetBookmarkListPort,
     GetBookmarkPort,
     UpdateBookmarkPort,
@@ -28,7 +27,7 @@ class BookmarkAdaptor(val bookmarkRepository: BookmarkRepository) :
         return bookmarkRepository.deleteById(id)
     }
 
-    override fun getBookmarkCountByUserId(userId: String): Long {
+    override fun getBookmarkListCountByUserId(userId: String): Long {
         return bookmarkRepository.countAllByUserId(userId)
     }
 

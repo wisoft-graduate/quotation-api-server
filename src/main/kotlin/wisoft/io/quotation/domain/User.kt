@@ -57,8 +57,10 @@ data class User(
         )
     }
 
-    fun encryptPassword(password: String) {
-        this.password = BCrypt.hashpw(password, BCrypt.gensalt())
+    fun encryptPassword(password: String): User {
+        return this.copy(
+            password = BCrypt.hashpw(password, BCrypt.gensalt())
+        )
     }
 
     fun isCorrectPassword(inputPassword: String): Boolean {
@@ -69,16 +71,24 @@ data class User(
         return this.nickname.startsWith("leaved#")
     }
 
-    fun resign(identifier: String) {
-        this.nickname = "leaved#$identifier"
+    fun resign(identifier: String): User {
+        return this.copy(
+            nickname = "leaved#$identifier"
+        )
+
     }
 
-    fun update(dto: RelatedUserDto.UpdateUserDto) {
-        dto.nickname?.let { this.nickname = it }
-        dto.profile?.let { this.profilePath = it }
-        dto.favoriteAuthor?.let { this.favoriteAuthor = it }
-        dto.favoriteQuotation?.let { this.favoriteQuotation = it }
-        dto.alarm?.let { this.quotationAlarm = it }
+    fun update(dto: UpdateUserUseCase.UpdateUserRequest): User {
+        return this.copy(
+            nickname = dto.nickname ?: this.nickname,
+            profilePath = dto.profilePath ?: this.profilePath,
+            favoriteQuotation = dto.favoriteQuotation ?: this.favoriteQuotation,
+            favoriteAuthor = dto.favoriteAuthor ?: this.favoriteAuthor,
+            quotationAlarm = dto.quotationAlarm ?: this.quotationAlarm,
+            commentAlarm = dto.commentAlarm ?: this.commentAlarm,
+            identityVerificationQuestion = dto.identityVerificationQuestion ?: this.identityVerificationQuestion,
+            identityVerificationAnswer = dto.identityVerificationAnswer ?: this.identityVerificationAnswer,
+        )
     }
 
 
