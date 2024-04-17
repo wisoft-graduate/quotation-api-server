@@ -265,12 +265,12 @@ class UserControllerTest(
             // given
             val existUser = repository.save(getUserEntityFixture())
             val request = GetUserListUseCase.GetUserListRequest(
-                likeNickname = existUser.nickname.dropLast(3)
+                nickname = existUser.nickname.dropLast(3)
             )
 
             // when
             val result = mockMvc.get("/users") {
-                param("likeNickname", request.likeNickname)
+                param("nickname", request.nickname)
                 accept = MediaType.APPLICATION_JSON
             }
                 .andExpect { MockMvcResultMatchers.status().isOk }

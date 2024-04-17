@@ -41,9 +41,9 @@ class UserController(
 
     @GetMapping("/users")
     fun getUserList(
-        @RequestParam likeNickname: String
+        @RequestParam nickname: String
     ): ResponseEntity<GetUserListUseCase.GetUserListResponse> {
-        val response = getUserListUseCase.getUserList(GetUserListUseCase.GetUserListRequest(likeNickname = likeNickname))
+        val response = getUserListUseCase.getUserList(GetUserListUseCase.GetUserListRequest(nickname = nickname))
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(

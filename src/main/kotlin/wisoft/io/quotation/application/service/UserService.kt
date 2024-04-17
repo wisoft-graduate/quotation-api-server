@@ -55,7 +55,7 @@ class UserService(
 
     override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
         return runCatching {
-            val userList = getUserListPort.getUserList(request.likeNickname)
+            val userList = getUserListPort.getUserList(request.nickname)
             userList.map { GetUserListUseCase.UserDto(id = it.id, nickname = it.nickname, profilePath = it.profilePath) }
         }.onFailure {
             logger.error { "getUserList fail: param[$request]" }
