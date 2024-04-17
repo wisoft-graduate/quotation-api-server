@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import wisoft.io.quotation.application.port.`in`.*
 import wisoft.io.quotation.util.annotation.Authenticated
@@ -21,7 +22,8 @@ class UserController(
     val deleteUserUseCase: DeleteUserUseCase,
     val getUserUseCase: GetUserUseCase,
     val getUserDetailUseCase: GetUserDetailUseCase,
-    val updateUserUseCase: UpdateUserUseCase
+    val getUserListUseCase: GetUserListUseCase,
+    val updateUserUseCase: UpdateUserUseCase,
 ) {
 
     @PostMapping("/users")
@@ -34,6 +36,18 @@ class UserController(
                 CreateUserUseCase.CreateUserResponse(
                     data = CreateUserUseCase.Data(id = response),
                 )
+            )
+    }
+
+    @GetMapping("/users")
+    fun getUserList(
+        @RequestParam nickname: String
+    ): ResponseEntity<GetUserListUseCase.GetUserListResponse> {
+        val response = getUserListUseCase.getUserList(GetUserListUseCase.GetUserListRequest(nickname = nickname))
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(
+                GetUserListUseCase.GetUserListResponse(data = GetUserListUseCase.Data(users = response))
             )
     }
 
@@ -51,7 +65,7 @@ class UserController(
             )
     }
 
-    @GetMapping("/users")
+    @GetMapping("/users/duplication-check")
     fun getUser(
         @ModelAttribute request: GetUserUseCase.GetUserByIdOrNicknameRequest
     ): ResponseEntity<GetUserUseCase.GetUserByIdOrNicknameResponse> {

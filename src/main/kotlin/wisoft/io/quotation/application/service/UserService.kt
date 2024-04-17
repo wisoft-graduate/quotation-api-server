@@ -18,12 +18,13 @@ import java.time.Instant
 class UserService(
     val createUserPort: CreateUserPort,
     val getUserPort: GetUserPort,
+    val getUserListPort: GetUserListPort,
     val getLikeListPort: GetLikeListPort,
     val getBookmarkListPort: GetBookmarkListPort,
     val updateUserPort: UpdateUserPort,
     val deleteUserPort: DeleteUserPort
 ) : CreateUserUseCase, SignInUseCase,
-    DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase, UpdateUserUseCase {
+    DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase, UpdateUserUseCase, GetUserListUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -50,10 +51,17 @@ class UserService(
         }.onFailure {
             logger.error { "createUser fail: param[$request]" }
         }.getOrThrow()
-
     }
 
-    @Transactional
+    override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
+        return runCatching {
+            val userList = getUserListPort.getUserList(request.nickname)
+            userList.map { GetUserListUseCase.UserDto(id = it.id, nickname = it.nickname, profilePath = it.profilePath) }
+        }.onFailure {
+            logger.error { "getUserList fail: param[$request]" }
+        }.getOrThrow()
+    }
+
     override fun signIn(request: SignInUseCase.SignInRequest): SignInUseCase.UserTokenDto {
         return runCatching {
             val user = getUserPort.getUserById(request.id) ?: throw UserNotFoundException(request.id)

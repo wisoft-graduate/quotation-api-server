@@ -5,7 +5,8 @@ import org.springframework.stereotype.Repository
 import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 
 @Repository
-interface UserRepository: JpaRepository<UserEntity, String> {
+interface UserRepository : JpaRepository<UserEntity, String> {
     fun findByNickname(nickname: String): UserEntity?
+    fun findAllByNicknameContains(nickname: String): List<UserEntity>
 
 }
