@@ -20,7 +20,6 @@ import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
 import wisoft.io.quotation.util.JWTUtil
-import wisoft.io.quotation.util.SaltUtil
 
 @SpringBootTest
 @ContextConfiguration(classes = [DatabaseContainerConfig::class])
@@ -120,8 +119,8 @@ class UserControllerTest(
         }
     }
 
-    context("getUserList Test") {
-        test("getUserList 성공") {
+    context("getUser Test") {
+        test("getUser 성공") {
             // given
             val existUser = repository.save(getUserEntityFixture())
             val request = GetUserUseCase.GetUserByIdOrNicknameRequest(
@@ -129,7 +128,7 @@ class UserControllerTest(
             )
 
             // when
-            val result = mockMvc.get("/users") {
+            val result = mockMvc.get("/users/duplication-check") {
                 param("id", request.id!!)
                 accept = MediaType.APPLICATION_JSON
             }
@@ -151,7 +150,7 @@ class UserControllerTest(
             val existUser = existUserEntity.toDomain()
             val accessToken = JWTUtil.generateAccessToken(existUser)
 
-            val result = mockMvc.perform(
+            mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/${existUserEntity.id}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer $accessToken")
@@ -163,7 +162,7 @@ class UserControllerTest(
             // given
             val existUser = repository.save(getUserEntityFixture())
 
-            val result = mockMvc.perform(
+            mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/${existUser.id}")
                     .contentType(MediaType.APPLICATION_JSON)
             )
@@ -176,7 +175,7 @@ class UserControllerTest(
             val accessToken = "testToken"
 
             // when, then
-            val result = mockMvc.perform(
+            mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/${existUser.id}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", accessToken)
@@ -257,6 +256,34 @@ class UserControllerTest(
             actualUser.identityVerificationQuestion shouldBe expectedIdentityVerificationQuestion
             actualUser.identityVerificationAnswer shouldBe expectedIdentityVerificationAnswer
 
+
+        }
+    }
+
+    context("getUserList Test") {
+        test("getUserList 성공 ") {
+            // given
+            val existUser = repository.save(getUserEntityFixture())
+            val request = GetUserListUseCase.GetUserListRequest(
+                likeNickname = existUser.nickname.dropLast(3)
+            )
+
+            // when
+            val result = mockMvc.get("/users") {
+                param("likeNickname", request.likeNickname)
+                accept = MediaType.APPLICATION_JSON
+            }
+                .andExpect { MockMvcResultMatchers.status().isOk }
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, GetUserListUseCase.GetUserListResponse::class.java)
+            val actualUserDto = actual.data.users[0]
+
+            actualUserDto.id shouldBe  existUser.id
+            actualUserDto.nickname shouldBe  existUser.nickname
+            actualUserDto.profilePath shouldBe  existUser.profilePath
 
         }
     }
