@@ -33,3 +33,5 @@ environment:
     access-token-expiration-time: 3600000
     # 토큰 만료 시간 (1주일)
     refresh-token-expiration-time: 604800000
+    # 토큰 만료 시간 (5분)
+    password-refresh-token-expiration-time: 300000

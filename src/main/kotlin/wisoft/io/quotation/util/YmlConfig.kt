@@ -30,12 +30,14 @@ data class YmlConfig(
         data class ApplicationConfig(
             @JsonProperty("name") val name: String
         )
+
         data class DataSourceConfig(
             @JsonProperty("url") val url: String,
             @JsonProperty("username") val username: String,
             @JsonProperty("password") val password: String,
             @JsonProperty("driver-class-name") val driverClassName: String
         )
+
         data class JpaConfig(
             @JsonProperty("hibernate") val hibernate: HibernateConfig,
             @JsonProperty("properties") val properties: PropertiesConfig,
@@ -44,6 +46,7 @@ data class YmlConfig(
             data class HibernateConfig(
                 @JsonProperty("ddl-auto") val ddlAuto: String,
             )
+
             data class PropertiesConfig(
                 @JsonProperty("hibernate") val hibernate: PropertiesHibernateConfig
             ) {
@@ -62,7 +65,9 @@ data class YmlConfig(
         data class JwtConfig(
             @JsonProperty("secret-key") val secretKey: String,
             @JsonProperty("access-token-expiration-time") val accessTokenExpirationTime: Long,
-            @JsonProperty("refresh-token-expiration-time") val refreshTokenExpirationTime: Long
+            @JsonProperty("refresh-token-expiration-time") val refreshTokenExpirationTime: Long,
+            @JsonProperty("password-refresh-token-expiration-time")
+            val passwordRefreshTokenExpirationTime: Long
         )
     }
 }

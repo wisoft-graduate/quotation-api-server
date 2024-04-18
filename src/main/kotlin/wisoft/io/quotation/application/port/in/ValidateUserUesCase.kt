@@ -2,29 +2,23 @@ package wisoft.io.quotation.application.port.`in`
 
 import jakarta.validation.constraints.NotBlank
 
-interface CreateUserUseCase {
+interface ValidateUserUesCase {
+    fun validateUser(request: ValidateUserRequest): Data
 
-    fun createUser(request: CreateUserRequest): String
-
-    data class CreateUserRequest(
+    data class ValidateUserRequest(
         @field:NotBlank
         val id: String,
-        @field:NotBlank
-        val password: String,
-        @field:NotBlank
-        val nickname: String,
         @field:NotBlank
         val identityVerificationQuestion: String,
         @field:NotBlank
         val identityVerificationAnswer: String
     )
 
-    data class CreateUserResponse(
+    data class ValidateUserResponse(
         val data: Data,
     )
 
     data class Data(
-        val id: String
+        val passwordResetToken: String
     )
-
 }

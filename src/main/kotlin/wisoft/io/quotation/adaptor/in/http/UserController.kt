@@ -24,6 +24,7 @@ class UserController(
     val getUserDetailUseCase: GetUserDetailUseCase,
     val getUserListUseCase: GetUserListUseCase,
     val updateUserUseCase: UpdateUserUseCase,
+    val validateUserUesCase: ValidateUserUesCase
 ) {
 
     @PostMapping("/users")
@@ -88,6 +89,19 @@ class UserController(
                 )
             )
     }
+
+    @PostMapping("/users/identity-verification")
+    fun validateUser(
+        @RequestBody @Valid request: ValidateUserUesCase.ValidateUserRequest
+    ): ResponseEntity<ValidateUserUesCase.ValidateUserResponse> {
+        val response = validateUserUesCase.validateUser(request)
+        return ResponseEntity.status(HttpStatus.OK).body(
+            ValidateUserUesCase.ValidateUserResponse(
+                data = response
+            )
+        )
+    }
+
 
     @PutMapping("/users/{id}")
     @Authenticated

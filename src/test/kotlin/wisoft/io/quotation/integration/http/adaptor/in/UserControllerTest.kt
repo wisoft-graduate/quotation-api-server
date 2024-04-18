@@ -114,8 +114,8 @@ class UserControllerTest(
 
             val userIdByAccessToken = JWTUtil.extractUserIdByToken(actual.data.accessToken)
             val userIdByRefreshToken = JWTUtil.extractUserIdByToken(actual.data.refreshToken)
-            userIdByAccessToken shouldBe existUser.nickname
-            userIdByRefreshToken shouldBe existUser.nickname
+            userIdByAccessToken shouldBe existUser.id
+            userIdByRefreshToken shouldBe existUser.id
         }
     }
 
@@ -281,10 +281,54 @@ class UserControllerTest(
             val actual = objectMapper.readValue(result, GetUserListUseCase.GetUserListResponse::class.java)
             val actualUserDto = actual.data.users[0]
 
-            actualUserDto.id shouldBe  existUser.id
-            actualUserDto.nickname shouldBe  existUser.nickname
-            actualUserDto.profilePath shouldBe  existUser.profilePath
+            actualUserDto.id shouldBe existUser.id
+            actualUserDto.nickname shouldBe existUser.nickname
+            actualUserDto.profilePath shouldBe existUser.profilePath
 
+        }
+    }
+
+    context("validateUser Test") {
+        test("validateUser 성공 ") {
+            // given
+            val existUser = repository.save(getUserEntityFixture())
+            val request = ValidateUserUesCase.ValidateUserRequest(
+                existUser.id, existUser.identityVerificationQuestion, existUser.identityVerificationAnswer
+            )
+
+            // when
+            val validateUserRequestJson = objectMapper.writeValueAsString(request)
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/users/identity-verification")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(validateUserRequestJson)
+            ).andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, ValidateUserUesCase.ValidateUserResponse::class.java)
+
+            val actualUserId = JWTUtil.extractUserIdByToken(actual.data.passwordResetToken)
+            actualUserId shouldBe existUser.id
+        }
+
+        test("validateUser 실패 - 해당하는 대답이 아님 ") {
+            // given
+            val existUser = repository.save(getUserEntityFixture())
+            val request = ValidateUserUesCase.ValidateUserRequest(
+                existUser.id, existUser.identityVerificationQuestion, "NotMatchingAnswer"
+            )
+
+            // when, then
+            val validateUserRequestJson = objectMapper.writeValueAsString(request)
+            mockMvc.perform(
+                MockMvcRequestBuilders.post("/users/identity-verification")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(validateUserRequestJson)
+            ).andExpect(MockMvcResultMatchers.status().isNotFound)
+                .andReturn()
+                .response.contentAsString
         }
     }
 
