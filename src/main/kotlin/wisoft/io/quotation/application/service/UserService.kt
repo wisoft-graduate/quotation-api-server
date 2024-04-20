@@ -26,7 +26,7 @@ class UserService(
     val deleteUserPort: DeleteUserPort
 ) : CreateUserUseCase, SignInUseCase,
     DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase, UpdateUserUseCase, GetUserListUseCase,
-    ValidateUserUesCase {
+    ValidateUserUesCase, ResetPasswordUserUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -47,9 +47,9 @@ class UserService(
                     identityVerificationAnswer = this.identityVerificationAnswer
                 )
             }
-            user.encryptPassword(request.password)
+            val encryptPasswordUser = user.encryptPassword(request.password)
 
-            createUserPort.create(user)
+            createUserPort.create(encryptPasswordUser)
         }.onFailure {
             logger.error { "createUser fail: param[$request]" }
         }.getOrThrow()
@@ -171,10 +171,21 @@ class UserService(
             val passwordResetToken = JWTUtil.generatePasswordResetToken(user)
 
             ValidateUserUesCase.Data(passwordResetToken = passwordResetToken)
-        }
-            .onFailure {
-                logger.error { "validateUser fail: param[${request}]" }
-            }
-            .getOrThrow()
+        }.onFailure {
+            logger.error { "validateUser fail: param[${request}]" }
+        }.getOrThrow()
     }
+
+    @Transactional
+    override fun resetPasswordUser(request: ResetPasswordUserUseCase.ResetPasswordUserRequest): String {
+        return runCatching {
+            val user = getUserPort.getUserById(request.userId) ?: throw UserNotFoundException("id: $request.userId")
+            val updatedUser = user.encryptPassword(request.password)
+
+            updateUserPort.updateUser(updatedUser)
+        }.onFailure {
+            logger.error { "resetPasswordUser fail: param[request:${request}" }
+        }.getOrThrow()
+    }
+
 }

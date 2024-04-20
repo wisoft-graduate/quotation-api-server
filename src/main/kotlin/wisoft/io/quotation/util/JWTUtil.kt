@@ -19,10 +19,15 @@ object JWTUtil {
         return runCatching {
             val jwtConfig = this.readYmlFile().environment.jwt
             val expirationDate = Date(System.currentTimeMillis() + jwtConfig.accessTokenExpirationTime)
-            Jwts.builder()
+
+            val claims: Claims = Jwts.claims()
                 .setSubject(user.id)
                 .setIssuedAt(Date())
                 .setExpiration(expirationDate)
+            claims.put("type", "accessToken")
+
+            Jwts.builder()
+                .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, jwtConfig.secretKey)
                 .compact()
         }
@@ -35,10 +40,15 @@ object JWTUtil {
         return runCatching {
             val jwtConfig = this.readYmlFile().environment.jwt
             val expirationDate = Date(System.currentTimeMillis() + jwtConfig.refreshTokenExpirationTime)
-            Jwts.builder()
+
+            val claims: Claims = Jwts.claims()
                 .setSubject(user.id)
                 .setIssuedAt(Date())
                 .setExpiration(expirationDate)
+            claims.put("type", "refreshToken")
+
+            Jwts.builder()
+                .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, jwtConfig.secretKey)
                 .compact()
         }.onFailure {
@@ -51,12 +61,12 @@ object JWTUtil {
         return runCatching {
             val jwtConfig = this.readYmlFile().environment.jwt
             val expirationDate = Date(System.currentTimeMillis() + jwtConfig.passwordRefreshTokenExpirationTime)
+
             val claims: Claims = Jwts.claims()
                 .setSubject(user.id)
                 .setIssuedAt(Date())
                 .setExpiration(expirationDate)
-
-            claims.put("type", "resetPassword")
+            claims.put("type", "resetPasswordToken")
 
             Jwts.builder()
                 .setClaims(claims)
@@ -68,13 +78,35 @@ object JWTUtil {
             }.getOrThrow()
     }
 
-    fun verifyToken(token: String, currentDate: Date = Date()): Boolean {
+    fun verifyAccessToken(token: String, currentDate: Date = Date()): Boolean {
         val jwtConfig = this.readYmlFile().environment.jwt
         return runCatching {
             val claims = Jwts.parserBuilder()
                 .setSigningKey(jwtConfig.secretKey)
                 .build()
                 .parseClaimsJws(token)
+
+            val tokenType = claims.body["type"].toString()
+            if (tokenType != "accessToken") throw InvalidJwtTokenException("tokenType: $tokenType")
+
+            claims.body.expiration.after(currentDate)
+        }.onFailure {
+            logger.error { "verifyToken fail: param[token: ${token}]" }
+            throw InvalidJwtTokenException(it.toString())
+        }.getOrThrow()
+    }
+
+    fun verifyResetPasswordToken(token: String, currentDate: Date = Date()): Boolean {
+        val jwtConfig = this.readYmlFile().environment.jwt
+        return runCatching {
+            val claims = Jwts.parserBuilder()
+                .setSigningKey(jwtConfig.secretKey)
+                .build()
+                .parseClaimsJws(token)
+
+            val tokenType = claims.body["type"].toString()
+            if (tokenType != "resetPasswordToken") throw InvalidJwtTokenException("tokenType: $tokenType")
+
             claims.body.expiration.after(currentDate)
         }.onFailure {
             logger.error { "verifyToken fail: param[token: ${token}]" }

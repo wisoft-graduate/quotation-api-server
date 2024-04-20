@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import wisoft.io.quotation.application.port.`in`.*
-import wisoft.io.quotation.util.annotation.Authenticated
+import wisoft.io.quotation.util.annotation.LoginAuthenticated
+import wisoft.io.quotation.util.annotation.ResetPasswordAuthenticated
 
 @RestController
 class UserController(
@@ -24,7 +26,8 @@ class UserController(
     val getUserDetailUseCase: GetUserDetailUseCase,
     val getUserListUseCase: GetUserListUseCase,
     val updateUserUseCase: UpdateUserUseCase,
-    val validateUserUesCase: ValidateUserUesCase
+    val validateUserUesCase: ValidateUserUesCase,
+    val resetPasswordUserUseCase: ResetPasswordUserUseCase
 ) {
 
     @PostMapping("/users")
@@ -102,9 +105,28 @@ class UserController(
         )
     }
 
+    @PatchMapping("/users/{id}/reset-password")
+    @ResetPasswordAuthenticated
+    fun resetPasswordUser(
+        @RequestBody @Valid requestBody: ResetPasswordUserUseCase.ResetPasswordUserRequestBody,
+        @PathVariable("id") userId: String
+    ): ResponseEntity<ResetPasswordUserUseCase.ResetPasswordUserResponse> {
+        val request = ResetPasswordUserUseCase.ResetPasswordUserRequest(
+            password = requestBody.password,
+            passwordConfirm = requestBody.passwordConfirm,
+            userId = userId
+        )
+        val response = resetPasswordUserUseCase.resetPasswordUser(request)
+        return ResponseEntity.status(HttpStatus.OK).body(
+            ResetPasswordUserUseCase.ResetPasswordUserResponse(
+                data = ResetPasswordUserUseCase.Data(response)
+            )
+        )
+    }
+
 
     @PutMapping("/users/{id}")
-    @Authenticated
+    @LoginAuthenticated
     fun updateUser(
         @PathVariable("id") id: String,
         @RequestBody @Valid request: UpdateUserUseCase.UpdateUserRequest
@@ -118,7 +140,7 @@ class UserController(
     }
 
     @DeleteMapping("/users/{id}")
-    @Authenticated
+    @LoginAuthenticated
     fun deleteUser(@PathVariable("id") id: String): ResponseEntity<DeleteUserUseCase> {
         deleteUserUseCase.deleteUser(id)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
