@@ -114,8 +114,8 @@ class UserControllerTest(
 
             val userIdByAccessToken = JWTUtil.extractUserIdByToken(actual.data.accessToken)
             val userIdByRefreshToken = JWTUtil.extractUserIdByToken(actual.data.refreshToken)
-            userIdByAccessToken shouldBe existUser.nickname
-            userIdByRefreshToken shouldBe existUser.nickname
+            userIdByAccessToken shouldBe existUser.id
+            userIdByRefreshToken shouldBe existUser.id
         }
     }
 
@@ -281,10 +281,145 @@ class UserControllerTest(
             val actual = objectMapper.readValue(result, GetUserListUseCase.GetUserListResponse::class.java)
             val actualUserDto = actual.data.users[0]
 
-            actualUserDto.id shouldBe  existUser.id
-            actualUserDto.nickname shouldBe  existUser.nickname
-            actualUserDto.profilePath shouldBe  existUser.profilePath
+            actualUserDto.id shouldBe existUser.id
+            actualUserDto.nickname shouldBe existUser.nickname
+            actualUserDto.profilePath shouldBe existUser.profilePath
 
+        }
+    }
+
+    context("validateUser Test") {
+        test("validateUser 성공 ") {
+            // given
+            val existUser = repository.save(getUserEntityFixture())
+            val request = ValidateUserUesCase.ValidateUserRequest(
+                existUser.id, existUser.identityVerificationQuestion, existUser.identityVerificationAnswer
+            )
+
+            // when
+            val validateUserRequestJson = objectMapper.writeValueAsString(request)
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/users/identity-verification")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(validateUserRequestJson)
+            ).andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, ValidateUserUesCase.ValidateUserResponse::class.java)
+
+            val actualUserId = JWTUtil.extractUserIdByToken(actual.data.passwordResetToken)
+            actualUserId shouldBe existUser.id
+        }
+
+        test("validateUser 실패 - ID, 질문, 대답 Data가 존재하는 것과 한개라도 다름 ") {
+            // given
+            val existUser = repository.save(getUserEntityFixture())
+            val request = ValidateUserUesCase.ValidateUserRequest(
+                existUser.id, existUser.identityVerificationQuestion, "NotMatchingAnswer"
+            )
+
+            // when, then
+            val validateUserRequestJson = objectMapper.writeValueAsString(request)
+            mockMvc.perform(
+                MockMvcRequestBuilders.post("/users/identity-verification")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(validateUserRequestJson)
+            ).andExpect(MockMvcResultMatchers.status().isNotFound)
+                .andReturn()
+                .response.contentAsString
+        }
+    }
+
+    context("resetPasswordUser Test") {
+        test("resetPasswordUser 성공") {
+            // given
+            val existUser = repository.save(getUserEntityFixture()).toDomain()
+            val expectedPassword = "resetPassword"
+            val request = ResetPasswordUserUseCase.ResetPasswordUserRequestBody(
+                expectedPassword, expectedPassword
+            )
+            val resetPasswordToken = JWTUtil.generatePasswordResetToken(existUser)
+
+            // when
+            val resetPasswordRequestBodyJson = objectMapper.writeValueAsString(request)
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/users/${existUser.id}/reset-password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", "Bearer $resetPasswordToken")
+                    .content(resetPasswordRequestBodyJson)
+            ).andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual =
+                objectMapper.readValue(result, ResetPasswordUserUseCase.ResetPasswordUserResponse::class.java)
+
+            actual.data.id shouldBe existUser.id
+            val actualUser = repository.findById(existUser.id).get().toDomain()
+            actualUser.isCorrectPassword(expectedPassword) shouldBe true
+
+        }
+
+        test("resetPasswordUser 실패 - RefreshToken이 없는 경우") {
+            // given
+            val existUser = repository.save(getUserEntityFixture()).toDomain()
+            val expectedStatus = HttpMessage.HTTP_401.status
+            val expectedPath = "/users/${existUser.id}/reset-password"
+
+            val expectedPassword = "resetPassword"
+            val request = ResetPasswordUserUseCase.ResetPasswordUserRequestBody(
+                expectedPassword, expectedPassword
+            )
+
+
+            // when
+            val resetPasswordRequestBodyJson = objectMapper.writeValueAsString(request)
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/users/${existUser.id}/reset-password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(resetPasswordRequestBodyJson)
+            ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, ErrorData::class.java).data
+            actual.status shouldBe expectedStatus.value()
+            actual.error shouldBe expectedStatus.reasonPhrase
+            actual.path shouldBe expectedPath
+        }
+
+        test("resetPasswordUser 실패 - RefreshToken이 아닌 다른 토큰이 온 경우") {
+            // given
+            val existUser = repository.save(getUserEntityFixture()).toDomain()
+            val expectedStatus = HttpMessage.HTTP_403.status
+            val expectedPath = "/users/${existUser.id}/reset-password"
+            val accessToken = JWTUtil.generateAccessToken(existUser)
+
+            val expectedPassword = "resetPassword"
+            val request = ResetPasswordUserUseCase.ResetPasswordUserRequestBody(
+                expectedPassword, expectedPassword
+            )
+
+            // when
+            val resetPasswordRequestBodyJson = objectMapper.writeValueAsString(request)
+            val result = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/users/${existUser.id}/reset-password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", "Bearer $accessToken")
+                    .content(resetPasswordRequestBodyJson)
+            ).andExpect(MockMvcResultMatchers.status().isForbidden)
+                .andReturn()
+                .response.contentAsString
+
+            // then
+            val actual = objectMapper.readValue(result, ErrorData::class.java).data
+            actual.status shouldBe expectedStatus.value()
+            actual.error shouldBe expectedStatus.reasonPhrase
+            actual.path shouldBe expectedPath
         }
     }
 

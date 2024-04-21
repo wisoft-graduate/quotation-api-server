@@ -38,4 +38,12 @@ class UserAdaptor(
         val userEntityList: List<UserEntity> = userRepository.findAllByNicknameContains(nickname)
         return userEntityList.map { it.toDomain() }
     }
+
+    override fun getUserByIdentityInformation(id: String, question: String, answer: String): User? {
+        val userEntity =
+            userRepository.findByIdAndIdentityVerificationQuestionAndIdentityVerificationAnswer(
+                id, question, answer
+            )
+        return userEntity?.toDomain()
+    }
 }

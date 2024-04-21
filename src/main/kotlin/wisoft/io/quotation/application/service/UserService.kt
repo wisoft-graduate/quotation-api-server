@@ -7,6 +7,7 @@ import wisoft.io.quotation.application.port.`in`.*
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.exception.error.InvalidRequestParameterException
+import wisoft.io.quotation.exception.error.InvalidUserException
 import wisoft.io.quotation.exception.error.UserDuplicateException
 import wisoft.io.quotation.exception.error.UserNotFoundException
 import wisoft.io.quotation.util.JWTUtil
@@ -24,7 +25,8 @@ class UserService(
     val updateUserPort: UpdateUserPort,
     val deleteUserPort: DeleteUserPort
 ) : CreateUserUseCase, SignInUseCase,
-    DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase, UpdateUserUseCase, GetUserListUseCase {
+    DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase, UpdateUserUseCase, GetUserListUseCase,
+    ValidateUserUesCase, ResetPasswordUserUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -45,9 +47,9 @@ class UserService(
                     identityVerificationAnswer = this.identityVerificationAnswer
                 )
             }
-            user.encryptPassword(request.password)
+            val encryptPasswordUser = user.encryptPassword(request.password)
 
-            createUserPort.create(user)
+            createUserPort.create(encryptPasswordUser)
         }.onFailure {
             logger.error { "createUser fail: param[$request]" }
         }.getOrThrow()
@@ -56,7 +58,13 @@ class UserService(
     override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
         return runCatching {
             val userList = getUserListPort.getUserList(request.nickname)
-            userList.map { GetUserListUseCase.UserDto(id = it.id, nickname = it.nickname, profilePath = it.profilePath) }
+            userList.map {
+                GetUserListUseCase.UserDto(
+                    id = it.id,
+                    nickname = it.nickname,
+                    profilePath = it.profilePath
+                )
+            }
         }.onFailure {
             logger.error { "getUserList fail: param[$request]" }
         }.getOrThrow()
@@ -152,5 +160,32 @@ class UserService(
         }.getOrThrow()
     }
 
+    override fun validateUser(request: ValidateUserUesCase.ValidateUserRequest): ValidateUserUesCase.Data {
+        return runCatching {
+            val user = getUserPort.getUserByIdentityInformation(
+                request.id,
+                request.identityVerificationQuestion,
+                request.identityVerificationAnswer
+            ) ?: throw InvalidUserException("request: ${request}")
+
+            val passwordResetToken = JWTUtil.generatePasswordResetToken(user)
+
+            ValidateUserUesCase.Data(passwordResetToken = passwordResetToken)
+        }.onFailure {
+            logger.error { "validateUser fail: param[${request}]" }
+        }.getOrThrow()
+    }
+
+    @Transactional
+    override fun resetPasswordUser(request: ResetPasswordUserUseCase.ResetPasswordUserRequest): String {
+        return runCatching {
+            val user = getUserPort.getUserById(request.userId) ?: throw UserNotFoundException("id: $request.userId")
+            val updatedUser = user.encryptPassword(request.password)
+
+            updateUserPort.updateUser(updatedUser)
+        }.onFailure {
+            logger.error { "resetPasswordUser fail: param[request:${request}" }
+        }.getOrThrow()
+    }
 
 }
