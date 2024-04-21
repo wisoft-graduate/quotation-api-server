@@ -71,3 +71,21 @@ tasks.withType<BootJar> {
         }
     }
 }
+
+val installLocalGitHook =
+    tasks.register<Copy>("installLocalGitHook") {
+        from("${rootProject.rootDir}/.github/hooks")
+        into(File("${rootProject.rootDir}/.git/hooks"))
+
+        eachFile {
+            mode = "755".toInt(radix = 8)
+        }
+    }
+
+tasks.build {
+    dependsOn(installLocalGitHook)
+}
+
+tasks.bootJar {
+    dependsOn(installLocalGitHook)
+}
