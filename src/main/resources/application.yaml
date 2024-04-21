@@ -1,5 +1,5 @@
 server:
-  port: 8888
+  port: 8080
   servlet:
     encoding:
       charset: UTF-8
@@ -11,9 +11,9 @@ spring:
     name: quotation
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: test123
+    url: jdbc:postgresql://${PG_HOST:localhost}:${PG_PORT:5432}/${PG_DATABASE:postgres}
+    username: ${PG_USER:postgres}
+    password: ${PG_PASSWORD:test123}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -33,3 +33,6 @@ environment:
     access-token-expiration-time: 3600000
     # 토큰 만료 시간 (1주일)
     refresh-token-expiration-time: 604800000
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
