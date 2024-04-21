@@ -3,7 +3,6 @@ package wisoft.io.quotation.application.port.`in`
 import jakarta.validation.constraints.NotBlank
 
 interface ResetPasswordUserUseCase {
-
     fun resetPasswordUser(request: ResetPasswordUserRequest): String
 
     data class ResetPasswordUserRequest(
@@ -16,15 +15,14 @@ interface ResetPasswordUserUseCase {
         @field:NotBlank
         val password: String,
         @field:NotBlank
-        val passwordConfirm: String
+        val passwordConfirm: String,
     )
 
     data class ResetPasswordUserResponse(
-        val data: Data
+        val data: Data,
     )
 
     data class Data(
-        val id: String
+        val id: String,
     )
-
 }

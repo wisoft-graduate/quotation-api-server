@@ -27,81 +27,85 @@ class UserController(
     val getUserListUseCase: GetUserListUseCase,
     val updateUserUseCase: UpdateUserUseCase,
     val validateUserUesCase: ValidateUserUesCase,
-    val resetPasswordUserUseCase: ResetPasswordUserUseCase
+    val resetPasswordUserUseCase: ResetPasswordUserUseCase,
 ) {
-
     @PostMapping("/users")
     fun createUser(
-        @RequestBody @Valid request: CreateUserUseCase.CreateUserRequest
+        @RequestBody @Valid request: CreateUserUseCase.CreateUserRequest,
     ): ResponseEntity<CreateUserUseCase.CreateUserResponse> {
         val response = createUserUseCase.createUser(request)
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(
                 CreateUserUseCase.CreateUserResponse(
                     data = CreateUserUseCase.Data(id = response),
-                )
+                ),
             )
     }
 
     @GetMapping("/users")
     fun getUserList(
-        @RequestParam nickname: String
+        @RequestParam nickname: String,
     ): ResponseEntity<GetUserListUseCase.GetUserListResponse> {
         val response = getUserListUseCase.getUserList(GetUserListUseCase.GetUserListRequest(nickname = nickname))
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(
-                GetUserListUseCase.GetUserListResponse(data = GetUserListUseCase.Data(users = response))
+                GetUserListUseCase.GetUserListResponse(data = GetUserListUseCase.Data(users = response)),
             )
     }
 
     @PostMapping("/users/sign-in")
-    fun signIn(@RequestBody @Valid request: SignInUseCase.SignInRequest): ResponseEntity<SignInUseCase.SignInResponse> {
+    fun signIn(
+        @RequestBody @Valid request: SignInUseCase.SignInRequest,
+    ): ResponseEntity<SignInUseCase.SignInResponse> {
         val response = signInUseCase.signIn(request)
         return ResponseEntity.status(HttpStatus.OK)
             .body(
                 SignInUseCase.SignInResponse(
-                    data = SignInUseCase.UserTokenDto(
-                        accessToken = response.accessToken,
-                        refreshToken = response.refreshToken
-                    ),
-                )
+                    data =
+                        SignInUseCase.UserTokenDto(
+                            accessToken = response.accessToken,
+                            refreshToken = response.refreshToken,
+                        ),
+                ),
             )
     }
 
     @GetMapping("/users/duplication-check")
     fun getUser(
-        @ModelAttribute request: GetUserUseCase.GetUserByIdOrNicknameRequest
+        @ModelAttribute request: GetUserUseCase.GetUserByIdOrNicknameRequest,
     ): ResponseEntity<GetUserUseCase.GetUserByIdOrNicknameResponse> {
         val response = getUserUseCase.getUserByIdOrNickname(request)
         return ResponseEntity.status(HttpStatus.OK)
             .body(
                 GetUserUseCase.GetUserByIdOrNicknameResponse(
                     data = GetUserUseCase.UserDto(id = response.id, nickname = response.nickname),
-                )
+                ),
             )
     }
 
     @GetMapping("/users/{id}")
-    fun getUserDetail(@PathVariable("id") id: String): ResponseEntity<GetUserDetailUseCase.GetUserDetailByIdResponse> {
+    fun getUserDetail(
+        @PathVariable("id") id: String,
+    ): ResponseEntity<GetUserDetailUseCase.GetUserDetailByIdResponse> {
         val response = getUserDetailUseCase.getUserDetailById(GetUserDetailUseCase.GetUserDetailByIdRequest(id))
         return ResponseEntity.status(HttpStatus.OK)
             .body(
                 GetUserDetailUseCase.GetUserDetailByIdResponse(
-                    data = response
-                )
+                    data = response,
+                ),
             )
     }
 
     @PostMapping("/users/identity-verification")
     fun validateUser(
-        @RequestBody @Valid request: ValidateUserUesCase.ValidateUserRequest
+        @RequestBody @Valid request: ValidateUserUesCase.ValidateUserRequest,
     ): ResponseEntity<ValidateUserUesCase.ValidateUserResponse> {
         val response = validateUserUesCase.validateUser(request)
         return ResponseEntity.status(HttpStatus.OK).body(
             ValidateUserUesCase.ValidateUserResponse(
-                data = response
-            )
+                data = response,
+            ),
         )
     }
 
@@ -109,42 +113,42 @@ class UserController(
     @ResetPasswordAuthenticated
     fun resetPasswordUser(
         @RequestBody @Valid requestBody: ResetPasswordUserUseCase.ResetPasswordUserRequestBody,
-        @PathVariable("id") userId: String
+        @PathVariable("id") userId: String,
     ): ResponseEntity<ResetPasswordUserUseCase.ResetPasswordUserResponse> {
-        val request = ResetPasswordUserUseCase.ResetPasswordUserRequest(
-            password = requestBody.password,
-            passwordConfirm = requestBody.passwordConfirm,
-            userId = userId
-        )
+        val request =
+            ResetPasswordUserUseCase.ResetPasswordUserRequest(
+                password = requestBody.password,
+                passwordConfirm = requestBody.passwordConfirm,
+                userId = userId,
+            )
         val response = resetPasswordUserUseCase.resetPasswordUser(request)
         return ResponseEntity.status(HttpStatus.OK).body(
             ResetPasswordUserUseCase.ResetPasswordUserResponse(
-                data = ResetPasswordUserUseCase.Data(response)
-            )
+                data = ResetPasswordUserUseCase.Data(response),
+            ),
         )
     }
-
 
     @PutMapping("/users/{id}")
     @LoginAuthenticated
     fun updateUser(
         @PathVariable("id") id: String,
-        @RequestBody @Valid request: UpdateUserUseCase.UpdateUserRequest
+        @RequestBody @Valid request: UpdateUserUseCase.UpdateUserRequest,
     ): ResponseEntity<UpdateUserUseCase.UpdateUserResponse> {
         val response = updateUserUseCase.updateUser(id, request)
         return ResponseEntity.status(HttpStatus.OK).body(
             UpdateUserUseCase.UpdateUserResponse(
-                data = UpdateUserUseCase.Data(response)
-            )
+                data = UpdateUserUseCase.Data(response),
+            ),
         )
     }
 
     @DeleteMapping("/users/{id}")
     @LoginAuthenticated
-    fun deleteUser(@PathVariable("id") id: String): ResponseEntity<DeleteUserUseCase> {
+    fun deleteUser(
+        @PathVariable("id") id: String,
+    ): ResponseEntity<DeleteUserUseCase> {
         deleteUserUseCase.deleteUser(id)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
-
-
 }

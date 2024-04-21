@@ -10,11 +10,10 @@ import wisoft.io.quotation.exception.error.http.*
 
 @RestControllerAdvice
 class ExceptionHandler {
-
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun methodArgumentNotValidExceptionHandler(
         e: MethodArgumentNotValidException,
-        request: HttpServletRequest
+        request: HttpServletRequest,
     ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_400.status
         val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
@@ -27,7 +26,7 @@ class ExceptionHandler {
     @ExceptionHandler(BadRequestException::class)
     fun badRequestExceptionHandler(
         e: BadRequestException,
-        request: HttpServletRequest
+        request: HttpServletRequest,
     ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_400.status
         val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
@@ -40,7 +39,7 @@ class ExceptionHandler {
     @ExceptionHandler(NotFoundException::class)
     fun notFoundExceptionHandler(
         e: NotFoundException,
-        request: HttpServletRequest
+        request: HttpServletRequest,
     ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_404.status
         val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
@@ -53,7 +52,7 @@ class ExceptionHandler {
     @ExceptionHandler(UnauthorizedException::class)
     fun unauthorizedExceptionExceptionHandler(
         e: UnauthorizedException,
-        request: HttpServletRequest
+        request: HttpServletRequest,
     ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_401.status
         val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
@@ -66,7 +65,7 @@ class ExceptionHandler {
     @ExceptionHandler(ForbiddenException::class)
     fun forbiddenExceptionHandler(
         e: ForbiddenException,
-        request: HttpServletRequest
+        request: HttpServletRequest,
     ): ResponseEntity<ErrorData> {
         val status = HttpMessage.HTTP_403.status
         val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
@@ -75,5 +74,4 @@ class ExceptionHandler {
             .status(status)
             .body(errorMessage)
     }
-
 }

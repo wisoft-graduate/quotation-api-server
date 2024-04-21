@@ -1,8 +1,10 @@
 package wisoft.io.quotation.application.port.`in`
 
 interface UpdateUserUseCase {
-
-    fun updateUser(id: String, request: UpdateUserRequest): String
+    fun updateUser(
+        id: String,
+        request: UpdateUserRequest,
+    ): String
 
     data class UpdateUserRequest(
         val nickname: String?,
@@ -16,10 +18,10 @@ interface UpdateUserUseCase {
     )
 
     data class UpdateUserResponse(
-        val data: Data
+        val data: Data,
     )
 
     data class Data(
-        val id: String
+        val id: String,
     )
 }

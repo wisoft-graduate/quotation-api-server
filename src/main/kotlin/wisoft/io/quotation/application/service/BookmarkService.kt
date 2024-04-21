@@ -19,7 +19,7 @@ class BookmarkService(
     val getBookmarkListPort: GetBookmarkListPort,
     val getBookmarkPort: GetBookmarkPort,
     val updateBookmarkPort: UpdateBookmarkPort,
-    val deleteBookmarkPort: DeleteBookmarkPort
+    val deleteBookmarkPort: DeleteBookmarkPort,
 ) : CreateBookmarkUseCase,
     GetBookmarkListUseCase,
     UpdateBookmarkUseCase,
@@ -37,7 +37,7 @@ class BookmarkService(
                         userId = this.userId,
                         visibility = this.visibility,
                         icon = this.icon,
-                    )
+                    ),
                 )
             }
         }.onFailure {
@@ -45,7 +45,10 @@ class BookmarkService(
         }.getOrThrow()
     }
 
-    override fun updateBookmark(id: UUID, request: UpdateBookmarkUseCase.UpdateBookmarkRequest): UUID {
+    override fun updateBookmark(
+        id: UUID,
+        request: UpdateBookmarkUseCase.UpdateBookmarkRequest,
+    ): UUID {
         return runCatching {
             val bookmark = getBookmarkPort.getBookmark(id) ?: throw BookmarkNotFoundException(id.toString())
             updateBookmarkPort.updateBookmark(bookmark.update(request))
@@ -70,5 +73,4 @@ class BookmarkService(
             logger.error { "getBookmarkList fail: param[$request]" }
         }.getOrThrow()
     }
-
 }

@@ -7,5 +7,4 @@ object SaltUtil {
             .map { chars.random() }
             .joinToString("")
     }
-
 }

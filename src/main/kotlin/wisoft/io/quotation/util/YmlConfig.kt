@@ -5,19 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class YmlConfig(
     @JsonProperty("server") val server: ServerConfig,
     @JsonProperty("spring") val spring: SpringConfig,
-    @JsonProperty("environment") val environment: EnvironmentConfig
+    @JsonProperty("environment") val environment: EnvironmentConfig,
 ) {
     data class ServerConfig(
         @JsonProperty("port") val port: Long,
-        @JsonProperty("servlet") val servlet: ServletConfig
+        @JsonProperty("servlet") val servlet: ServletConfig,
     ) {
         data class ServletConfig(
-            @JsonProperty("encoding") val encoding: EncodingConfig
+            @JsonProperty("encoding") val encoding: EncodingConfig,
         ) {
             data class EncodingConfig(
                 @JsonProperty("charset") val charset: String,
                 @JsonProperty("enabled") val enabled: Boolean,
-                @JsonProperty("force") val force: Boolean
+                @JsonProperty("force") val force: Boolean,
             )
         }
     }
@@ -28,27 +28,27 @@ data class YmlConfig(
         @JsonProperty("jpa") val jpa: JpaConfig,
     ) {
         data class ApplicationConfig(
-            @JsonProperty("name") val name: String
+            @JsonProperty("name") val name: String,
         )
 
         data class DataSourceConfig(
             @JsonProperty("url") val url: String,
             @JsonProperty("username") val username: String,
             @JsonProperty("password") val password: String,
-            @JsonProperty("driver-class-name") val driverClassName: String
+            @JsonProperty("driver-class-name") val driverClassName: String,
         )
 
         data class JpaConfig(
             @JsonProperty("hibernate") val hibernate: HibernateConfig,
             @JsonProperty("properties") val properties: PropertiesConfig,
-            @JsonProperty("open-in-view") val openInView: Boolean
+            @JsonProperty("open-in-view") val openInView: Boolean,
         ) {
             data class HibernateConfig(
                 @JsonProperty("ddl-auto") val ddlAuto: String,
             )
 
             data class PropertiesConfig(
-                @JsonProperty("hibernate") val hibernate: PropertiesHibernateConfig
+                @JsonProperty("hibernate") val hibernate: PropertiesHibernateConfig,
             ) {
                 data class PropertiesHibernateConfig(
                     @JsonProperty("format_sql") val formatSql: Boolean,
@@ -67,7 +67,7 @@ data class YmlConfig(
             @JsonProperty("access-token-expiration-time") val accessTokenExpirationTime: Long,
             @JsonProperty("refresh-token-expiration-time") val refreshTokenExpirationTime: Long,
             @JsonProperty("password-refresh-token-expiration-time")
-            val passwordRefreshTokenExpirationTime: Long
+            val passwordRefreshTokenExpirationTime: Long,
         )
     }
 }

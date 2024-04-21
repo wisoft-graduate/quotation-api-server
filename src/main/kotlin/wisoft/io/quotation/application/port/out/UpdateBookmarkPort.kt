@@ -4,6 +4,5 @@ import wisoft.io.quotation.domain.Bookmark
 import java.util.UUID
 
 interface UpdateBookmarkPort {
-
     fun updateBookmark(bookmark: Bookmark): UUID
 }

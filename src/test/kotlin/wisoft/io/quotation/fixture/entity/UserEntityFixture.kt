@@ -14,6 +14,6 @@ fun getUserEntityFixture(): UserEntity {
         identityVerificationAnswer = "answer",
         commentAlarm = false,
         quotationAlarm = false,
-        createdTime = Timestamp.valueOf(LocalDateTime.now())
+        createdTime = Timestamp.valueOf(LocalDateTime.now()),
     )
 }

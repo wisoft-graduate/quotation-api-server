@@ -7,7 +7,6 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
 
-
 /**
  * @property id 식별자
  * @property name 저자의 이름

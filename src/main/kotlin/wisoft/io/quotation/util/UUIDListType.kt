@@ -15,7 +15,10 @@ class UUIDListType : UserType<List<UUID>> {
         return List::class.java as Class<List<UUID>>
     }
 
-    override fun equals(x: List<UUID>?, y: List<UUID>?): Boolean {
+    override fun equals(
+        x: List<UUID>?,
+        y: List<UUID>?,
+    ): Boolean {
         return x == y
     }
 
@@ -28,9 +31,10 @@ class UUIDListType : UserType<List<UUID>> {
         rs: ResultSet?,
         position: Int,
         session: SharedSessionContractImplementor?,
-        owner: Any?
+        owner: Any?,
     ): List<UUID> {
         val array = rs?.getArray(position) ?: return emptyList()
+
         @Suppress("UNCHECKED_CAST")
         val javaArray = array.array as Array<UUID>
         return javaArray.toList()
@@ -41,7 +45,7 @@ class UUIDListType : UserType<List<UUID>> {
         st: PreparedStatement?,
         value: List<UUID>?,
         index: Int,
-        session: SharedSessionContractImplementor?
+        session: SharedSessionContractImplementor?,
     ) {
         if (value == null) {
             st?.setNull(index, Types.ARRAY)
@@ -65,7 +69,10 @@ class UUIDListType : UserType<List<UUID>> {
         return ArrayList(value ?: emptyList())
     }
 
-    override fun assemble(cached: Serializable?, owner: Any?): List<UUID> {
+    override fun assemble(
+        cached: Serializable?,
+        owner: Any?,
+    ): List<UUID> {
         @Suppress("UNCHECKED_CAST")
         return cached as List<UUID>? ?: emptyList()
     }

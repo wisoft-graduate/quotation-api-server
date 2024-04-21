@@ -1,8 +1,6 @@
 package wisoft.io.quotation.fixture.entity
 
 import wisoft.io.quotation.adaptor.out.persistence.entity.QuotationEntity
-import java.sql.Timestamp
-import java.time.LocalDateTime
 import java.util.*
 
 fun getQuotationEntityFixture(authorId: UUID): QuotationEntity {
@@ -12,6 +10,6 @@ fun getQuotationEntityFixture(authorId: UUID): QuotationEntity {
         likeCount = 0L,
         shareCount = 0L,
         commentCount = 0L,
-        backgroundImagePath = "path"
+        backgroundImagePath = "path",
     )
 }

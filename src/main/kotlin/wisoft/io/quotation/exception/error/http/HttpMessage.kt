@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus
 
 enum class HttpMessage(
     val status: HttpStatus,
-    val message: String
+    val message: String,
 ) {
     HTTP_400(HttpStatus.BAD_REQUEST, " 잘못된 요청입니다."),
     HTTP_401(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),

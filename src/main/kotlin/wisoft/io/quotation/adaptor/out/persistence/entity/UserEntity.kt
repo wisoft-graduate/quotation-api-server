@@ -1,7 +1,6 @@
 package wisoft.io.quotation.adaptor.out.persistence.entity
 
 import io.hypersistence.utils.hibernate.type.array.ListArrayType
-import io.hypersistence.utils.hibernate.type.array.TimestampArrayType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -44,7 +43,7 @@ data class UserEntity(
     val createdTime: Timestamp,
     val lastModifiedTime: Timestamp? = null,
     val identityVerificationQuestion: String,
-    val identityVerificationAnswer: String
+    val identityVerificationAnswer: String,
 ) {
     fun toDomain(): User {
         return User(
