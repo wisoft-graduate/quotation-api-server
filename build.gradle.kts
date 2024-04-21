@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("org.springframework.boot") version "3.2.3"
@@ -55,4 +56,17 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.withType<BootJar> {
+    archiveFileName.set("api-server.jar")
+    val jarFile = "build/libs/api-server.jar"
+    val destinationDir = file("docker/server")
+
+    doLast {
+        copy {
+            from(jarFile)
+            into(destinationDir)
+        }
+    }
 }
