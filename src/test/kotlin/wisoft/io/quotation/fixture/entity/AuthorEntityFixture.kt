@@ -7,5 +7,4 @@ fun getAuthorEntityFixture(): AuthorEntity {
         name = "author",
         countryCode = "kr",
     )
-
 }

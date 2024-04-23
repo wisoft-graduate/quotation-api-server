@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank
 import java.util.UUID
 
 interface CreateBookmarkUseCase {
-
     fun createBookmark(request: CreateBookmarkRequest): UUID
 
     data class CreateBookmarkRequest(
@@ -16,15 +15,14 @@ interface CreateBookmarkUseCase {
         val quotationIds: List<UUID> = emptyList(),
         val visibility: Boolean,
         @field:NotBlank
-        val icon: String
+        val icon: String,
     )
 
     data class CreateBookmarkResponse(
-        val data: Data
+        val data: Data,
     )
 
     data class Data(
-        val id: UUID
+        val id: UUID,
     )
-
 }

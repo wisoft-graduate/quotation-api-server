@@ -6,7 +6,7 @@ import wisoft.io.quotation.adaptor.out.persistence.entity.BookmarkEntity
 import java.util.*
 
 @Repository
-interface BookmarkRepository: JpaRepository<BookmarkEntity, UUID>{
+interface BookmarkRepository : JpaRepository<BookmarkEntity, UUID> {
     fun countAllByUserId(userId: String): Long
 
     fun findByUserId(userId: String): List<BookmarkEntity>

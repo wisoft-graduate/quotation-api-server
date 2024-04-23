@@ -3,7 +3,6 @@ package wisoft.io.quotation.domain
 import org.mindrot.jbcrypt.BCrypt
 import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 import wisoft.io.quotation.application.port.`in`.UpdateUserUseCase
-import wisoft.io.quotation.domain.dto.RelatedUserDto
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
@@ -37,7 +36,7 @@ data class User(
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     var lastModifiedTime: Timestamp? = null,
     var identityVerificationQuestion: String,
-    var identityVerificationAnswer: String
+    var identityVerificationAnswer: String,
 ) {
     fun toEntity(): UserEntity {
         return UserEntity(
@@ -59,7 +58,7 @@ data class User(
 
     fun encryptPassword(password: String): User {
         return this.copy(
-            password = BCrypt.hashpw(password, BCrypt.gensalt())
+            password = BCrypt.hashpw(password, BCrypt.gensalt()),
         )
     }
 
@@ -73,9 +72,8 @@ data class User(
 
     fun resign(identifier: String): User {
         return this.copy(
-            nickname = "leaved#$identifier"
+            nickname = "leaved#$identifier",
         )
-
     }
 
     fun update(dto: UpdateUserUseCase.UpdateUserRequest): User {
@@ -90,6 +88,4 @@ data class User(
             identityVerificationAnswer = dto.identityVerificationAnswer ?: this.identityVerificationAnswer,
         )
     }
-
-
 }

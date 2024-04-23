@@ -14,7 +14,6 @@ class BookmarkAdaptor(val bookmarkRepository: BookmarkRepository) :
     GetBookmarkPort,
     UpdateBookmarkPort,
     DeleteBookmarkPort {
-
     override fun createBookmark(bookmark: Bookmark): UUID {
         return bookmarkRepository.save(bookmark.toEntity()).id
     }
@@ -38,5 +37,4 @@ class BookmarkAdaptor(val bookmarkRepository: BookmarkRepository) :
     override fun getBookmark(id: UUID): Bookmark? {
         return bookmarkRepository.findByIdOrNull(id)?.toDomain()
     }
-
 }

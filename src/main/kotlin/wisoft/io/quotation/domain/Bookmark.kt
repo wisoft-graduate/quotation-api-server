@@ -34,7 +34,7 @@ data class Bookmark(
             quotationIds = this.quotationIds,
             visibility = this.visibility,
             icon = this.icon,
-            createdTime = this.createdTime
+            createdTime = this.createdTime,
         )
     }
 

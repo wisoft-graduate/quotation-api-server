@@ -11,7 +11,6 @@ import wisoft.io.quotation.domain.User
 class UserAdaptor(
     val userRepository: UserRepository,
 ) : GetUserPort, CreateUserPort, UpdateUserPort, DeleteUserPort, GetUserListPort {
-
     override fun create(user: User): String {
         return userRepository.save(user.toEntity()).id
     }
@@ -39,10 +38,16 @@ class UserAdaptor(
         return userEntityList.map { it.toDomain() }
     }
 
-    override fun getUserByIdentityInformation(id: String, question: String, answer: String): User? {
+    override fun getUserByIdentityInformation(
+        id: String,
+        question: String,
+        answer: String,
+    ): User? {
         val userEntity =
             userRepository.findByIdAndIdentityVerificationQuestionAndIdentityVerificationAnswer(
-                id, question, answer
+                id,
+                question,
+                answer,
             )
         return userEntity?.toDomain()
     }

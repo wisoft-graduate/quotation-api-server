@@ -1,12 +1,11 @@
 package wisoft.io.quotation.application.port.`in`
 
 interface GetUserUseCase {
-
     fun getUserByIdOrNickname(request: GetUserByIdOrNicknameRequest): UserDto
 
     data class GetUserByIdOrNicknameRequest(
         val id: String?,
-        val nickname: String?
+        val nickname: String?,
     )
 
     data class GetUserByIdOrNicknameResponse(
@@ -17,5 +16,4 @@ interface GetUserUseCase {
         val id: String,
         val nickname: String,
     )
-
 }

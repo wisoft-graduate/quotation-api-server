@@ -3,7 +3,6 @@ package wisoft.io.quotation.application.port.`in`
 import jakarta.validation.constraints.NotBlank
 
 interface SignInUseCase {
-
     fun signIn(request: SignInRequest): UserTokenDto
 
     data class SignInRequest(
@@ -19,6 +18,6 @@ interface SignInUseCase {
 
     data class UserTokenDto(
         val accessToken: String,
-        val refreshToken: String
+        val refreshToken: String,
     )
 }

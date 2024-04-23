@@ -1,10 +1,8 @@
 package wisoft.io.quotation.application.port.`in`
 
 import jakarta.validation.constraints.NotBlank
-import java.sql.Timestamp
 
 interface GetUserDetailUseCase {
-
     fun getUserDetailById(request: GetUserDetailByIdRequest): UserDetailDto
 
     data class GetUserDetailByIdRequest(
@@ -13,7 +11,7 @@ interface GetUserDetailUseCase {
     )
 
     data class GetUserDetailByIdResponse(
-        val data: UserDetailDto
+        val data: UserDetailDto,
     )
 
     data class UserDetailDto(

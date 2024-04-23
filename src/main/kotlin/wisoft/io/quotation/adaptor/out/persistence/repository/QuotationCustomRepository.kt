@@ -12,7 +12,7 @@ import wisoft.io.quotation.domain.SortDirection
 
 @Repository
 class QuotationCustomRepository(
-    val queryFactory: SpringDataQueryFactory
+    val queryFactory: SpringDataQueryFactory,
 ) {
     fun findQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<QuotationEntity> {
         return queryFactory.listQuery<QuotationEntity> {
@@ -25,14 +25,15 @@ class QuotationCustomRepository(
                     and(column(QuotationEntity::content).like("%${request.searchWord}%"))
                         .or(column(AuthorEntity::name).like("%${request.searchWord}%"))
                 },
-                request.ids?.run { and(column(QuotationEntity::id).`in`(request.ids)) }
+                request.ids?.run { and(column(QuotationEntity::id).`in`(request.ids)) },
             )
 
             request.sortTarget?.let { sortTarget ->
-                val sortColumn = when (sortTarget) {
-                    QuotationSortTarget.LIKE -> column(QuotationEntity::likeCount)
-                    QuotationSortTarget.SHARE -> column(QuotationEntity::shareCount)
-                }
+                val sortColumn =
+                    when (sortTarget) {
+                        QuotationSortTarget.LIKE -> column(QuotationEntity::likeCount)
+                        QuotationSortTarget.SHARE -> column(QuotationEntity::shareCount)
+                    }
 
                 if (request.sortDirection == SortDirection.DESC) {
                     orderBy(sortColumn.desc())
@@ -90,5 +91,4 @@ class QuotationCustomRepository(
 //            }
 //            .resultList as List<QuotationEntity>
 //    }
-
 }

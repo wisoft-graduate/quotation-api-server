@@ -1,7 +1,6 @@
 package wisoft.io.quotation.adaptor.out.persistence.entity
 
 import io.hypersistence.utils.hibernate.type.array.ListArrayType
-import io.hypersistence.utils.hibernate.type.array.UUIDArrayType
 import jakarta.persistence.*
 import org.hibernate.annotations.Type
 import wisoft.io.quotation.domain.Bookmark
@@ -42,7 +41,7 @@ data class BookmarkEntity(
             quotationIds = this.quotationIds,
             visibility = this.visibility,
             icon = this.icon,
-            createdTime = this.createdTime
+            createdTime = this.createdTime,
         )
     }
 }

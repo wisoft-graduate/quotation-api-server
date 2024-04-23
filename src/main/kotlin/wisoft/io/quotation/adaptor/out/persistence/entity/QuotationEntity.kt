@@ -43,7 +43,7 @@ data class QuotationEntity(
             commentCount = commentCount,
             backgroundImagePath = backgroundImagePath,
             createdTime = createdTime,
-            lastModifiedTime = lastModifiedTime
+            lastModifiedTime = lastModifiedTime,
         )
     }
 }

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "Running git pre-commit hook"
+
+./gradlew ktlintCheck
+
+RESULT=$?
+
+# return 1 exit code if running checks fails
+[ $RESULT -ne 0 ] && ./gradlew ktlintFormat && echo 'format fixed. re-commit required' && exit 1
+exit 0

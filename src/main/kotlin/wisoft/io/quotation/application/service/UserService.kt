@@ -23,10 +23,16 @@ class UserService(
     val getLikeListPort: GetLikeListPort,
     val getBookmarkListPort: GetBookmarkListPort,
     val updateUserPort: UpdateUserPort,
-    val deleteUserPort: DeleteUserPort
-) : CreateUserUseCase, SignInUseCase,
-    DeleteUserUseCase, GetUserUseCase, GetUserDetailUseCase, UpdateUserUseCase, GetUserListUseCase,
-    ValidateUserUesCase, ResetPasswordUserUseCase {
+    val deleteUserPort: DeleteUserPort,
+) : CreateUserUseCase,
+    SignInUseCase,
+    DeleteUserUseCase,
+    GetUserUseCase,
+    GetUserDetailUseCase,
+    UpdateUserUseCase,
+    GetUserListUseCase,
+    ValidateUserUesCase,
+    ResetPasswordUserUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -39,14 +45,15 @@ class UserService(
                 throw UserDuplicateException("nickname: ${request.nickname}")
             }
 
-            val user = request.run {
-                User(
-                    id = this.id,
-                    nickname = this.nickname,
-                    identityVerificationQuestion = this.identityVerificationQuestion,
-                    identityVerificationAnswer = this.identityVerificationAnswer
-                )
-            }
+            val user =
+                request.run {
+                    User(
+                        id = this.id,
+                        nickname = this.nickname,
+                        identityVerificationQuestion = this.identityVerificationQuestion,
+                        identityVerificationAnswer = this.identityVerificationAnswer,
+                    )
+                }
             val encryptPasswordUser = user.encryptPassword(request.password)
 
             createUserPort.create(encryptPasswordUser)
@@ -62,7 +69,7 @@ class UserService(
                 GetUserListUseCase.UserDto(
                     id = it.id,
                     nickname = it.nickname,
-                    profilePath = it.profilePath
+                    profilePath = it.profilePath,
                 )
             }
         }.onFailure {
@@ -86,7 +93,6 @@ class UserService(
         }.onFailure {
             logger.error { "signIn fail: param[$request]" }
         }.getOrThrow()
-
     }
 
     @Transactional
@@ -105,26 +111,29 @@ class UserService(
         }.onFailure {
             logger.error { "deleteUser fail: parma[id: $id]" }
         }.getOrThrow()
-
     }
 
     override fun getUserByIdOrNickname(request: GetUserUseCase.GetUserByIdOrNicknameRequest): GetUserUseCase.UserDto {
         return runCatching {
-            if (request.id === null && request.nickname === null) throw InvalidRequestParameterException(request.toString())
-            else if (request.id !== null && request.nickname !== null) throw InvalidRequestParameterException(request.toString())
-
-            val user: User = if (request.id !== null) {
-                request.id.run {
-                    getUserPort.getUserById(this)
-                } ?: throw UserNotFoundException("id: ${request.id}")
-            } else {
-                request.nickname?.run {
-                    getUserPort.getUserByNickname(this)
-                } ?: throw UserNotFoundException("nickname: ${request.nickname}")
+            if (request.id === null && request.nickname === null) {
+                throw InvalidRequestParameterException(request.toString())
+            } else if (request.id !== null && request.nickname !== null) {
+                throw InvalidRequestParameterException(request.toString())
             }
+
+            val user: User =
+                if (request.id !== null) {
+                    request.id.run {
+                        getUserPort.getUserById(this)
+                    } ?: throw UserNotFoundException("id: ${request.id}")
+                } else {
+                    request.nickname?.run {
+                        getUserPort.getUserByNickname(this)
+                    } ?: throw UserNotFoundException("nickname: ${request.nickname}")
+                }
             GetUserUseCase.UserDto(user.id, user.nickname)
         }.onFailure {
-            logger.error { "getUserList fail: param[${request}]" }
+            logger.error { "getUserList fail: param[$request]" }
         }.getOrThrow()
     }
 
@@ -142,37 +151,41 @@ class UserService(
                 user.commentAlarm,
                 user.quotationAlarm,
                 bookmarkCount,
-                likeCount
+                likeCount,
             )
         }.onFailure {
-            logger.error { "getUserDetailById fail: param[${request}]" }
+            logger.error { "getUserDetailById fail: param[$request]" }
         }.getOrThrow()
     }
 
     @Transactional
-    override fun updateUser(id: String, request: UpdateUserUseCase.UpdateUserRequest): String {
+    override fun updateUser(
+        id: String,
+        request: UpdateUserUseCase.UpdateUserRequest,
+    ): String {
         return runCatching {
-            val user = getUserPort.getUserById(id) ?: throw UserNotFoundException("id: ${id}")
+            val user = getUserPort.getUserById(id) ?: throw UserNotFoundException("id: $id")
             val updatedUser = user.update(request)
             updateUserPort.updateUser(updatedUser)
         }.onFailure {
-            logger.error { "updateUser fail: param[id: ${id}, request: ${request}]" }
+            logger.error { "updateUser fail: param[id: $id, request: $request]" }
         }.getOrThrow()
     }
 
     override fun validateUser(request: ValidateUserUesCase.ValidateUserRequest): ValidateUserUesCase.Data {
         return runCatching {
-            val user = getUserPort.getUserByIdentityInformation(
-                request.id,
-                request.identityVerificationQuestion,
-                request.identityVerificationAnswer
-            ) ?: throw InvalidUserException("request: ${request}")
+            val user =
+                getUserPort.getUserByIdentityInformation(
+                    request.id,
+                    request.identityVerificationQuestion,
+                    request.identityVerificationAnswer,
+                ) ?: throw InvalidUserException("request: $request")
 
             val passwordResetToken = JWTUtil.generatePasswordResetToken(user)
 
             ValidateUserUesCase.Data(passwordResetToken = passwordResetToken)
         }.onFailure {
-            logger.error { "validateUser fail: param[${request}]" }
+            logger.error { "validateUser fail: param[$request]" }
         }.getOrThrow()
     }
 
@@ -184,8 +197,7 @@ class UserService(
 
             updateUserPort.updateUser(updatedUser)
         }.onFailure {
-            logger.error { "resetPasswordUser fail: param[request:${request}" }
+            logger.error { "resetPasswordUser fail: param[request:$request" }
         }.getOrThrow()
     }
-
 }

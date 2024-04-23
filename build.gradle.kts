@@ -4,9 +4,10 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.spring") version "1.9.22"
-    kotlin("plugin.jpa") version "1.9.22"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+    kotlin("jvm") version "1.9.23"
+    kotlin("plugin.spring") version "1.9.23"
+    kotlin("plugin.jpa") version "1.9.23"
 }
 
 group = "wisoft.io"
@@ -69,4 +70,22 @@ tasks.withType<BootJar> {
             into(destinationDir)
         }
     }
+}
+
+val installLocalGitHook =
+    tasks.register<Copy>("installLocalGitHook") {
+        from("${rootProject.rootDir}/.github/hooks")
+        into(File("${rootProject.rootDir}/.git/hooks"))
+
+        eachFile {
+            mode = "755".toInt(radix = 8)
+        }
+    }
+
+tasks.build {
+    dependsOn(installLocalGitHook)
+}
+
+tasks.bootJar {
+    dependsOn(installLocalGitHook)
 }

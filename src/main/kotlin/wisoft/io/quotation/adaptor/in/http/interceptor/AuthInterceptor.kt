@@ -14,8 +14,12 @@ import wisoft.io.quotation.util.annotation.ResetPasswordAuthenticated
 @Component
 class AuthInterceptor : HandlerInterceptor {
     val logger = KotlinLogging.logger {}
-    override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
 
+    override fun preHandle(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        handler: Any,
+    ): Boolean {
         if (handler !is HandlerMethod) return true
         println(request.requestURI)
         val loginAuthenticated = handler.getMethodAnnotation(LoginAuthenticated::class.java)
@@ -64,4 +68,3 @@ class AuthInterceptor : HandlerInterceptor {
         }.getOrThrow()
     }
 }
-

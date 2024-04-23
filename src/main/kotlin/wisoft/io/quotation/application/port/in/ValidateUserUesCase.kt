@@ -11,7 +11,7 @@ interface ValidateUserUesCase {
         @field:NotBlank
         val identityVerificationQuestion: String,
         @field:NotBlank
-        val identityVerificationAnswer: String
+        val identityVerificationAnswer: String,
     )
 
     data class ValidateUserResponse(
@@ -19,6 +19,6 @@ interface ValidateUserUesCase {
     )
 
     data class Data(
-        val passwordResetToken: String
+        val passwordResetToken: String,
     )
 }
