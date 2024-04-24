@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional
 import wisoft.io.quotation.application.port.`in`.*
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
-import wisoft.io.quotation.exception.error.InvalidRequestParameterException
 import wisoft.io.quotation.exception.error.InvalidUserException
 import wisoft.io.quotation.exception.error.UserDuplicateException
 import wisoft.io.quotation.exception.error.UserNotFoundException
@@ -27,7 +26,6 @@ class UserService(
 ) : CreateUserUseCase,
     SignInUseCase,
     DeleteUserUseCase,
-    GetUserUseCase,
     GetUserDetailUseCase,
     UpdateUserUseCase,
     GetUserListUseCase,
@@ -64,7 +62,7 @@ class UserService(
 
     override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
         return runCatching {
-            val userList = getUserListPort.getUserList(request.nickname)
+            val userList = getUserListPort.getUserList(request)
             userList.map {
                 GetUserListUseCase.UserDto(
                     id = it.id,
@@ -110,30 +108,6 @@ class UserService(
             deleteUserPort.deleteUser(deletedUser)
         }.onFailure {
             logger.error { "deleteUser fail: parma[id: $id]" }
-        }.getOrThrow()
-    }
-
-    override fun getUserByIdOrNickname(request: GetUserUseCase.GetUserByIdOrNicknameRequest): GetUserUseCase.UserDto {
-        return runCatching {
-            if (request.id === null && request.nickname === null) {
-                throw InvalidRequestParameterException(request.toString())
-            } else if (request.id !== null && request.nickname !== null) {
-                throw InvalidRequestParameterException(request.toString())
-            }
-
-            val user: User =
-                if (request.id !== null) {
-                    request.id.run {
-                        getUserPort.getUserById(this)
-                    } ?: throw UserNotFoundException("id: ${request.id}")
-                } else {
-                    request.nickname?.run {
-                        getUserPort.getUserByNickname(this)
-                    } ?: throw UserNotFoundException("nickname: ${request.nickname}")
-                }
-            GetUserUseCase.UserDto(user.id, user.nickname)
-        }.onFailure {
-            logger.error { "getUserList fail: param[$request]" }
         }.getOrThrow()
     }
 

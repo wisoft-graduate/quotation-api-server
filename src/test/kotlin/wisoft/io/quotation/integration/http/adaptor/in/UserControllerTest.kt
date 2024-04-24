@@ -127,33 +127,6 @@ class UserControllerTest(
             }
         }
 
-        context("getUser Test") {
-            test("getUser 성공") {
-                // given
-                val existUser = repository.save(getUserEntityFixture())
-                val request =
-                    GetUserUseCase.GetUserByIdOrNicknameRequest(
-                        existUser.id,
-                        null,
-                    )
-
-                // when
-                val result =
-                    mockMvc.get("/users/duplication-check") {
-                        param("id", request.id!!)
-                        accept = MediaType.APPLICATION_JSON
-                    }
-                        .andExpect { MockMvcResultMatchers.status().isOk }
-                        .andReturn()
-                        .response.contentAsString
-
-                // then
-                val actual = objectMapper.readValue(result, GetUserUseCase.GetUserByIdOrNicknameResponse::class.java)
-                actual.data.id shouldBe existUser.id
-                actual.data.nickname shouldBe existUser.nickname
-            }
-        }
-
         context("deleteUser Test") {
             test("deleteUser 성공") {
                 // given
@@ -273,18 +246,73 @@ class UserControllerTest(
         }
 
         context("getUserList Test") {
-            test("getUserList 성공 ") {
+            test("getUserList 성공 - searchNickname") {
                 // given
                 val existUser = repository.save(getUserEntityFixture())
                 val request =
                     GetUserListUseCase.GetUserListRequest(
-                        nickname = existUser.nickname.dropLast(3),
+                        searchNickname = existUser.nickname.dropLast(3),
+                        nickname = null,
+                        id = null,
                     )
-
                 // when
                 val result =
                     mockMvc.get("/users") {
-                        param("nickname", request.nickname)
+                        param("searchNickname", request.searchNickname!!)
+                        accept = MediaType.APPLICATION_JSON
+                    }
+                        .andExpect { MockMvcResultMatchers.status().isOk }
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(result, GetUserListUseCase.GetUserListResponse::class.java)
+                val actualUserDto = actual.data.users[0]
+
+                actualUserDto.id shouldBe existUser.id
+                actualUserDto.nickname shouldBe existUser.nickname
+                actualUserDto.profilePath shouldBe existUser.profilePath
+            }
+            test("getUserList 성공 - nickname") {
+                // given
+                val existUser = repository.save(getUserEntityFixture())
+                val request =
+                    GetUserListUseCase.GetUserListRequest(
+                        searchNickname = null,
+                        nickname = existUser.nickname,
+                        id = null,
+                    )
+                // when
+                val result =
+                    mockMvc.get("/users") {
+                        param("nickname", request.nickname!!)
+                        accept = MediaType.APPLICATION_JSON
+                    }
+                        .andExpect { MockMvcResultMatchers.status().isOk }
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(result, GetUserListUseCase.GetUserListResponse::class.java)
+                val actualUserDto = actual.data.users[0]
+
+                actualUserDto.id shouldBe existUser.id
+                actualUserDto.nickname shouldBe existUser.nickname
+                actualUserDto.profilePath shouldBe existUser.profilePath
+            }
+            test("getUserList 성공 - id") {
+                // given
+                val existUser = repository.save(getUserEntityFixture())
+                val request =
+                    GetUserListUseCase.GetUserListRequest(
+                        searchNickname = null,
+                        nickname = null,
+                        id = existUser.id,
+                    )
+                // when
+                val result =
+                    mockMvc.get("/users") {
+                        param("id", request.id!!)
                         accept = MediaType.APPLICATION_JSON
                     }
                         .andExpect { MockMvcResultMatchers.status().isOk }

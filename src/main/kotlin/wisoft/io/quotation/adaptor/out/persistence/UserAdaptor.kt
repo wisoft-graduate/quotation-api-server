@@ -4,6 +4,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
+import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
 
@@ -33,9 +34,15 @@ class UserAdaptor(
         userRepository.save(user.toEntity())
     }
 
-    override fun getUserList(nickname: String): List<User> {
-        val userEntityList: List<UserEntity> = userRepository.findAllByNicknameContains(nickname)
-        return userEntityList.map { it.toDomain() }
+    override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<User> {
+        val userList: List<UserEntity> =
+            when {
+                request.searchNickname != null -> userRepository.findAllByNicknameContains(request.searchNickname)
+                request.nickname != null -> userRepository.findAllByNickname(request.nickname)
+                request.id != null -> userRepository.findAllById(request.id)
+                else -> emptyList() // 모든 옵션이 없는 경우 빈 리스트 반환
+            }
+        return userList.map { it.toDomain() }
     }
 
     override fun getUserByIdentityInformation(
