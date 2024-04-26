@@ -327,6 +327,36 @@ class UserControllerTest(
                 actualUserDto.nickname shouldBe existUser.nickname
                 actualUserDto.profilePath shouldBe existUser.profilePath
             }
+            test("getUserList 실패 - 값이 채워진 request param이 2개 이상인 경우") {
+                // given
+                val status = HttpMessage.HTTP_400.status
+                val path = "/users"
+                val existUser = repository.save(getUserEntityFixture())
+                val request =
+                    GetUserListUseCase.GetUserListRequest(
+                        searchNickname = existUser.nickname.dropLast(3),
+                        nickname = existUser.nickname,
+                        id = existUser.id,
+                    )
+                // when
+                val result =
+                    mockMvc.get("/users") {
+                        param("searchNickname", request.searchNickname!!)
+                        param("nickname", request.nickname!!)
+                        param("id", request.id!!)
+                        accept = MediaType.APPLICATION_JSON
+                    }
+                        .andExpect { MockMvcResultMatchers.status().isBadRequest }
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(result, ErrorData::class.java).data
+
+                actual.status shouldBe status.value()
+                actual.error shouldBe status.reasonPhrase
+                actual.path shouldBe path
+            }
         }
 
         context("validateUser Test") {

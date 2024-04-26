@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import wisoft.io.quotation.application.port.`in`.*
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.domain.User
+import wisoft.io.quotation.exception.error.InvalidRequestParameterException
 import wisoft.io.quotation.exception.error.InvalidUserException
 import wisoft.io.quotation.exception.error.UserDuplicateException
 import wisoft.io.quotation.exception.error.UserNotFoundException
@@ -62,6 +63,10 @@ class UserService(
 
     override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
         return runCatching {
+            // FIXME: 추후 가능 하면 요청 정보 중 하나만 받도록 Validate 에서 제한
+            val valueCount = listOf(request.id, request.nickname, request.searchNickname).count { it != null }
+            if (valueCount != 1) throw InvalidRequestParameterException("parameter valueCount: $valueCount")
+
             val userList = getUserListPort.getUserList(request)
             userList.map {
                 GetUserListUseCase.UserDto(
