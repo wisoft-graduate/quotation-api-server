@@ -21,7 +21,8 @@ data class CommentEntity(
     val quotationId: UUID,
     val userId: String,
     val content: String,
+    val commentedUserId: String? = null,
     val createdTime: Timestamp,
     val lastModifiedTime: Timestamp? = null,
-    val parentId: UUID,
+    val parentId: UUID? = null,
 )

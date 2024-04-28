@@ -17,3 +17,16 @@ fun getUserEntityFixture(): UserEntity {
         createdTime = Timestamp.valueOf(LocalDateTime.now()),
     )
 }
+
+fun getUserEntityFixture(id: String): UserEntity {
+    return UserEntity(
+        id = id,
+        password = BCrypt.hashpw("password", BCrypt.gensalt()),
+        nickname = "testNickname",
+        identityVerificationQuestion = "question",
+        identityVerificationAnswer = "answer",
+        commentAlarm = false,
+        quotationAlarm = false,
+        createdTime = Timestamp.valueOf(LocalDateTime.now()),
+    )
+}
