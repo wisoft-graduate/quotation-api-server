@@ -33,113 +33,113 @@ class CommentControllerTest(
     val commentRepository: CommentRepository,
 ) : FunSpec({
 
-    val objectMapper = ObjectMapper().registerKotlinModule()
+        val objectMapper = ObjectMapper().registerKotlinModule()
 
-    afterEach {
-        quotationRepository.deleteAll()
-        userRepository.deleteAll()
-        commentRepository.deleteAll()
-    }
+        afterEach {
+            quotationRepository.deleteAll()
+            userRepository.deleteAll()
+            commentRepository.deleteAll()
+        }
 
-    context("createComment Test") {
-        test("createComment 성공") {
-            // given
-            val user = userRepository.save(getUserEntityFixture())
-            val commentedUser = userRepository.save(getUserEntityFixture("commentedUser"))
-            val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
-            val request =
-                CreateCommentUseCase.CreateCommentRequest(
-                    quotationId = quotation.id,
-                    userId = user.id,
-                    content = "content",
-                    commentedUserId = commentedUser.id,
-                )
+        context("createComment Test") {
+            test("createComment 성공") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val commentedUser = userRepository.save(getUserEntityFixture("commentedUser"))
+                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
+                val request =
+                    CreateCommentUseCase.CreateCommentRequest(
+                        quotationId = quotation.id,
+                        userId = user.id,
+                        content = "content",
+                        commentedUserId = commentedUser.id,
+                    )
 
-            // when
-            val createCommentRequestJson = objectMapper.writeValueAsString(request)
-            val result =
+                // when
+                val createCommentRequestJson = objectMapper.writeValueAsString(request)
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.post("/comments")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(createCommentRequestJson),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isCreated)
+                        .andReturn()
+                        .response.contentAsString
+                val comment = objectMapper.readValue(result, CreateCommentUseCase.CreateCommentResponse::class.java)
+
+                // then
+                val actual = commentRepository.findById(comment.data.id).get()
+                actual.quotationId shouldBe request.quotationId
+                actual.userId shouldBe request.userId
+                actual.content shouldBe request.content
+                actual.commentedUserId shouldBe request.commentedUserId
+            }
+
+            test("createComment 실패 - 등록되지 않은 사용자") {
+                // given
+                val commentedUser = userRepository.save(getUserEntityFixture("commentedUser"))
+                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
+                val request =
+                    CreateCommentUseCase.CreateCommentRequest(
+                        quotationId = quotation.id,
+                        userId = "test",
+                        content = "content",
+                        commentedUserId = commentedUser.id,
+                    )
+
+                // when, then
+                val createCommentRequestJson = objectMapper.writeValueAsString(request)
                 mockMvc.perform(
                     MockMvcRequestBuilders.post("/comments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createCommentRequestJson),
                 )
-                    .andExpect(MockMvcResultMatchers.status().isCreated)
-                    .andReturn()
-                    .response.contentAsString
-            val comment = objectMapper.readValue(result, CreateCommentUseCase.CreateCommentResponse::class.java)
+                    .andExpect(MockMvcResultMatchers.status().isNotFound)
+            }
 
-            // then
-            val actual = commentRepository.findById(comment.data.id).get()
-            actual.quotationId shouldBe request.quotationId
-            actual.userId shouldBe request.userId
-            actual.content shouldBe request.content
-            actual.commentedUserId shouldBe request.commentedUserId
-        }
+            test("createComment 실패 - 등록되지 않은 명언") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val commentedUser = userRepository.save(getUserEntityFixture("commentedUser"))
+                val request =
+                    CreateCommentUseCase.CreateCommentRequest(
+                        quotationId = UUID.randomUUID(),
+                        userId = user.id,
+                        content = "content",
+                        commentedUserId = commentedUser.id,
+                    )
 
-        test("createComment 실패 - 등록되지 않은 사용자") {
-            // given
-            val commentedUser = userRepository.save(getUserEntityFixture("commentedUser"))
-            val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
-            val request =
-                CreateCommentUseCase.CreateCommentRequest(
-                    quotationId = quotation.id,
-                    userId = "test",
-                    content = "content",
-                    commentedUserId = commentedUser.id,
+                // when, then
+                val createCommentRequestJson = objectMapper.writeValueAsString(request)
+                mockMvc.perform(
+                    MockMvcRequestBuilders.post("/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createCommentRequestJson),
                 )
+                    .andExpect(MockMvcResultMatchers.status().isNotFound)
+            }
 
-            // when, then
-            val createCommentRequestJson = objectMapper.writeValueAsString(request)
-            mockMvc.perform(
-                MockMvcRequestBuilders.post("/comments")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createCommentRequestJson),
-            )
-                .andExpect(MockMvcResultMatchers.status().isNotFound)
-        }
+            test("createComment 실패 - 태그된 유저 등록되지 않음") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
+                val request =
+                    CreateCommentUseCase.CreateCommentRequest(
+                        quotationId = quotation.id,
+                        userId = user.id,
+                        content = "content",
+                        commentedUserId = "test",
+                    )
 
-        test("createComment 실패 - 등록되지 않은 명언") {
-            // given
-            val user = userRepository.save(getUserEntityFixture())
-            val commentedUser = userRepository.save(getUserEntityFixture("commentedUser"))
-            val request =
-                CreateCommentUseCase.CreateCommentRequest(
-                    quotationId = UUID.randomUUID(),
-                    userId = user.id,
-                    content = "content",
-                    commentedUserId = commentedUser.id,
+                // when, then
+                val createCommentRequestJson = objectMapper.writeValueAsString(request)
+                mockMvc.perform(
+                    MockMvcRequestBuilders.post("/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createCommentRequestJson),
                 )
-
-            // when, then
-            val createCommentRequestJson = objectMapper.writeValueAsString(request)
-            mockMvc.perform(
-                MockMvcRequestBuilders.post("/comments")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createCommentRequestJson),
-            )
-                .andExpect(MockMvcResultMatchers.status().isNotFound)
+                    .andExpect(MockMvcResultMatchers.status().isNotFound)
+            }
         }
-
-        test("createComment 실패 - 태그된 유저 등록되지 않음") {
-            // given
-            val user = userRepository.save(getUserEntityFixture())
-            val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
-            val request =
-                CreateCommentUseCase.CreateCommentRequest(
-                    quotationId = quotation.id,
-                    userId = user.id,
-                    content = "content",
-                    commentedUserId = "test",
-                )
-
-            // when, then
-            val createCommentRequestJson = objectMapper.writeValueAsString(request)
-            mockMvc.perform(
-                MockMvcRequestBuilders.post("/comments")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createCommentRequestJson),
-            )
-                .andExpect(MockMvcResultMatchers.status().isNotFound)
-        }
-    }
-})
+    })
