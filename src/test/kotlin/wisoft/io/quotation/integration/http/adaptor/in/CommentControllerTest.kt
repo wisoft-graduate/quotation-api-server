@@ -45,7 +45,7 @@ class CommentControllerTest(
             test("createComment 성공") {
                 // given
                 val user = userRepository.save(getUserEntityFixture())
-                val commentedUser = userRepository.save(getUserEntityFixture("commentedUser"))
+                val commentedUser = userRepository.save(getUserEntityFixture("commentedUser", "nickname2"))
                 val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
                 val request =
                     CreateCommentUseCase.CreateCommentRequest(
