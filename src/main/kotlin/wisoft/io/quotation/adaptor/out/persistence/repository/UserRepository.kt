@@ -10,6 +10,10 @@ interface UserRepository : JpaRepository<UserEntity, String> {
 
     fun findAllByNicknameContains(nickname: String): List<UserEntity>
 
+    fun findAllById(id: String): List<UserEntity>
+
+    fun findAllByNickname(nickname: String): List<UserEntity>
+
     fun findByIdAndIdentityVerificationQuestionAndIdentityVerificationAnswer(
         nickname: String,
         identityVerificationQuestion: String,

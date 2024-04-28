@@ -21,7 +21,6 @@ class AuthInterceptor : HandlerInterceptor {
         handler: Any,
     ): Boolean {
         if (handler !is HandlerMethod) return true
-        println(request.requestURI)
         val loginAuthenticated = handler.getMethodAnnotation(LoginAuthenticated::class.java)
         val resetPasswordAuthenticated = handler.getMethodAnnotation(ResetPasswordAuthenticated::class.java)
 

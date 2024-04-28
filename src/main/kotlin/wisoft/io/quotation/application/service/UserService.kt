@@ -27,7 +27,6 @@ class UserService(
 ) : CreateUserUseCase,
     SignInUseCase,
     DeleteUserUseCase,
-    GetUserUseCase,
     GetUserDetailUseCase,
     UpdateUserUseCase,
     GetUserListUseCase,
@@ -64,7 +63,11 @@ class UserService(
 
     override fun getUserList(request: GetUserListUseCase.GetUserListRequest): List<GetUserListUseCase.UserDto> {
         return runCatching {
-            val userList = getUserListPort.getUserList(request.nickname)
+            // FIXME: 추후 가능 하면 요청 정보 중 하나만 받도록 Validate 에서 제한
+            val valueCount = listOf(request.id, request.nickname, request.searchNickname).count { it != null }
+            if (valueCount != 1) throw InvalidRequestParameterException("parameter valueCount: $valueCount")
+
+            val userList = getUserListPort.getUserList(request)
             userList.map {
                 GetUserListUseCase.UserDto(
                     id = it.id,
@@ -110,30 +113,6 @@ class UserService(
             deleteUserPort.deleteUser(deletedUser)
         }.onFailure {
             logger.error { "deleteUser fail: parma[id: $id]" }
-        }.getOrThrow()
-    }
-
-    override fun getUserByIdOrNickname(request: GetUserUseCase.GetUserByIdOrNicknameRequest): GetUserUseCase.UserDto {
-        return runCatching {
-            if (request.id === null && request.nickname === null) {
-                throw InvalidRequestParameterException(request.toString())
-            } else if (request.id !== null && request.nickname !== null) {
-                throw InvalidRequestParameterException(request.toString())
-            }
-
-            val user: User =
-                if (request.id !== null) {
-                    request.id.run {
-                        getUserPort.getUserById(this)
-                    } ?: throw UserNotFoundException("id: ${request.id}")
-                } else {
-                    request.nickname?.run {
-                        getUserPort.getUserByNickname(this)
-                    } ?: throw UserNotFoundException("nickname: ${request.nickname}")
-                }
-            GetUserUseCase.UserDto(user.id, user.nickname)
-        }.onFailure {
-            logger.error { "getUserList fail: param[$request]" }
         }.getOrThrow()
     }
 

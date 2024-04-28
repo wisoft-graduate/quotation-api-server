@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -22,7 +21,6 @@ class UserController(
     val createUserUseCase: CreateUserUseCase,
     val signInUseCase: SignInUseCase,
     val deleteUserUseCase: DeleteUserUseCase,
-    val getUserUseCase: GetUserUseCase,
     val getUserDetailUseCase: GetUserDetailUseCase,
     val getUserListUseCase: GetUserListUseCase,
     val updateUserUseCase: UpdateUserUseCase,
@@ -44,9 +42,18 @@ class UserController(
 
     @GetMapping("/users")
     fun getUserList(
-        @RequestParam nickname: String,
+        @RequestParam searchNickname: String?,
+        @RequestParam nickname: String?,
+        @RequestParam id: String?,
     ): ResponseEntity<GetUserListUseCase.GetUserListResponse> {
-        val response = getUserListUseCase.getUserList(GetUserListUseCase.GetUserListRequest(nickname = nickname))
+        val response =
+            getUserListUseCase.getUserList(
+                GetUserListUseCase.GetUserListRequest(
+                    searchNickname = searchNickname,
+                    nickname = nickname,
+                    id = id,
+                ),
+            )
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(
@@ -67,19 +74,6 @@ class UserController(
                             accessToken = response.accessToken,
                             refreshToken = response.refreshToken,
                         ),
-                ),
-            )
-    }
-
-    @GetMapping("/users/duplication-check")
-    fun getUser(
-        @ModelAttribute request: GetUserUseCase.GetUserByIdOrNicknameRequest,
-    ): ResponseEntity<GetUserUseCase.GetUserByIdOrNicknameResponse> {
-        val response = getUserUseCase.getUserByIdOrNickname(request)
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(
-                GetUserUseCase.GetUserByIdOrNicknameResponse(
-                    data = GetUserUseCase.UserDto(id = response.id, nickname = response.nickname),
                 ),
             )
     }
