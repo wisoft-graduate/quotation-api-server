@@ -32,7 +32,6 @@ class BookmarkService(
             request.run {
                 createBookmarkPort.createBookmark(
                     Bookmark(
-                        id = this.id ?: UUID.randomUUID(),
                         name = this.name,
                         userId = this.userId,
                         visibility = this.visibility,

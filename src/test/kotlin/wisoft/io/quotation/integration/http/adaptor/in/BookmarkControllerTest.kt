@@ -48,7 +48,6 @@ class BookmarkControllerTest(
                 val user = userRepository.save(getUserEntityFixture())
                 val request =
                     CreateBookmarkUseCase.CreateBookmarkRequest(
-                        id = UUID.randomUUID(),
                         userId = user.id,
                         quotationIds = listOf(UUID.randomUUID()),
                         name = "name",
@@ -67,10 +66,14 @@ class BookmarkControllerTest(
                         .andExpect(MockMvcResultMatchers.status().isCreated)
                         .andReturn()
                         .response.contentAsString
+                val bookmark = objectMapper.readValue(result, CreateBookmarkUseCase.CreateBookmarkResponse::class.java)
 
                 // then
-                val actual = objectMapper.readValue(result, CreateBookmarkUseCase.CreateBookmarkResponse::class.java)
-                actual.data.id shouldBe request.id
+                val actual = bookmarkRepository.findById(bookmark.data.id).get()
+                actual.name shouldBe request.name
+                actual.userId shouldBe user.id
+                actual.visibility shouldBe request.visibility
+                actual.icon shouldBe request.icon
             }
 
             test("createBookmark 실패 - 등록되지 않은 유저") {

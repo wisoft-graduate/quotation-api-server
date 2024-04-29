@@ -5,11 +5,14 @@ import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
-fun getUserEntityFixture(): UserEntity {
+fun getUserEntityFixture(
+    id: String? = null,
+    nickname: String? = null,
+): UserEntity {
     return UserEntity(
-        id = "testUser",
+        id = id ?: "testUser",
+        nickname = nickname ?: "testNickname",
         password = BCrypt.hashpw("password", BCrypt.gensalt()),
-        nickname = "testNickname",
         identityVerificationQuestion = "question",
         identityVerificationAnswer = "answer",
         commentAlarm = false,
