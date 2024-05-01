@@ -4,10 +4,9 @@ import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.MethodArgumentNotValidException
 import java.sql.Timestamp
-import java.time.LocalDateTime
 
 data class ErrorMessage(
-    val timestamp: Timestamp = Timestamp(LocalDateTime.now().second.toLong()),
+    val timestamp: Timestamp = Timestamp(System.currentTimeMillis()),
     val status: Int,
     val error: String,
     val path: String,

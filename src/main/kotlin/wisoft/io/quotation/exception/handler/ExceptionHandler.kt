@@ -74,4 +74,17 @@ class ExceptionHandler {
             .status(status)
             .body(errorMessage)
     }
+
+    @ExceptionHandler(DuplicateException::class)
+    fun duplicateExceptionHandler(
+        e: DuplicateException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorData> {
+        val status = HttpMessage.HTTP_400_DUPLICATE.status
+        val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
+
+        return ResponseEntity
+            .status(status)
+            .body(errorMessage)
+    }
 }
