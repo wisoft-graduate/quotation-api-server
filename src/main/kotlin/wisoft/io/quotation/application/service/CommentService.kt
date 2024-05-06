@@ -3,7 +3,9 @@ package wisoft.io.quotation.application.service
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import wisoft.io.quotation.application.port.`in`.CreateCommentUseCase
+import wisoft.io.quotation.application.port.`in`.GetCommentListUseCase
 import wisoft.io.quotation.application.port.out.CreateCommentPort
+import wisoft.io.quotation.application.port.out.GetCommentListPort
 import wisoft.io.quotation.application.port.out.GetQuotationPort
 import wisoft.io.quotation.application.port.out.GetUserPort
 import wisoft.io.quotation.domain.Comment
@@ -16,7 +18,8 @@ class CommentService(
     val createCommentPort: CreateCommentPort,
     val getUserPort: GetUserPort,
     val getQuotationPort: GetQuotationPort,
-) : CreateCommentUseCase {
+    val getCommentListPort: GetCommentListPort,
+) : CreateCommentUseCase, GetCommentListUseCase {
     val logger = KotlinLogging.logger {}
 
     override fun createComment(request: CreateCommentUseCase.CreateCommentRequest): UUID {
@@ -45,6 +48,14 @@ class CommentService(
             )
         }.onFailure {
             logger.error { "createComment fail: param[$request]" }
+        }.getOrThrow()
+    }
+
+    override fun getCommentList(request: GetCommentListUseCase.GetCommentListRequest): List<Comment> {
+        return runCatching {
+            getCommentListPort.getCommentList(request.commentIds, request.quotationId, request.parentCommentId)
+        }.onFailure {
+            logger.error { "getCommentList fail: param[$request]" }
         }.getOrThrow()
     }
 }

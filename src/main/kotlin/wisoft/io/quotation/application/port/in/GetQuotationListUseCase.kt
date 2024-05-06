@@ -22,6 +22,6 @@ interface GetQuotationListUseCase {
     )
 
     data class Data(
-        val quotations: List<Quotation>,
+        val quotationList: List<Quotation>,
     )
 }
