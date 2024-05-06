@@ -9,7 +9,8 @@ interface GetCommentListUseCase {
     data class GetCommentListRequest(
         val commentIds: List<UUID>? = null,
         val quotationId: UUID? = null,
-        val parentCommentId: UUID? = null,
+        val parentId: UUID? = null,
+        val isTopDepth: Boolean = false,
     )
 
     data class GetCommentListResponse(

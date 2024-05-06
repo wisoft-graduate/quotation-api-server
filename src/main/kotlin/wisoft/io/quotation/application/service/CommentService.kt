@@ -53,7 +53,12 @@ class CommentService(
 
     override fun getCommentList(request: GetCommentListUseCase.GetCommentListRequest): List<Comment> {
         return runCatching {
-            getCommentListPort.getCommentList(request.commentIds, request.quotationId, request.parentCommentId)
+            getCommentListPort.getCommentList(
+                request.commentIds,
+                request.quotationId,
+                request.parentId,
+                request.isTopDepth,
+            )
         }.onFailure {
             logger.error { "getCommentList fail: param[$request]" }
         }.getOrThrow()

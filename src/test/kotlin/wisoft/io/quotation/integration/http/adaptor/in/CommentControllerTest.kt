@@ -159,6 +159,7 @@ class CommentControllerTest(
                     mockMvc.perform(
                         MockMvcRequestBuilders.get("/comments")
                             .param("quotationId", quotation.id.toString())
+                            .param("isTopDepth", true.toString())
                             .contentType(MediaType.APPLICATION_JSON),
                     ).andExpect(MockMvcResultMatchers.status().isOk)
                         .andReturn()
@@ -220,7 +221,7 @@ class CommentControllerTest(
                 val result =
                     mockMvc.perform(
                         MockMvcRequestBuilders.get("/comments")
-                            .param("parentCommentId", comment.id.toString())
+                            .param("parentId", comment.id.toString())
                             .contentType(MediaType.APPLICATION_JSON),
                     ).andExpect(MockMvcResultMatchers.status().isOk)
                         .andReturn()

@@ -15,6 +15,7 @@ class CommentCustomRepository(
         commentIds: List<UUID>?,
         quotationId: UUID?,
         parentId: UUID?,
+        isTopDepth: Boolean,
     ): List<CommentEntity> {
         return queryFactory.listQuery<CommentEntity> {
             select(entity(CommentEntity::class))
@@ -27,8 +28,12 @@ class CommentCustomRepository(
                 quotationId?.let {
                     and(column(CommentEntity::quotationId).equal(it))
                 },
-                parentId?.let {
-                    and(column(CommentEntity::parentId).equal(it))
+                if (isTopDepth) {
+                    and(column(CommentEntity::parentId).isNull())
+                } else {
+                    parentId?.let {
+                        and(column(CommentEntity::parentId).equal(parentId))
+                    }
                 },
             )
         }

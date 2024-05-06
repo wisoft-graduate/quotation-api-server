@@ -8,5 +8,6 @@ interface GetCommentListPort {
         commentIds: List<UUID>?,
         quotationId: UUID?,
         parentId: UUID?,
+        isTopDepth: Boolean,
     ): List<Comment>
 }

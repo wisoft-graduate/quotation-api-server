@@ -21,8 +21,9 @@ class CommentAdaptor(
         commentIds: List<UUID>?,
         quotationId: UUID?,
         parentId: UUID?,
+        isTopDepth: Boolean,
     ): List<Comment> {
-        val comments = commentCustomRepository.findCommentList(commentIds, quotationId, parentId)
+        val comments = commentCustomRepository.findCommentList(commentIds, quotationId, parentId, isTopDepth)
         return comments.map {
             val childCommentIds = commentRepository.findByParentId(it.id).map { child -> child.id }
             Comment(
