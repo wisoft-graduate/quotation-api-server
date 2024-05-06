@@ -27,7 +27,8 @@ class UserService(
 ) : CreateUserUseCase,
     SignInUseCase,
     DeleteUserUseCase,
-    GetUserDetailUseCase,
+    GetUserMyPageUseCase,
+    GetUserPageUseCase,
     UpdateUserUseCase,
     GetUserListUseCase,
     ValidateUserUesCase,
@@ -116,12 +117,12 @@ class UserService(
         }.getOrThrow()
     }
 
-    override fun getUserDetailById(request: GetUserDetailUseCase.GetUserDetailByIdRequest): GetUserDetailUseCase.UserDetailDto {
+    override fun getUserMyPage(request: GetUserMyPageUseCase.GetUserMyPageRequest): GetUserMyPageUseCase.UserMyPageDto {
         return runCatching {
             val user = getUserPort.getUserById(request.id) ?: throw UserNotFoundException("id: ${request.id}")
             val bookmarkCount = getBookmarkListPort.getBookmarkListCountByUserId(request.id)
             val likeCount = getLikeListPort.getLikeListCountByUserId(request.id)
-            GetUserDetailUseCase.UserDetailDto(
+            GetUserMyPageUseCase.UserMyPageDto(
                 user.id,
                 user.nickname,
                 user.profilePath,
@@ -131,6 +132,25 @@ class UserService(
                 user.quotationAlarm,
                 bookmarkCount,
                 likeCount,
+            )
+        }.onFailure {
+            logger.error { "getUserDetailById fail: param[$request]" }
+        }.getOrThrow()
+    }
+
+    override fun getUserPage(request: GetUserPageUseCase.GetUserPageRequest): GetUserPageUseCase.UserPageDto {
+        return runCatching {
+            val user = getUserPort.getUserById(request.id) ?: throw UserNotFoundException("id: ${request.id}")
+            val bookmarkCount = getBookmarkListPort.getBookmarkListCountByUserId(request.id)
+            val likeCount = getLikeListPort.getLikeListCountByUserId(request.id)
+            GetUserPageUseCase.UserPageDto(
+                id = user.id,
+                nickname = user.nickname,
+                profilePath = user.profilePath,
+                favoriteQuotation = user.favoriteQuotation,
+                favoriteAuthor = user.favoriteAuthor,
+                bookmarkCount = bookmarkCount,
+                likeQuotationCount = likeCount,
             )
         }.onFailure {
             logger.error { "getUserDetailById fail: param[$request]" }

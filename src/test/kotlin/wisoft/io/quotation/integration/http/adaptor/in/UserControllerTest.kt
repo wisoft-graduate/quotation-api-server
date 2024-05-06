@@ -168,8 +168,59 @@ class UserControllerTest(
             }
         }
 
-        context("getUserDetail Test") {
-            test("getUserDetail 성공") {
+        context("getUserMyPage Test") {
+            test("getUserMyPage 성공") {
+                // given
+                val existUser = repository.save(getUserEntityFixture())
+                val accessToken = JWTUtil.generateAccessToken(existUser.toDomain())
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.get("/users/${existUser.id}/my-page")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer $accessToken"),
+                    )
+                        .andExpect { MockMvcResultMatchers.status().isOk }
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(result, GetUserMyPageUseCase.GetUserMyPageResponse::class.java)
+                actual.data.id shouldBe existUser.id
+                actual.data.nickname shouldBe existUser.nickname
+                actual.data.bookmarkCount shouldBe 0
+                actual.data.likeQuotationCount shouldBe 0
+                actual.data.commentAlarm shouldBe existUser.commentAlarm
+                actual.data.quotationAlarm shouldBe existUser.quotationAlarm
+            }
+
+            test("getUserMyPage 실패 - 비 인가된 사용자") {
+                // given
+                val existUser = repository.save(getUserEntityFixture())
+                // when
+                mockMvc.perform(
+                    MockMvcRequestBuilders.get("/users/${existUser.id}/my-page")
+                        .contentType(MediaType.APPLICATION_JSON),
+                )
+                    .andExpect(MockMvcResultMatchers.status().isUnauthorized)
+            }
+
+            test("getUserMyPage 실패 - 인증 정보 불일치 사용자") {
+                // given
+                val existUser = repository.save(getUserEntityFixture())
+                val accessToken = "unauthorized Token"
+                // when
+                mockMvc.perform(
+                    MockMvcRequestBuilders.get("/users/${existUser.id}/my-page")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer $accessToken"),
+                )
+                    .andExpect(MockMvcResultMatchers.status().isForbidden)
+            }
+        }
+
+        context("getUserPage Test") {
+            test("getUserPage 성공") {
                 // given
                 val existUser = repository.save(getUserEntityFixture())
                 // when
@@ -183,7 +234,7 @@ class UserControllerTest(
                         .response.contentAsString
 
                 // then
-                val actual = objectMapper.readValue(result, GetUserDetailUseCase.GetUserDetailByIdResponse::class.java)
+                val actual = objectMapper.readValue(result, GetUserPageUseCase.GetUserPageResponse::class.java)
                 actual.data.id shouldBe existUser.id
                 actual.data.nickname shouldBe existUser.nickname
                 actual.data.bookmarkCount shouldBe 0

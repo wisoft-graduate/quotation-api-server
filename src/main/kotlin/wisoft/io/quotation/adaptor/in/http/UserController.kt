@@ -21,7 +21,8 @@ class UserController(
     val createUserUseCase: CreateUserUseCase,
     val signInUseCase: SignInUseCase,
     val deleteUserUseCase: DeleteUserUseCase,
-    val getUserDetailUseCase: GetUserDetailUseCase,
+    val getUserMyPageUseCase: GetUserMyPageUseCase,
+    val getUserPageUseCase: GetUserPageUseCase,
     val getUserListUseCase: GetUserListUseCase,
     val updateUserUseCase: UpdateUserUseCase,
     val validateUserUesCase: ValidateUserUesCase,
@@ -78,14 +79,28 @@ class UserController(
             )
     }
 
-    @GetMapping("/users/{id}")
-    fun getUserDetail(
+    @GetMapping("/users/{id}/my-page")
+    @LoginAuthenticated
+    fun getUserMyPage(
         @PathVariable("id") id: String,
-    ): ResponseEntity<GetUserDetailUseCase.GetUserDetailByIdResponse> {
-        val response = getUserDetailUseCase.getUserDetailById(GetUserDetailUseCase.GetUserDetailByIdRequest(id))
+    ): ResponseEntity<GetUserMyPageUseCase.GetUserMyPageResponse> {
+        val response = getUserMyPageUseCase.getUserMyPage(GetUserMyPageUseCase.GetUserMyPageRequest(id))
         return ResponseEntity.status(HttpStatus.OK)
             .body(
-                GetUserDetailUseCase.GetUserDetailByIdResponse(
+                GetUserMyPageUseCase.GetUserMyPageResponse(
+                    data = response,
+                ),
+            )
+    }
+
+    @GetMapping("/users/{id}")
+    fun getUserPage(
+        @PathVariable("id") id: String,
+    ): ResponseEntity<GetUserPageUseCase.GetUserPageResponse> {
+        val response = getUserPageUseCase.getUserPage(GetUserPageUseCase.GetUserPageRequest(id))
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(
+                GetUserPageUseCase.GetUserPageResponse(
                     data = response,
                 ),
             )
