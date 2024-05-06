@@ -23,6 +23,7 @@ class CommentAdaptor(
         parentId: UUID?,
         isTopDepth: Boolean,
     ): List<Comment> {
+        // HACK: n+1 문제로 인해 일부 entity에 대해 객체 그래프 형태를 사용할지 고민필요.
         val comments = commentCustomRepository.findCommentList(commentIds, quotationId, parentId, isTopDepth)
         return comments.map {
             val childCommentIds = commentRepository.findByParentId(it.id).map { child -> child.id }
