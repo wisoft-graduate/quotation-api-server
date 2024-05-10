@@ -1,0 +1,8 @@
+package wisoft.io.quotation.application.port.out.author
+
+import wisoft.io.quotation.domain.Author
+import java.util.*
+
+interface UpdateAuthorPort {
+    fun updateAuthor(author: Author): UUID
+}

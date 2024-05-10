@@ -3,6 +3,7 @@ package wisoft.io.quotation.adaptor.out.persistence.entity
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import wisoft.io.quotation.domain.Author
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
@@ -23,4 +24,14 @@ data class AuthorEntity(
     val countryCode: String,
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
-)
+) {
+    fun toDomain(): Author {
+        return Author(
+            id = this.id,
+            name = this.name,
+            countryCode = this.countryCode,
+            createdTime = this.createdTime,
+            lastModifiedTime = this.lastModifiedTime,
+        )
+    }
+}
