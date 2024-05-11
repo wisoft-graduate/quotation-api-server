@@ -3,13 +3,8 @@ package wisoft.io.quotation.application.service
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import wisoft.io.quotation.application.port.`in`.author.CreateAuthorUseCase
-import wisoft.io.quotation.application.port.`in`.author.DeleteAuthorUseCase
-import wisoft.io.quotation.application.port.`in`.author.UpdateAuthorUseCase
-import wisoft.io.quotation.application.port.out.author.CreateAuthorPort
-import wisoft.io.quotation.application.port.out.author.DeleteAuthorPort
-import wisoft.io.quotation.application.port.out.author.GetAuthorPort
-import wisoft.io.quotation.application.port.out.author.UpdateAuthorPort
+import wisoft.io.quotation.application.port.`in`.author.*
+import wisoft.io.quotation.application.port.out.author.*
 import wisoft.io.quotation.domain.Author
 import wisoft.io.quotation.exception.error.AuthorNotFoundException
 import java.util.*
@@ -21,7 +16,8 @@ class AuthorService(
     val updateAuthorPort: UpdateAuthorPort,
     val deleteAuthorPort: DeleteAuthorPort,
     val getAuthorPort: GetAuthorPort,
-) : CreateAuthorUseCase, UpdateAuthorUseCase, DeleteAuthorUseCase {
+    val getAuthorListPort: GetAuthorListPort,
+) : CreateAuthorUseCase, UpdateAuthorUseCase, DeleteAuthorUseCase, GetAuthorUseCase, GetAuthorListUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -60,6 +56,22 @@ class AuthorService(
             deleteAuthorPort.deleteAuthor(id)
         }.onFailure {
             logger.error { "deleteAuthor fail: param[id: $id]" }
+        }.getOrThrow()
+    }
+
+    override fun getAuthor(id: UUID): Author {
+        return runCatching {
+            getAuthorPort.getAuthor(id) ?: throw AuthorNotFoundException(id.toString())
+        }.onFailure {
+            logger.error { "getAuthor fail: param[id: $id]" }
+        }.getOrThrow()
+    }
+
+    override fun getAuthorList(): List<Author> {
+        return runCatching {
+            getAuthorListPort.getAuthorList()
+        }.onFailure {
+            logger.error { "getAuthorList fail" }
         }.getOrThrow()
     }
 }
