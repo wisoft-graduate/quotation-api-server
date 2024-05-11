@@ -2,6 +2,7 @@ package wisoft.io.quotation.adaptor.out.persistence.entity
 
 import jakarta.persistence.*
 import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.UUID
 
 /**
@@ -22,7 +23,7 @@ data class CommentEntity(
     val userId: String,
     val content: String,
     val commentedUserId: String? = null,
-    val createdTime: Timestamp,
+    val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
     val parentId: UUID? = null,
 )

@@ -26,7 +26,7 @@ data class Comment(
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
     val parentCommentId: UUID? = null,
-    val childCommentIds: List<Comment> = emptyList(),
+    val childCommentIds: List<UUID> = emptyList(),
 ) {
     fun toEntity(): CommentEntity {
         return CommentEntity(
