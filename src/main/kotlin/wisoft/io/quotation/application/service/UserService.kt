@@ -39,10 +39,10 @@ class UserService(
     override fun createUser(request: CreateUserUseCase.CreateUserRequest): String {
         return runCatching {
             getUserPort.getUserById(request.id)?.let {
-                throw UserDuplicateException("id: ${request.id}")
+                throw UserDuplicateException("아이디")
             }
             getUserPort.getUserByNickname((request.nickname))?.let {
-                throw UserDuplicateException("nickname: ${request.nickname}")
+                throw UserDuplicateException("닉네임")
             }
 
             val user =
