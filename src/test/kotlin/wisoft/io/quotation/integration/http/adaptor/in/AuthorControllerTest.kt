@@ -15,6 +15,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.AuthorRepository
 import wisoft.io.quotation.application.port.`in`.author.CreateAuthorUseCase
+import wisoft.io.quotation.application.port.`in`.author.GetAuthorListUseCase
+import wisoft.io.quotation.application.port.`in`.author.GetAuthorUseCase
 import wisoft.io.quotation.application.port.`in`.author.UpdateAuthorUseCase
 import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
@@ -170,6 +172,71 @@ class AuthorControllerTest(
                 actual.status shouldBe status.value()
                 actual.error shouldBe status.reasonPhrase
                 actual.path shouldBe path
+            }
+        }
+        context("getAuthor Test") {
+            test("getAuthor 성공") {
+                // given
+                val existAuthor = repository.save(getAuthorEntityFixture())
+
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.get("/authors/${existAuthor.id}"),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isOk)
+                        .andReturn()
+                        .response.contentAsString
+
+                val actual = objectMapper.readValue(result, GetAuthorUseCase.GetAuthorResponse::class.java)
+                // then
+                existAuthor.id shouldBe actual.data.id
+                existAuthor.name shouldBe actual.data.name
+                existAuthor.countryCode shouldBe actual.data.countryCode
+            }
+
+            test("getAuthor 실패 - id가 일치하는 author가 없음") {
+                // given
+                val randomId = UUID.randomUUID()
+                val status = HttpMessage.HTTP_404.status
+                val path = "/authors/$randomId"
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.delete("/authors/$randomId"),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isNotFound)
+                        .andReturn()
+                        .response.contentAsString
+
+                val actual = objectMapper.readValue(result, ErrorData::class.java).data
+
+                // then
+                actual.status shouldBe status.value()
+                actual.error shouldBe status.reasonPhrase
+                actual.path shouldBe path
+            }
+        }
+        context("getAuthorList Test") {
+            test("getAuthorList 성공") {
+                // given
+                val existAuthor = repository.save(getAuthorEntityFixture())
+
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.get("/authors"),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isOk)
+                        .andReturn()
+                        .response.contentAsString
+
+                val actual = objectMapper.readValue(result, GetAuthorListUseCase.GetAuthorListResponse::class.java)
+                // then
+                val actualAuthor = actual.data[0]
+                existAuthor.id shouldBe actualAuthor.id
+                existAuthor.name shouldBe actualAuthor.name
+                existAuthor.countryCode shouldBe actualAuthor.countryCode
             }
         }
     })
