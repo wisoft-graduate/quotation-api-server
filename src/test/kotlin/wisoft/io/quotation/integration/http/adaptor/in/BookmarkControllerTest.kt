@@ -16,9 +16,9 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.BookmarkRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
-import wisoft.io.quotation.application.port.`in`.CreateBookmarkUseCase
-import wisoft.io.quotation.application.port.`in`.GetBookmarkListUseCase
-import wisoft.io.quotation.application.port.`in`.UpdateBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.CreateBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.GetBookmarkListUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.UpdateBookmarkUseCase
 import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getBookmarkEntityFixture

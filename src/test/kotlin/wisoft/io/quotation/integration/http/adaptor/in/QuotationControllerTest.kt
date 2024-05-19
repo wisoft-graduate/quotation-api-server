@@ -16,8 +16,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.AuthorRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
-import wisoft.io.quotation.application.port.`in`.GetQuotationListUseCase
-import wisoft.io.quotation.application.port.`in`.GetQuotationUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection

@@ -3,8 +3,8 @@ package wisoft.io.quotation.adaptor.`in`.http
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import wisoft.io.quotation.application.port.`in`.GetQuotationListUseCase
-import wisoft.io.quotation.application.port.`in`.GetQuotationUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection

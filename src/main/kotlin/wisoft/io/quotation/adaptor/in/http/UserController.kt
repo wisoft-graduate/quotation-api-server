@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import wisoft.io.quotation.application.port.`in`.*
+import wisoft.io.quotation.application.port.`in`.user.*
 import wisoft.io.quotation.util.annotation.LoginAuthenticated
 import wisoft.io.quotation.util.annotation.ResetPasswordAuthenticated
 

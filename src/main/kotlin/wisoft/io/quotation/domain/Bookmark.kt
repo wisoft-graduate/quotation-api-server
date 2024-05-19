@@ -1,7 +1,7 @@
 package wisoft.io.quotation.domain
 
 import wisoft.io.quotation.adaptor.out.persistence.entity.BookmarkEntity
-import wisoft.io.quotation.application.port.`in`.UpdateBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.UpdateBookmarkUseCase
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID

@@ -2,13 +2,15 @@ package wisoft.io.quotation.application.service
 
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
-import wisoft.io.quotation.application.port.`in`.CreateCommentUseCase
-import wisoft.io.quotation.application.port.`in`.GetCommentListUseCase
-import wisoft.io.quotation.application.port.out.CreateCommentPort
-import wisoft.io.quotation.application.port.out.GetCommentListPort
-import wisoft.io.quotation.application.port.out.GetQuotationPort
-import wisoft.io.quotation.application.port.out.GetUserPort
+import wisoft.io.quotation.application.port.`in`.comment.CreateCommentUseCase
+import wisoft.io.quotation.application.port.`in`.comment.DeleteCommentUseCase
+import wisoft.io.quotation.application.port.`in`.comment.GetCommentListUseCase
+import wisoft.io.quotation.application.port.`in`.comment.UpdateCommentUseCase
+import wisoft.io.quotation.application.port.out.comment.*
+import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
+import wisoft.io.quotation.application.port.out.user.GetUserPort
 import wisoft.io.quotation.domain.Comment
+import wisoft.io.quotation.exception.error.CommentNotFoundException
 import wisoft.io.quotation.exception.error.QuotationNotFoundException
 import wisoft.io.quotation.exception.error.UserNotFoundException
 import java.util.*
@@ -19,7 +21,13 @@ class CommentService(
     val getUserPort: GetUserPort,
     val getQuotationPort: GetQuotationPort,
     val getCommentListPort: GetCommentListPort,
-) : CreateCommentUseCase, GetCommentListUseCase {
+    val getCommentPort: GetCommentPort,
+    val updateCommentPort: UpdateCommentPort,
+    val deleteCommentPort: DeleteCommentPort,
+) : CreateCommentUseCase,
+    GetCommentListUseCase,
+    UpdateCommentUseCase,
+    DeleteCommentUseCase {
     val logger = KotlinLogging.logger {}
 
     override fun createComment(request: CreateCommentUseCase.CreateCommentRequest): UUID {
@@ -61,6 +69,31 @@ class CommentService(
             )
         }.onFailure {
             logger.error { "getCommentList fail: param[$request]" }
+        }.getOrThrow()
+    }
+
+    override fun updateComment(
+        id: UUID,
+        request: UpdateCommentUseCase.UpdateCommentRequest,
+    ): UUID {
+        return runCatching {
+            val comment = getCommentPort.getCommentById(id) ?: throw CommentNotFoundException(id.toString())
+            request.commentedUserId?.let {
+                getUserPort.getUserById(it) ?: throw UserNotFoundException(it)
+            }
+
+            updateCommentPort.update(comment.update(request))
+        }.onFailure {
+            logger.error { "updateComment fail: param[$request]" }
+        }.getOrThrow()
+    }
+
+    override fun deleteComment(id: UUID) {
+        return runCatching {
+            getCommentPort.getCommentById(id) ?: throw CommentNotFoundException(id.toString())
+            deleteCommentPort.deleteComment(id)
+        }.onFailure {
+            logger.error { "deleteComment fail: param[id: $id]" }
         }.getOrThrow()
     }
 }

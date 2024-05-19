@@ -5,7 +5,7 @@ import com.linecorp.kotlinjdsl.spring.data.SpringDataQueryFactory
 import com.linecorp.kotlinjdsl.spring.data.listQuery
 import org.springframework.stereotype.Repository
 import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
-import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
+import wisoft.io.quotation.application.port.`in`.user.GetUserListUseCase
 
 @Repository
 class UserCustomRepository(

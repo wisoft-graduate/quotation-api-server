@@ -2,11 +2,12 @@ package wisoft.io.quotation.application.service
 
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
-import wisoft.io.quotation.application.port.`in`.CreateBookmarkUseCase
-import wisoft.io.quotation.application.port.`in`.DeleteBookmarkUseCase
-import wisoft.io.quotation.application.port.`in`.GetBookmarkListUseCase
-import wisoft.io.quotation.application.port.`in`.UpdateBookmarkUseCase
-import wisoft.io.quotation.application.port.out.*
+import wisoft.io.quotation.application.port.`in`.bookmark.CreateBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.DeleteBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.GetBookmarkListUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.UpdateBookmarkUseCase
+import wisoft.io.quotation.application.port.out.bookmark.*
+import wisoft.io.quotation.application.port.out.user.GetUserPort
 import wisoft.io.quotation.domain.Bookmark
 import wisoft.io.quotation.exception.error.BookmarkNotFoundException
 import wisoft.io.quotation.exception.error.UserNotFoundException

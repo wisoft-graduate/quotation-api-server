@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import wisoft.io.quotation.application.port.`in`.CreateBookmarkUseCase
-import wisoft.io.quotation.application.port.`in`.DeleteBookmarkUseCase
-import wisoft.io.quotation.application.port.`in`.GetBookmarkListUseCase
-import wisoft.io.quotation.application.port.`in`.UpdateBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.CreateBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.DeleteBookmarkUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.GetBookmarkListUseCase
+import wisoft.io.quotation.application.port.`in`.bookmark.UpdateBookmarkUseCase
 import java.util.UUID
 
 @RestController
