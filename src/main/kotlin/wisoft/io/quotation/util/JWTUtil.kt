@@ -8,7 +8,6 @@ import io.jsonwebtoken.SignatureAlgorithm
 import mu.KotlinLogging
 import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.exception.error.InvalidJwtTokenException
-import java.io.File
 import java.util.*
 
 object JWTUtil {
@@ -135,10 +134,10 @@ object JWTUtil {
         }.getOrThrow()
     }
 
-    private fun readYmlFile(): YmlConfig {
+    fun readYmlFile(): YmlConfig {
         return runCatching {
             val objectMapper = ObjectMapper(YAMLFactory())
-            val file = File("./src/main/resources/application.yaml")
+            val file = object {}.javaClass.getResource("/application.yaml")
 
             objectMapper.readValue(file, YmlConfig::class.java)
         }.onFailure {

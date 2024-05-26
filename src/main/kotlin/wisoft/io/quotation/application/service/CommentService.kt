@@ -7,9 +7,11 @@ import wisoft.io.quotation.application.port.`in`.comment.DeleteCommentUseCase
 import wisoft.io.quotation.application.port.`in`.comment.GetCommentListUseCase
 import wisoft.io.quotation.application.port.`in`.comment.UpdateCommentUseCase
 import wisoft.io.quotation.application.port.out.comment.*
+import wisoft.io.quotation.application.port.out.notification.CreateNotificationPort
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
 import wisoft.io.quotation.application.port.out.user.GetUserPort
 import wisoft.io.quotation.domain.Comment
+import wisoft.io.quotation.domain.Notification
 import wisoft.io.quotation.exception.error.CommentNotFoundException
 import wisoft.io.quotation.exception.error.QuotationNotFoundException
 import wisoft.io.quotation.exception.error.UserNotFoundException
@@ -24,6 +26,7 @@ class CommentService(
     val getCommentPort: GetCommentPort,
     val updateCommentPort: UpdateCommentPort,
     val deleteCommentPort: DeleteCommentPort,
+    val createNotificationPort: CreateNotificationPort,
 ) : CreateCommentUseCase,
     GetCommentListUseCase,
     UpdateCommentUseCase,
@@ -45,15 +48,23 @@ class CommentService(
             }
 
             // Create Comment
-            createCommentPort.createComment(
-                Comment(
-                    quotationId = request.quotationId,
-                    userId = request.userId,
-                    content = request.content,
-                    commentedUserId = request.commentedUserId,
-                    parentCommentId = request.parentCommentId,
-                ),
-            )
+            val commentId =
+                createCommentPort.createComment(
+                    Comment(
+                        quotationId = request.quotationId,
+                        userId = request.userId,
+                        content = request.content,
+                        commentedUserId = request.commentedUserId,
+                        parentCommentId = request.parentCommentId,
+                    ),
+                )
+
+            request.commentedUserId?.let {
+                createNotificationPort.createNotification(
+                    Notification.createNotification(request.userId, it, commentId),
+                )
+            }
+            commentId
         }.onFailure {
             logger.error { "createComment fail: param[$request]" }
         }.getOrThrow()
@@ -82,7 +93,14 @@ class CommentService(
                 getUserPort.getUserById(it) ?: throw UserNotFoundException(it)
             }
 
-            updateCommentPort.update(comment.update(request))
+            val commentId = updateCommentPort.update(comment.update(request))
+
+            request.commentedUserId?.let {
+                createNotificationPort.createNotification(
+                    Notification.createNotification(comment.userId, it, commentId),
+                )
+            }
+            commentId
         }.onFailure {
             logger.error { "updateComment fail: param[$request]" }
         }.getOrThrow()
