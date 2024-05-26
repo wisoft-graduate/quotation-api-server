@@ -2,6 +2,7 @@ package wisoft.io.quotation.domain
 
 import jakarta.persistence.*
 import wisoft.io.quotation.adaptor.out.persistence.entity.CommentEntity
+import wisoft.io.quotation.application.port.`in`.comment.UpdateCommentUseCase
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
@@ -37,6 +38,13 @@ data class Comment(
             commentedUserId = this.commentedUserId,
             createdTime = this.createdTime,
             parentId = this.parentCommentId,
+        )
+    }
+
+    fun update(dto: UpdateCommentUseCase.UpdateCommentRequest): Comment {
+        return this.copy(
+            content = dto.content ?: this.content,
+            commentedUserId = dto.commentedUserId ?: this.commentedUserId,
         )
     }
 }

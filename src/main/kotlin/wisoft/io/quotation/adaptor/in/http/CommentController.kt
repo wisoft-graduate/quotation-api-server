@@ -3,18 +3,19 @@ package wisoft.io.quotation.adaptor.`in`.http
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
-import wisoft.io.quotation.application.port.`in`.CreateCommentUseCase
-import wisoft.io.quotation.application.port.`in`.GetCommentListUseCase
+import org.springframework.web.bind.annotation.*
+import wisoft.io.quotation.application.port.`in`.comment.CreateCommentUseCase
+import wisoft.io.quotation.application.port.`in`.comment.DeleteCommentUseCase
+import wisoft.io.quotation.application.port.`in`.comment.GetCommentListUseCase
+import wisoft.io.quotation.application.port.`in`.comment.UpdateCommentUseCase
+import java.util.UUID
 
 @RestController
 class CommentController(
     val createCommentUseCase: CreateCommentUseCase,
     val getCommentListUseCase: GetCommentListUseCase,
+    val updateCommentUseCase: UpdateCommentUseCase,
+    val deleteCommentUseCase: DeleteCommentUseCase,
 ) {
     @PostMapping("/comments")
     fun createComment(
@@ -42,5 +43,27 @@ class CommentController(
                     GetCommentListUseCase.Data(result),
                 ),
             )
+    }
+
+    @PutMapping("/comments/{id}")
+    fun updateComment(
+        @PathVariable("id") id: UUID,
+        @RequestBody request: UpdateCommentUseCase.UpdateCommentRequest,
+    ): ResponseEntity<UpdateCommentUseCase.UpdateCommentResponse> {
+        val result = updateCommentUseCase.updateComment(id, request)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(UpdateCommentUseCase.UpdateCommentResponse(data = UpdateCommentUseCase.Data(id = result)))
+    }
+
+    @DeleteMapping("/comments/{id}")
+    fun deleteComment(
+        @PathVariable("id") id: UUID,
+    ): ResponseEntity<Unit> {
+        deleteCommentUseCase.deleteComment(id)
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .build()
     }
 }

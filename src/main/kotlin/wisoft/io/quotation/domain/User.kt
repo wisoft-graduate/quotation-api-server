@@ -2,7 +2,7 @@ package wisoft.io.quotation.domain
 
 import org.mindrot.jbcrypt.BCrypt
 import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
-import wisoft.io.quotation.application.port.`in`.UpdateUserUseCase
+import wisoft.io.quotation.application.port.`in`.user.UpdateUserUseCase
 import java.sql.Timestamp
 import java.time.LocalDateTime
 

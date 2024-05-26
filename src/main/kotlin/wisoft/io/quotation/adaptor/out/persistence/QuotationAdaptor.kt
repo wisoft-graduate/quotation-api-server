@@ -4,9 +4,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationCustomRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
-import wisoft.io.quotation.application.port.`in`.GetQuotationListUseCase
-import wisoft.io.quotation.application.port.out.GetQuotationListPort
-import wisoft.io.quotation.application.port.out.GetQuotationPort
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
+import wisoft.io.quotation.application.port.out.quotation.GetQuotationListPort
+import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
 import wisoft.io.quotation.domain.Quotation
 import java.util.*
 

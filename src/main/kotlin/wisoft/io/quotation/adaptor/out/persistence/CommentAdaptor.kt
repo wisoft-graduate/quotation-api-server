@@ -1,10 +1,10 @@
 package wisoft.io.quotation.adaptor.out.persistence
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.repository.CommentCustomRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.CommentRepository
-import wisoft.io.quotation.application.port.out.CreateCommentPort
-import wisoft.io.quotation.application.port.out.GetCommentListPort
+import wisoft.io.quotation.application.port.out.comment.*
 import wisoft.io.quotation.domain.Comment
 import java.util.UUID
 
@@ -12,9 +12,25 @@ import java.util.UUID
 class CommentAdaptor(
     val commentRepository: CommentRepository,
     val commentCustomRepository: CommentCustomRepository,
-) : CreateCommentPort, GetCommentListPort {
+) : CreateCommentPort,
+    GetCommentListPort,
+    GetCommentPort,
+    UpdateCommentPort,
+    DeleteCommentPort {
     override fun createComment(comment: Comment): UUID {
         return commentRepository.save(comment.toEntity()).id
+    }
+
+    override fun update(comment: Comment): UUID {
+        return commentRepository.save(comment.toEntity()).id
+    }
+
+    override fun getCommentById(id: UUID): Comment? {
+        return commentRepository.findByIdOrNull(id)?.toDomain()
+    }
+
+    override fun deleteComment(id: UUID) {
+        return commentRepository.deleteById(id)
     }
 
     override fun getCommentList(

@@ -2,13 +2,15 @@ package wisoft.io.quotation.integration.http.adaptor.`in`
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.async.methods.BasicHttpRequests.post
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest.delete
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest.put
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -18,8 +20,9 @@ import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.CommentRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
-import wisoft.io.quotation.application.port.`in`.CreateCommentUseCase
-import wisoft.io.quotation.application.port.`in`.GetCommentListUseCase
+import wisoft.io.quotation.application.port.`in`.comment.CreateCommentUseCase
+import wisoft.io.quotation.application.port.`in`.comment.GetCommentListUseCase
+import wisoft.io.quotation.application.port.`in`.comment.UpdateCommentUseCase
 import wisoft.io.quotation.fixture.entity.getCommentEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
@@ -42,6 +45,95 @@ class CommentControllerTest(
             quotationRepository.deleteAll()
             userRepository.deleteAll()
             commentRepository.deleteAll()
+        }
+
+        context("deleteComment Test") {
+            test("deleteComment 성공") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
+                val comment = commentRepository.save(getCommentEntityFixture(quotation.id, user.id))
+
+                // when, then
+                mockMvc.perform(MockMvcRequestBuilders.delete("/comments/${comment.id}"))
+                    .andExpect(MockMvcResultMatchers.status().isNoContent)
+            }
+
+            test("deleteComment 실패") {
+                // given
+                val id = UUID.randomUUID()
+
+                // when, then
+                mockMvc.perform(MockMvcRequestBuilders.delete("/comments/$id"))
+                    .andExpect(MockMvcResultMatchers.status().isNotFound)
+            }
+        }
+
+        context("updateComment Test") {
+            test("updateComment 성공") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val commentedUser = userRepository.save(getUserEntityFixture("commentedUser", "nickname2"))
+                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
+                val comment = commentRepository.save(getCommentEntityFixture(quotation.id, user.id))
+                val request =
+                    UpdateCommentUseCase.UpdateCommentRequest(
+                        content = "updated content",
+                        commentedUserId = commentedUser.id,
+                    )
+                val updateCommentRequestJson = objectMapper.writeValueAsString(request)
+
+                // when
+                mockMvc.perform(
+                    MockMvcRequestBuilders.put("/comments/${comment.id}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateCommentRequestJson),
+                )
+                    .andExpect(MockMvcResultMatchers.status().isOk)
+                    .andReturn()
+                val updatedComment = commentRepository.findByIdOrNull(comment.id)
+
+                // then
+                updatedComment?.content shouldBe request.content
+                updatedComment?.commentedUserId shouldBe request.commentedUserId
+            }
+
+            test("updateComment 실패 - 태그된 사용자 존재 x") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
+                val comment = commentRepository.save(getCommentEntityFixture(quotation.id, user.id))
+                val request =
+                    UpdateCommentUseCase.UpdateCommentRequest(
+                        content = "updated content",
+                        commentedUserId = "등록되지 않은 사용자 아이디",
+                    )
+                val updateCommentRequestJson = objectMapper.writeValueAsString(request)
+
+                // when, then
+                mockMvc.perform(
+                    MockMvcRequestBuilders.put("/comments/${comment.id}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateCommentRequestJson),
+                )
+                    .andExpect(MockMvcResultMatchers.status().isNotFound)
+                    .andReturn()
+            }
+
+            test("updateComment 실패 - 댓글 존재 x") {
+                // given
+                val request = UpdateCommentUseCase.UpdateCommentRequest(content = null, commentedUserId = null)
+                val updateCommentRequestJson = objectMapper.writeValueAsString(request)
+
+                // when, then
+                mockMvc.perform(
+                    MockMvcRequestBuilders.put("/comments/${UUID.randomUUID()}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateCommentRequestJson),
+                )
+                    .andExpect(MockMvcResultMatchers.status().isNotFound)
+                    .andReturn()
+            }
         }
 
         context("createComment Test") {

@@ -6,7 +6,7 @@ import com.linecorp.kotlinjdsl.spring.data.listQuery
 import org.springframework.stereotype.Repository
 import wisoft.io.quotation.adaptor.out.persistence.entity.AuthorEntity
 import wisoft.io.quotation.adaptor.out.persistence.entity.QuotationEntity
-import wisoft.io.quotation.application.port.`in`.GetQuotationListUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection
 

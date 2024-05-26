@@ -1,6 +1,7 @@
 package wisoft.io.quotation.adaptor.out.persistence.entity
 
 import jakarta.persistence.*
+import wisoft.io.quotation.domain.Comment
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
@@ -26,4 +27,17 @@ data class CommentEntity(
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
     val parentId: UUID? = null,
-)
+) {
+    fun toDomain(): Comment {
+        return Comment(
+            id = this.id,
+            quotationId = this.quotationId,
+            userId = this.userId,
+            content = this.content,
+            commentedUserId = this.commentedUserId,
+            createdTime = this.createdTime,
+            lastModifiedTime = this.lastModifiedTime,
+            parentCommentId = this.parentId,
+        )
+    }
+}

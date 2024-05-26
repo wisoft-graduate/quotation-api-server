@@ -4,8 +4,8 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserCustomRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
-import wisoft.io.quotation.application.port.`in`.GetUserListUseCase
-import wisoft.io.quotation.application.port.out.*
+import wisoft.io.quotation.application.port.`in`.user.GetUserListUseCase
+import wisoft.io.quotation.application.port.out.user.*
 import wisoft.io.quotation.domain.User
 
 @Component

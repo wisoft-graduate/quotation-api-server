@@ -3,8 +3,10 @@ package wisoft.io.quotation.application.service
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import wisoft.io.quotation.application.port.`in`.*
+import wisoft.io.quotation.application.port.`in`.user.*
 import wisoft.io.quotation.application.port.out.*
+import wisoft.io.quotation.application.port.out.bookmark.GetBookmarkListPort
+import wisoft.io.quotation.application.port.out.user.*
 import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.exception.error.InvalidRequestParameterException
 import wisoft.io.quotation.exception.error.InvalidUserException
