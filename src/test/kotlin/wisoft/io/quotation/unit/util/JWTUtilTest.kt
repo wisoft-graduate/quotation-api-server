@@ -11,7 +11,6 @@ class JWTUtilTest : FunSpec({
 
         // when
         val yaml = jwtUtil.readYmlFile()
-        println("yaml: $yaml")
 
         // then
         yaml.environment.jwt.secretKey shouldNotBe null
