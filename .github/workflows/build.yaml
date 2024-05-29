@@ -47,7 +47,7 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v5
         with:
-          context: ${{ env.DOCKER_CONTEXT }}
+          context: .
           file: ${{ env.DOCKERFILE_PATH }}
           push: true
           tags: nomorework/test:latest
