@@ -1,0 +1,42 @@
+name: Build Test
+
+on:
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+    branches: [ main ]
+
+env:
+  DOCKER_CONTEXT: "docker"
+  DOCKERFILE_PATH: "docker/Dockerfile"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build With Test
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: build --parallel --info --stacktrace
+
+      - name: Login To Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.CONTAINER_REGISTRY_ID }}
+          password: ${{ secrets.CONTAINER_REGISTRY_PW }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.DOCKER_CONTEXT }}
+          file: ${{ env.DOCKERFILE_PATH }}
+          push: true
+          tags: nomorework/test:latest
