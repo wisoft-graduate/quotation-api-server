@@ -32,6 +32,9 @@ jobs:
         with:
           arguments: build --parallel --info --stacktrace
 
+      - name: Copy JAR to Docker context
+        run: cp build/libs/api-server.jar docker/server/
+
       - name: Set Docker context
         run: |
           echo "Setting Docker context"
