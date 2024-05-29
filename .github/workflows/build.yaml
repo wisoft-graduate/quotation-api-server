@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_CONTEXT: "docker"
+  DOCKER_CONTEXT: "."
   DOCKERFILE_PATH: "docker/Dockerfile"
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
         with:
           arguments: build --parallel --info --stacktrace
 
-      - name: Setup Docker Buildx
+      - name: SetUp Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Login To Docker Hub
