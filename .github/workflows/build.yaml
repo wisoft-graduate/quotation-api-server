@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_CONTEXT: "."
+  DOCKER_CONTEXT: "docker"
   DOCKERFILE_PATH: "docker/Dockerfile"
 
 jobs:
