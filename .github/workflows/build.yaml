@@ -7,6 +7,9 @@ on:
 
 env:
   DOCKERFILE_PATH: "docker/Dockerfile"
+  DOCKER_CONTEXT: "docker"
+  REGISTRY_ORGANIZATION: "nomorework"
+  REGISTRY_REPOSITORY: "test"
 
 jobs:
   build-test:
@@ -30,7 +33,7 @@ jobs:
       - name: Build With Test
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: build --parallel --stacktrace
+          arguments: build --parallel
 
       - name: Login To Docker Hub
         uses: docker/login-action@v3
@@ -39,10 +42,10 @@ jobs:
           password: ${{ secrets.CONTAINER_REGISTRY_PW }}
 
       - name: Build the Docker image
-        run: docker build docker --file docker/Dockerfile --tag nomorework/test:latest
+        run: docker build ${{ env.DOCKER_CONTEXT }} --file ${{ env.DOCKERFILE_PATH }} --tag ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:latest
 
       - name: Push the Docker image
-        run: docker push nomorework/test:latest
+        run: docker push ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:latest
 #      - name: Docker Build And Push
 #        run: docker build docker --tag nomorework/test:latest --file docker/Dockerfile && docker push nomorework/test:latest
 
