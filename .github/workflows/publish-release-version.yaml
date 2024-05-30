@@ -50,3 +50,15 @@ jobs:
 
       - name: Push the Docker image
         run: docker push ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }}
+
+      - name: Deploy to EC2 with Rolling Update
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          echo "${EC2_SSH_KEY}" > /tmp/ec2-key.pem
+          chmod 600 /tmp/ec2-key.pem
+          ssh -o StrictHostKeyChecking=no -i /tmp/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          docker pull ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }}
+          docker service update --image ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }} things
+          EOF
+          rm /tmp/ec2-key.pem
