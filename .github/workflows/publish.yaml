@@ -7,7 +7,7 @@ on:
 
 env:
   DOCKERFILE_PATH: docker/Dockerfile
-  DOCKER_CONTEXT: docker
+  CONTAINER_CONTEXT_PATH: docker
   REGISTRY_ORGANIZATION: nomorework
   REGISTRY_REPOSITORY: test
 
@@ -46,7 +46,7 @@ jobs:
           password: ${{ secrets.CONTAINER_REGISTRY_PW }}
 
       - name: Build the Docker image
-        run: docker build ${{ env.DOCKER_CONTEXT }} --file ${{ env.DOCKERFILE_PATH }} --tag ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }}
+        run: docker build --file ${{ env.DOCKERFILE_PATH }} --tag ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }} ${{ env.CONTAINER_CONTEXT_PATH }}
 
       - name: Push the Docker image
         run: docker push ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }}
