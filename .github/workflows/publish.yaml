@@ -6,10 +6,10 @@ on:
       - 'v*.*.*'   # 예: v1.0.0 형식의 태그가 푸시될 때 작동
 
 env:
-  DOCKERFILE_PATH: "docker/Dockerfile"
-  DOCKER_CONTEXT: "docker"
-  REGISTRY_ORGANIZATION: "nomorework"
-  REGISTRY_REPOSITORY: "test"
+  DOCKERFILE_PATH: docker/Dockerfile
+  DOCKER_CONTEXT: docker
+  REGISTRY_ORGANIZATION: nomorework
+  REGISTRY_REPOSITORY: test
 
 jobs:
   build-test:
