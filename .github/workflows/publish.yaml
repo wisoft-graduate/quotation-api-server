@@ -36,7 +36,7 @@ jobs:
           arguments: build --parallel
 
       - name: Extract Tag Name
-        uses: extract_tag
+        id: extract_tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Login To Docker Hub
