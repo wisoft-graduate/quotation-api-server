@@ -42,7 +42,7 @@ jobs:
           password: ${{ secrets.CONTAINER_REGISTRY_PW }}
 
       - name: Build the Docker image
-        run: docker docker --file ${{ env.DOCKERFILE_PATH }} --tag ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:latest
+        run: docker build docker --file ${{ env.DOCKERFILE_PATH }} --tag ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:latest
 
       - name: Push the Docker image
         run: docker push ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:latest
