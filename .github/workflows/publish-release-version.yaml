@@ -1,0 +1,64 @@
+name: Publish Test
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'   # 예: v1.0.0 형식의 태그가 푸시될 때 작동
+
+env:
+  DOCKERFILE_PATH: docker/Dockerfile
+  CONTAINER_CONTEXT_PATH: docker
+  REGISTRY_ORGANIZATION: nomorework
+  REGISTRY_REPOSITORY: test
+
+jobs:
+  publish-release-version:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build With Test
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: build --parallel
+
+      - name: Extract Tag Name
+        id: extract_tag
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Login To Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.CONTAINER_REGISTRY_ID }}
+          password: ${{ secrets.CONTAINER_REGISTRY_PW }}
+
+      - name: Build the Docker image
+        run: docker build --file ${{ env.DOCKERFILE_PATH }} --tag ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }} ${{ env.CONTAINER_CONTEXT_PATH }}
+
+      - name: Push the Docker image
+        run: docker push ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }}
+
+      - name: Deploy to EC2 with Rolling Update
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          echo "${EC2_SSH_KEY}" > /tmp/ec2-key.pem
+          chmod 600 /tmp/ec2-key.pem
+          ssh -o StrictHostKeyChecking=no -i /tmp/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          docker pull ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }}
+          docker service update --image ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }} things
+          EOF
+          rm /tmp/ec2-key.pem
