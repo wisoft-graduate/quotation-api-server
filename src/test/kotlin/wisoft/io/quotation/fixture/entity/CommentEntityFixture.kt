@@ -7,10 +7,12 @@ fun getCommentEntityFixture(
     quotationId: UUID,
     userId: String,
     parentId: UUID? = null,
+    commentedUserId: String? = null,
 ): CommentEntity =
     CommentEntity(
         quotationId = quotationId,
         userId = userId,
         content = "content",
         parentId = parentId,
+        commentedUserId = commentedUserId,
     )

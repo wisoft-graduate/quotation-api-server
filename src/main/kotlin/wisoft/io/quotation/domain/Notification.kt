@@ -2,6 +2,7 @@ package wisoft.io.quotation.domain
 
 import jakarta.persistence.Id
 import wisoft.io.quotation.adaptor.out.persistence.entity.NotificationEntity
+import wisoft.io.quotation.application.port.`in`.notification.UpdateNotificationUseCase
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
@@ -34,6 +35,12 @@ data class Notification(
             alarmCheck = alarmCheck,
             createdTime = createdTime,
             lastModifiedTime = lastModifiedTime,
+        )
+    }
+
+    fun update(dto: UpdateNotificationUseCase.UpdateNotificationRequest): Notification {
+        return this.copy(
+            alarmCheck = dto.alarmCheck,
         )
     }
 
