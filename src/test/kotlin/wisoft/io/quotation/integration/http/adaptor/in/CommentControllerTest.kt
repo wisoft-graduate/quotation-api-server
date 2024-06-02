@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.CommentRepository
+import wisoft.io.quotation.adaptor.out.persistence.repository.NotificationRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.comment.CreateCommentUseCase
@@ -35,6 +36,7 @@ class CommentControllerTest(
     val quotationRepository: QuotationRepository,
     val userRepository: UserRepository,
     val commentRepository: CommentRepository,
+    val notificationRepository: NotificationRepository,
 ) : FunSpec({
 
         val objectMapper = ObjectMapper().registerKotlinModule()
@@ -43,6 +45,7 @@ class CommentControllerTest(
             quotationRepository.deleteAll()
             userRepository.deleteAll()
             commentRepository.deleteAll()
+            notificationRepository.deleteAll()
         }
 
         context("deleteComment Test") {
