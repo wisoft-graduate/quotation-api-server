@@ -26,6 +26,7 @@ data class YmlConfig(
         @JsonProperty("application") val application: ApplicationConfig,
         @JsonProperty("datasource") val datasource: DataSourceConfig,
         @JsonProperty("jpa") val jpa: JpaConfig,
+        @JsonProperty("flyway") val flyway: FlywayConfig,
     ) {
         data class ApplicationConfig(
             @JsonProperty("name") val name: String,
@@ -57,6 +58,12 @@ data class YmlConfig(
                 )
             }
         }
+
+        data class FlywayConfig(
+            @JsonProperty("enabled") val enabled: Boolean,
+            @JsonProperty("locations") val locations: String,
+            @JsonProperty("baseline-on-migrate") val baselineOnMigrate: Boolean,
+        )
     }
 
     data class EnvironmentConfig(
