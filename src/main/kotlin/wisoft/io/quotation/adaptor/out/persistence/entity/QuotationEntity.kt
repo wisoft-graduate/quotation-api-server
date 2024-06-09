@@ -19,6 +19,7 @@ import java.util.UUID
  * @property createdTime 생성된 시간
  * @property lastModifiedTime 마지막 수정 시간
  */
+
 @Table(name = "quotation")
 @Entity
 data class QuotationEntity(

@@ -17,6 +17,7 @@ import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.repository.AuthorRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
@@ -42,6 +43,28 @@ class QuotationControllerTest(
         afterEach {
             authorRepository.deleteAll()
             quotationRepository.deleteAll()
+        }
+
+        context("getQuotationRank Test") {
+            test("getQuotationRank 성공") {
+                // given
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.get("/quotations/rank"),
+                    ).andExpect(MockMvcResultMatchers.status().isOk)
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(result, GetQuotationRankUseCase.GetQuotationRankResponse::class.java)
+                actual.data.quotationRanks.first().id shouldBe quotation.id
+                actual.data.quotationRanks.first().likeRank shouldBe 1
+                actual.data.quotationRanks.first().shareRank shouldBe 1
+            }
         }
 
         context("getQuotation Test") {

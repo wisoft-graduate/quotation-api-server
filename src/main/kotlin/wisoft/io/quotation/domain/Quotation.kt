@@ -23,7 +23,11 @@ data class Quotation(
     val likeCount: Long,
     val shareCount: Long,
     val commentCount: Long,
+    val shareLank: Long = 0,
+    val likeLank: Long = 0,
     val backgroundImagePath: String,
     val createdTime: Timestamp,
     val lastModifiedTime: Timestamp? = null,
 )
+
+// like, share, comment 에 대한 순위 제공

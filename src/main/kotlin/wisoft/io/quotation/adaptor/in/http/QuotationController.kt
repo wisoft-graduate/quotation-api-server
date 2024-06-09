@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
@@ -15,7 +16,19 @@ import java.util.UUID
 class QuotationController(
     val getQuotationsUseCase: GetQuotationListUseCase,
     val getQuotationUseCase: GetQuotationUseCase,
+    val getQuotationLankUseCase: GetQuotationRankUseCase,
 ) {
+    @GetMapping("/rank")
+    fun getQuotationRank(
+        @RequestParam ids: List<UUID>?,
+    ): ResponseEntity<GetQuotationRankUseCase.GetQuotationRankResponse> {
+        return ResponseEntity.status(HttpStatus.OK).body(
+            GetQuotationRankUseCase.GetQuotationRankResponse(
+                data = GetQuotationRankUseCase.Data(getQuotationLankUseCase.getQuotationRank(ids)),
+            ),
+        )
+    }
+
     @GetMapping
     fun getQuotationList(
         @RequestParam searchWord: String?,

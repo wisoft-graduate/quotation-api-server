@@ -3,17 +3,35 @@ package wisoft.io.quotation.adaptor.out.persistence.repository
 import com.linecorp.kotlinjdsl.querydsl.expression.column
 import com.linecorp.kotlinjdsl.spring.data.SpringDataQueryFactory
 import com.linecorp.kotlinjdsl.spring.data.listQuery
+import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Repository
 import wisoft.io.quotation.adaptor.out.persistence.entity.AuthorEntity
 import wisoft.io.quotation.adaptor.out.persistence.entity.QuotationEntity
+import wisoft.io.quotation.adaptor.out.persistence.entity.view.QuotationRankView
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.SortDirection
+import java.util.*
 
 @Repository
 class QuotationCustomRepository(
     val queryFactory: SpringDataQueryFactory,
+    val entityManager: EntityManager,
 ) {
+    fun findQuotationRank(ids: List<UUID>?): List<QuotationRankView> {
+        val sql =
+            buildString {
+                append("SELECT id, ROW_NUMBER() OVER (ORDER BY like_count DESC) AS like_rank, ")
+                append("ROW_NUMBER() OVER (ORDER BY share_count DESC) AS share_rank FROM quotation ")
+                ids?.let {
+                    append("WHERE id IN :ids")
+                }
+            }
+        return entityManager.createNativeQuery(sql, QuotationRankView::class.java)
+            .apply { ids?.let { setParameter("ids", ids) } }
+            .resultList as List<QuotationRankView>
+    }
+
     fun findQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<QuotationEntity> {
         return queryFactory.listQuery<QuotationEntity> {
             select(QuotationEntity::class.java)
