@@ -126,7 +126,31 @@ class UserControllerTest(
                 userIdByRefreshToken shouldBe existUser.id
             }
         }
+        context("RefreshToken Test") {
+            test("RefreshToken 성공") {
+                // given
+                val existUser = repository.save(getUserEntityFixture())
+                val refreshToken = JWTUtil.generateRefreshToken(existUser.toDomain())
 
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.post("/users/refresh-token")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer $refreshToken"),
+                    ).andExpect(MockMvcResultMatchers.status().isOk)
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(result, SignInUseCase.SignInResponse::class.java)
+
+                val userIdByAccessToken = JWTUtil.extractUserIdByToken(actual.data.accessToken)
+                val userIdByRefreshToken = JWTUtil.extractUserIdByToken(actual.data.refreshToken)
+                userIdByAccessToken shouldBe existUser.id
+                userIdByRefreshToken shouldBe existUser.id
+            }
+        }
         context("deleteUser Test") {
             test("deleteUser 성공") {
                 // given

@@ -36,7 +36,7 @@ environment:
     secret-key: "8kTcEnj4ABscsjcWVOg06brYjyOwwVwdMB7s1BGwzBQDhmASi"
     # 토큰 만료 시간 (1시간)
     access-token-expiration-time: 3600000
-    # 토큰 만료 시간 (1주일)
-    refresh-token-expiration-time: 604800000
+    # 토큰 만료 시간 (30일)
+    refresh-token-expiration-time: 2592000000
     # 토큰 만료 시간 (5분)
     password-refresh-token-expiration-time: 300000

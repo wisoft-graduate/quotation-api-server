@@ -100,6 +100,28 @@ object JWTUtil {
         }.getOrThrow()
     }
 
+    fun verifyRefreshToken(
+        token: String,
+        currentDate: Date = Date(),
+    ): Boolean {
+        val jwtConfig = this.readYmlFile().environment.jwt
+        return runCatching {
+            val claims =
+                Jwts.parserBuilder()
+                    .setSigningKey(jwtConfig.secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+
+            val tokenType = claims.body["type"].toString()
+            if (tokenType != "refreshToken") throw InvalidJwtTokenException("tokenType: $tokenType")
+
+            claims.body.expiration.after(currentDate)
+        }.onFailure {
+            logger.error { "verifyToken fail: param[token: $token]" }
+            throw InvalidJwtTokenException(it.toString())
+        }.getOrThrow()
+    }
+
     fun verifyResetPasswordToken(
         token: String,
         currentDate: Date = Date(),

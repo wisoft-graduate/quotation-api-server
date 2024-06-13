@@ -9,6 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor
 import wisoft.io.quotation.exception.error.UnauthorizedUserException
 import wisoft.io.quotation.util.JWTUtil
 import wisoft.io.quotation.util.annotation.LoginAuthenticated
+import wisoft.io.quotation.util.annotation.RefreshTokenAuthenticated
 import wisoft.io.quotation.util.annotation.ResetPasswordAuthenticated
 
 @Component
@@ -22,6 +23,7 @@ class AuthInterceptor : HandlerInterceptor {
     ): Boolean {
         if (handler !is HandlerMethod) return true
         val loginAuthenticated = handler.getMethodAnnotation(LoginAuthenticated::class.java)
+        val refreshTokenAuthenticated = handler.getMethodAnnotation(RefreshTokenAuthenticated::class.java)
         val resetPasswordAuthenticated = handler.getMethodAnnotation(ResetPasswordAuthenticated::class.java)
 
         if (loginAuthenticated != null) {
@@ -29,6 +31,9 @@ class AuthInterceptor : HandlerInterceptor {
         }
         if (resetPasswordAuthenticated != null) {
             return resetPasswordAuthCheck(request)
+        }
+        if (refreshTokenAuthenticated != null) {
+            return refreshTokenCheck(request)
         }
         return true
     }
@@ -47,6 +52,21 @@ class AuthInterceptor : HandlerInterceptor {
             true
         }.onFailure {
             logger.error { "loginAuthCheck fail" }
+        }.getOrThrow()
+    }
+
+    private fun refreshTokenCheck(request: HttpServletRequest): Boolean {
+        return runCatching {
+            val authHeader =
+                request.getHeader("Authorization") ?: throw UnauthorizedUserException("Authorization Not Found")
+            val token = authHeader.substringAfter("Bearer ")
+
+            val userId = JWTUtil.extractUserIdByToken(token)
+            request.setAttribute("userId", userId)
+            true
+        }.onFailure {
+            println(4444)
+            logger.error { "refreshTokenCheck fail" }
         }.getOrThrow()
     }
 
