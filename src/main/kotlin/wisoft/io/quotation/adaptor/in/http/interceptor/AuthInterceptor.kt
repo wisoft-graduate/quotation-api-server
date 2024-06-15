@@ -65,7 +65,6 @@ class AuthInterceptor : HandlerInterceptor {
             request.setAttribute("userId", userId)
             true
         }.onFailure {
-            println(4444)
             logger.error { "refreshTokenCheck fail" }
         }.getOrThrow()
     }
