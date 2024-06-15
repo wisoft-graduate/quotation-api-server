@@ -28,6 +28,7 @@ class UserService(
     val deleteUserPort: DeleteUserPort,
 ) : CreateUserUseCase,
     SignInUseCase,
+    RefreshTokenUserUseCase,
     DeleteUserUseCase,
     GetUserMyPageUseCase,
     GetUserPageUseCase,
@@ -98,6 +99,16 @@ class UserService(
             SignInUseCase.UserTokenDto(JWTUtil.generateAccessToken(user), JWTUtil.generateRefreshToken(user))
         }.onFailure {
             logger.error { "signIn fail: param[$request]" }
+        }.getOrThrow()
+    }
+
+    override fun refreshToken(userId: String): RefreshTokenUserUseCase.UserTokenDto {
+        return runCatching {
+            val user = getUserPort.getUserById(userId) ?: throw UserNotFoundException(userId)
+
+            RefreshTokenUserUseCase.UserTokenDto(JWTUtil.generateAccessToken(user), JWTUtil.generateRefreshToken(user))
+        }.onFailure {
+            logger.error { "refreshToken fail: param[id: $userId]" }
         }.getOrThrow()
     }
 

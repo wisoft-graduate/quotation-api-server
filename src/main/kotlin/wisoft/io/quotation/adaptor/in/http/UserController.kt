@@ -9,17 +9,20 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import wisoft.io.quotation.application.port.`in`.user.*
 import wisoft.io.quotation.util.annotation.LoginAuthenticated
+import wisoft.io.quotation.util.annotation.RefreshTokenAuthenticated
 import wisoft.io.quotation.util.annotation.ResetPasswordAuthenticated
 
 @RestController
 class UserController(
     val createUserUseCase: CreateUserUseCase,
     val signInUseCase: SignInUseCase,
+    val refreshTokenUserUseCase: RefreshTokenUserUseCase,
     val deleteUserUseCase: DeleteUserUseCase,
     val getUserMyPageUseCase: GetUserMyPageUseCase,
     val getUserPageUseCase: GetUserPageUseCase,
@@ -72,6 +75,24 @@ class UserController(
                 SignInUseCase.SignInResponse(
                     data =
                         SignInUseCase.UserTokenDto(
+                            accessToken = response.accessToken,
+                            refreshToken = response.refreshToken,
+                        ),
+                ),
+            )
+    }
+
+    @PostMapping("/users/refresh-token")
+    @RefreshTokenAuthenticated
+    fun refreshToken(
+        @RequestAttribute("userId") userId: String,
+    ): ResponseEntity<RefreshTokenUserUseCase.RefreshTokenUserResponse> {
+        val response = refreshTokenUserUseCase.refreshToken(userId)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(
+                RefreshTokenUserUseCase.RefreshTokenUserResponse(
+                    data =
+                        RefreshTokenUserUseCase.UserTokenDto(
                             accessToken = response.accessToken,
                             refreshToken = response.refreshToken,
                         ),
