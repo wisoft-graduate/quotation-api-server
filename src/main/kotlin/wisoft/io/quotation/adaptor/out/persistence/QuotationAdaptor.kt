@@ -6,6 +6,7 @@ import wisoft.io.quotation.adaptor.out.persistence.entity.view.QuotationRankView
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationCustomRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationListPort
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
 import wisoft.io.quotation.domain.Quotation
@@ -26,7 +27,7 @@ class QuotationAdaptor(
         return result.map { it.toDomain() }
     }
 
-    override fun getQuotationLank(ids: List<UUID>?): List<QuotationRankView> {
-        return quotationCustomRepository.findQuotationRank(ids)
+    override fun getQuotationLank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
+        return quotationCustomRepository.findQuotationRank(request)
     }
 }

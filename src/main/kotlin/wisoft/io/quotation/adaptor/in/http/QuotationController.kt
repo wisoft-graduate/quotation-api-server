@@ -8,6 +8,7 @@ import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCa
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
+import wisoft.io.quotation.domain.RankProperty
 import wisoft.io.quotation.domain.SortDirection
 import java.util.UUID
 
@@ -21,10 +22,21 @@ class QuotationController(
     @GetMapping("/rank")
     fun getQuotationRank(
         @RequestParam ids: List<UUID>?,
+        @RequestParam rankProperty: RankProperty,
+        @ModelAttribute paging: Paging?,
     ): ResponseEntity<GetQuotationRankUseCase.GetQuotationRankResponse> {
         return ResponseEntity.status(HttpStatus.OK).body(
             GetQuotationRankUseCase.GetQuotationRankResponse(
-                data = GetQuotationRankUseCase.Data(getQuotationLankUseCase.getQuotationRank(ids)),
+                data =
+                    GetQuotationRankUseCase.Data(
+                        getQuotationLankUseCase.getQuotationRank(
+                            GetQuotationRankUseCase.GetQuotationRankRequest(
+                                ids = ids,
+                                rankProperty = rankProperty,
+                                paging = paging,
+                            ),
+                        ),
+                    ),
             ),
         )
     }

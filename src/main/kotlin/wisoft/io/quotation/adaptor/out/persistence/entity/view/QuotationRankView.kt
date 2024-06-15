@@ -4,6 +4,7 @@ import java.util.*
 
 data class QuotationRankView(
     val id: UUID,
-    val likeRank: Long,
-    val shareRank: Long,
+    val rank: Long,
+    val count: Long,
+    val backgroundImagePath: String,
 )
