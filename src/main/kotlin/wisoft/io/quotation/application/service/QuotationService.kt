@@ -2,7 +2,9 @@ package wisoft.io.quotation.application.service
 
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
+import wisoft.io.quotation.adaptor.out.persistence.entity.view.QuotationRankView
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationUseCase
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationListPort
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
@@ -15,6 +17,7 @@ class QuotationService(
     val getQuotationsPort: GetQuotationListPort,
     val getQuotationPort: GetQuotationPort,
 ) : GetQuotationListUseCase,
+    GetQuotationRankUseCase,
     GetQuotationUseCase {
     val logger = KotlinLogging.logger {}
 
@@ -24,6 +27,10 @@ class QuotationService(
         }.onFailure {
             logger.error { "getQuotationList fail: param[$request]" }
         }.getOrThrow()
+    }
+
+    override fun getQuotationRank(ids: List<UUID>?): List<QuotationRankView> {
+        return getQuotationsPort.getQuotationLank(ids)
     }
 
     override fun getQuotation(id: UUID): Quotation {
