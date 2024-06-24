@@ -3,17 +3,11 @@ package wisoft.io.quotation.adaptor.`in`.http
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.*
 import wisoft.io.quotation.application.port.`in`.author.*
 import java.util.*
 
-@Controller()
+@RestController
 class AuthorController(
     val createAuthorUseCase: CreateAuthorUseCase,
     val updateAuthorUseCase: UpdateAuthorUseCase,
@@ -22,6 +16,7 @@ class AuthorController(
     val getAuthorListUseCase: GetAuthorListUseCase,
 ) {
     @PostMapping("/authors")
+
     fun createAuthor(
         @Valid @RequestBody request: CreateAuthorUseCase.CreateAuthorRequest,
     ): ResponseEntity<CreateAuthorUseCase.CreateAuthorResponse> {
