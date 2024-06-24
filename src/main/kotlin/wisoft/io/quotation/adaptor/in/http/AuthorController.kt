@@ -16,7 +16,6 @@ class AuthorController(
     val getAuthorListUseCase: GetAuthorListUseCase,
 ) {
     @PostMapping("/authors")
-
     fun createAuthor(
         @Valid @RequestBody request: CreateAuthorUseCase.CreateAuthorRequest,
     ): ResponseEntity<CreateAuthorUseCase.CreateAuthorResponse> {
