@@ -29,8 +29,8 @@ class QuotationService(
         }.getOrThrow()
     }
 
-    override fun getQuotationRank(ids: List<UUID>?): List<QuotationRankView> {
-        return getQuotationsPort.getQuotationLank(ids)
+    override fun getQuotationRank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
+        return getQuotationsPort.getQuotationLank(request)
     }
 
     override fun getQuotation(id: UUID): Quotation {

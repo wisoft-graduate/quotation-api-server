@@ -21,6 +21,7 @@ import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCa
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationUseCase
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
+import wisoft.io.quotation.domain.RankProperty
 import wisoft.io.quotation.domain.SortDirection
 import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
@@ -53,17 +54,27 @@ class QuotationControllerTest(
 
                 // when
                 val result =
-                    mockMvc.perform(
-                        MockMvcRequestBuilders.get("/quotations/rank"),
-                    ).andExpect(MockMvcResultMatchers.status().isOk)
+                    mockMvc.get("/quotations/rank") {
+                        apply { listOf(quotation.id).forEach { param("ids", it.toString()) } }
+                        param("rankProperty", RankProperty.LIKE.name)
+                        param("page", 1.toString())
+                        param("count", 100.toString())
+                    }.andExpect { MockMvcResultMatchers.status().isOk }
                         .andReturn()
                         .response.contentAsString
 
                 // then
-                val actual = objectMapper.readValue(result, GetQuotationRankUseCase.GetQuotationRankResponse::class.java)
-                actual.data.quotationRanks.first().id shouldBe quotation.id
-                actual.data.quotationRanks.first().likeRank shouldBe 1
-                actual.data.quotationRanks.first().shareRank shouldBe 1
+                val actual =
+                    objectMapper.readValue(
+                        result,
+                        GetQuotationRankUseCase.GetQuotationRankResponse::class.java,
+                    ).data.quotationRanks.first()
+
+                println("actual: $actual")
+                actual.id shouldBe quotation.id
+                actual.rank shouldBe 1
+                actual.count shouldBe 0
+                actual.backgroundImagePath shouldBe quotation.backgroundImagePath
             }
         }
 

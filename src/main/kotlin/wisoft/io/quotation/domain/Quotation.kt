@@ -29,5 +29,3 @@ data class Quotation(
     val createdTime: Timestamp,
     val lastModifiedTime: Timestamp? = null,
 )
-
-// like, share, comment 에 대한 순위 제공

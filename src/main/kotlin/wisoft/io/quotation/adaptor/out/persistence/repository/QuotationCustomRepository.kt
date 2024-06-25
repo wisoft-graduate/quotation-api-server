@@ -9,7 +9,9 @@ import wisoft.io.quotation.adaptor.out.persistence.entity.AuthorEntity
 import wisoft.io.quotation.adaptor.out.persistence.entity.QuotationEntity
 import wisoft.io.quotation.adaptor.out.persistence.entity.view.QuotationRankView
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.domain.QuotationSortTarget
+import wisoft.io.quotation.domain.RankProperty
 import wisoft.io.quotation.domain.SortDirection
 import java.util.*
 
@@ -18,17 +20,30 @@ class QuotationCustomRepository(
     val queryFactory: SpringDataQueryFactory,
     val entityManager: EntityManager,
 ) {
-    fun findQuotationRank(ids: List<UUID>?): List<QuotationRankView> {
+    fun findQuotationRank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
         val sql =
             buildString {
-                append("SELECT id, ROW_NUMBER() OVER (ORDER BY like_count DESC) AS like_rank, ")
-                append("ROW_NUMBER() OVER (ORDER BY share_count DESC) AS share_rank FROM quotation ")
-                ids?.let {
-                    append("WHERE id IN :ids")
+                append("SELECT id, ")
+                when (request.rankProperty) {
+                    RankProperty.LIKE -> {
+                        append("ROW_NUMBER() OVER (ORDER BY like_count DESC) AS like_rank, like_count, ")
+                    }
+                    RankProperty.SHARE -> {
+                        append("ROW_NUMBER() OVER (ORDER BY share_count DESC) AS share_rank, share_count, ")
+                    }
+                }
+                append("background_image_path ")
+                append("FROM quotation WHERE 1=1 ")
+                request.ids?.let {
+                    append("AND id IN :ids ")
+                }
+                request.paging?.let {
+                    append("OFFSET ${(it.page - 1) * it.count} ")
+                    append("LIMIT ${it.count} ")
                 }
             }
         return entityManager.createNativeQuery(sql, QuotationRankView::class.java)
-            .apply { ids?.let { setParameter("ids", ids) } }
+            .apply { request.ids?.let { setParameter("ids", it) } }
             .resultList as List<QuotationRankView>
     }
 
