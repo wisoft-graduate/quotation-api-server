@@ -14,14 +14,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
-import wisoft.io.quotation.adaptor.out.persistence.repository.CommentRepository
-import wisoft.io.quotation.adaptor.out.persistence.repository.NotificationRepository
-import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
-import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
+import wisoft.io.quotation.adaptor.out.persistence.repository.*
 import wisoft.io.quotation.application.port.`in`.comment.CreateCommentUseCase
 import wisoft.io.quotation.application.port.`in`.notification.GetNotificationListUseCase
 import wisoft.io.quotation.application.port.`in`.notification.UpdateNotificationUseCase
 import wisoft.io.quotation.application.service.CommentService
+import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getNotificationEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
@@ -38,12 +36,14 @@ class NotificationControllerTest(
     val commentService: CommentService,
     val commentRepository: CommentRepository,
     val notificationRepository: NotificationRepository,
+    val authorRepository: AuthorRepository,
 ) : FunSpec({
 
         val objectMapper = ObjectMapper().registerKotlinModule()
 
         afterEach {
             quotationRepository.deleteAll()
+            authorRepository.deleteAll()
             userRepository.deleteAll()
             commentRepository.deleteAll()
             notificationRepository.deleteAll()
@@ -54,7 +54,8 @@ class NotificationControllerTest(
                 // given
                 val user = userRepository.save(getUserEntityFixture())
                 val commentedUser = userRepository.save(getUserEntityFixture("commentedUser"))
-                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
                 val commentId =
                     commentService.createComment(
                         CreateCommentUseCase.CreateCommentRequest(
