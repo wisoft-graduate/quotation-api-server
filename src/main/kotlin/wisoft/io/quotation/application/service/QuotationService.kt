@@ -30,7 +30,11 @@ class QuotationService(
     }
 
     override fun getQuotationRank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
-        return getQuotationsPort.getQuotationLank(request)
+        return runCatching {
+            getQuotationsPort.getQuotationLank(request)
+        }.onFailure {
+            logger.error { "getQuotationRank fail: param[$request]" }
+        }.getOrThrow()
     }
 
     override fun getQuotation(id: UUID): Quotation {
