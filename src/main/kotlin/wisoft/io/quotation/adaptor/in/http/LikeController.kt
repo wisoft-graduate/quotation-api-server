@@ -28,7 +28,7 @@ class LikeController(val createLikeUseCase: CreateLikeUseCase, val deleteLikeUse
             )
     }
 
-    @DeleteMapping("/likes/{id}")
+    @DeleteMapping("/{id}")
     fun deleteLike(
         @PathVariable("id") id: UUID,
     ): ResponseEntity<Unit> {
