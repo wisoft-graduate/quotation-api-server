@@ -3,6 +3,7 @@ package wisoft.io.quotation.adaptor.out.persistence
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.entity.view.QuotationRankView
+import wisoft.io.quotation.adaptor.out.persistence.mapeer.QuotationEntityMapper
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationCustomRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
@@ -16,15 +17,18 @@ import java.util.*
 class QuotationAdaptor(
     val quotationRepository: QuotationRepository,
     val quotationCustomRepository: QuotationCustomRepository,
+    val quotationEntityMapper: QuotationEntityMapper,
 ) : GetQuotationListPort,
     GetQuotationPort {
     override fun getQuotation(id: UUID): Quotation? {
-        return quotationRepository.findByIdOrNull(id)?.toDomain()
+        return quotationRepository.findByIdOrNull(id)?.let {
+            quotationEntityMapper.toDomain(quotationEntity = it)
+        }
     }
 
     override fun getQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<Quotation> {
         val result = quotationCustomRepository.findQuotationList(request).distinct()
-        return result.map { it.toDomain() }
+        return quotationEntityMapper.toDomains(result)
     }
 
     override fun getQuotationLank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {

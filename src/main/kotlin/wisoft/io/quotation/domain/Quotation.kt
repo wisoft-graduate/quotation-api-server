@@ -18,7 +18,6 @@ import java.util.UUID
 data class Quotation(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val authorId: UUID,
     val content: String,
     val likeCount: Long,
     val shareCount: Long,
@@ -28,4 +27,5 @@ data class Quotation(
     val backgroundImagePath: String,
     val createdTime: Timestamp,
     val lastModifiedTime: Timestamp? = null,
+    val author: Author,
 )
