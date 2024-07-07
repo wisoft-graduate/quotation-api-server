@@ -34,6 +34,13 @@ class LikeControllerTest(
     val likeRepository: LikeRepository,
     val mockMvc: MockMvc,
 ) : FunSpec({
+
+        afterEach {
+            likeRepository.deleteAll()
+            quotationRepository.deleteAll()
+            userRepository.deleteAll()
+        }
+
         val objectMapper = ObjectMapper().registerKotlinModule()
 
         context("createLike Test") {
