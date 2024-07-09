@@ -1,7 +1,6 @@
 package wisoft.io.quotation.domain
 
 import jakarta.persistence.Id
-import wisoft.io.quotation.adaptor.out.persistence.entity.LikeEntity
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
@@ -20,14 +19,4 @@ data class Like(
     val quotationId: UUID,
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
-) {
-    fun toEntity(): LikeEntity {
-        return LikeEntity(
-            id = this.id,
-            userId = this.userId,
-            quotationId = this.quotationId,
-            createdTime = this.createdTime,
-            lastModifiedTime = this.lastModifiedTime,
-        )
-    }
-}
+)

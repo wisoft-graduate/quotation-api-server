@@ -8,4 +8,6 @@ import java.util.UUID
 @Repository
 interface CommentRepository : JpaRepository<CommentEntity, UUID> {
     fun findByParentId(parentId: UUID): List<CommentEntity>
+
+    fun findByParentIdIn(parentIds: List<UUID>): List<CommentEntity>
 }

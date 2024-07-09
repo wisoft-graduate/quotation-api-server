@@ -3,7 +3,6 @@ package wisoft.io.quotation.adaptor.out.persistence.entity
 import io.hypersistence.utils.hibernate.type.array.ListArrayType
 import jakarta.persistence.*
 import org.hibernate.annotations.Type
-import wisoft.io.quotation.domain.Bookmark
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
@@ -32,16 +31,4 @@ data class BookmarkEntity(
     val icon: String? = null,
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
-) {
-    fun toDomain(): Bookmark {
-        return Bookmark(
-            id = this.id,
-            name = this.name,
-            userId = this.userId,
-            quotationIds = this.quotationIds,
-            visibility = this.visibility,
-            icon = this.icon,
-            createdTime = this.createdTime,
-        )
-    }
-}
+)

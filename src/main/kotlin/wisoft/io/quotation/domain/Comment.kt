@@ -1,7 +1,6 @@
 package wisoft.io.quotation.domain
 
 import jakarta.persistence.*
-import wisoft.io.quotation.adaptor.out.persistence.entity.CommentEntity
 import wisoft.io.quotation.application.port.`in`.comment.UpdateCommentUseCase
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -29,18 +28,6 @@ data class Comment(
     val parentCommentId: UUID? = null,
     val childCommentIds: List<UUID> = emptyList(),
 ) {
-    fun toEntity(): CommentEntity {
-        return CommentEntity(
-            id = this.id,
-            quotationId = this.quotationId,
-            userId = this.userId,
-            content = this.content,
-            commentedUserId = this.commentedUserId,
-            createdTime = this.createdTime,
-            parentId = this.parentCommentId,
-        )
-    }
-
     fun update(dto: UpdateCommentUseCase.UpdateCommentRequest): Comment {
         return this.copy(
             content = dto.content ?: this.content,

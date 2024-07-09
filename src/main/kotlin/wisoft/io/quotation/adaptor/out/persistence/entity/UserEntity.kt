@@ -6,7 +6,6 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.hibernate.annotations.Type
-import wisoft.io.quotation.domain.User
 import java.sql.Timestamp
 
 /**
@@ -44,22 +43,4 @@ data class UserEntity(
     val lastModifiedTime: Timestamp? = null,
     val identityVerificationQuestion: String,
     val identityVerificationAnswer: String,
-) {
-    fun toDomain(): User {
-        return User(
-            id = this.id,
-            password = this.password,
-            nickname = this.nickname,
-            profilePath = this.profilePath,
-            favoriteAuthor = this.favoriteAuthor,
-            favoriteQuotation = this.favoriteQuotation,
-            commentAlarm = this.commentAlarm,
-            quotationAlarm = this.quotationAlarm,
-            quotationAlarmTimes = this.quotationAlarmTimes.toList(),
-            createdTime = this.createdTime,
-            lastModifiedTime = this.lastModifiedTime,
-            identityVerificationQuestion = this.identityVerificationQuestion,
-            identityVerificationAnswer = this.identityVerificationAnswer,
-        )
-    }
-}
+)

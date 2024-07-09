@@ -2,6 +2,7 @@ package wisoft.io.quotation.adaptor.out.persistence
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
+import wisoft.io.quotation.adaptor.out.persistence.mapeer.LikeMapper
 import wisoft.io.quotation.adaptor.out.persistence.repository.LikeRepository
 import wisoft.io.quotation.application.port.out.GetLikeListPort
 import wisoft.io.quotation.application.port.out.like.CreateLikePort
@@ -13,6 +14,7 @@ import java.util.*
 @Component
 class LikeAdapter(
     val likeRepository: LikeRepository,
+    val likeMapper: LikeMapper,
 ) : GetLikeListPort,
     DeleteLikePort,
     GetLikePort,
@@ -22,7 +24,7 @@ class LikeAdapter(
     }
 
     override fun createLike(like: Like): UUID {
-        return likeRepository.save(like.toEntity()).id
+        return likeRepository.save(likeMapper.toEntity(like)).id
     }
 
     override fun deleteLike(id: UUID) {
@@ -30,6 +32,6 @@ class LikeAdapter(
     }
 
     override fun getLikeById(id: UUID): Like? {
-        return likeRepository.findByIdOrNull(id)?.toDomain()
+        return likeRepository.findByIdOrNull(id)?.let { likeMapper.toDomain(it) }
     }
 }

@@ -1,7 +1,6 @@
 package wisoft.io.quotation.domain
 
 import org.mindrot.jbcrypt.BCrypt
-import wisoft.io.quotation.adaptor.out.persistence.entity.UserEntity
 import wisoft.io.quotation.application.port.`in`.user.UpdateUserUseCase
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -38,24 +37,6 @@ data class User(
     var identityVerificationQuestion: String,
     var identityVerificationAnswer: String,
 ) {
-    fun toEntity(): UserEntity {
-        return UserEntity(
-            id = this.id,
-            password = this.password,
-            nickname = this.nickname,
-            profilePath = this.profilePath,
-            favoriteAuthor = this.favoriteAuthor,
-            favoriteQuotation = this.favoriteQuotation,
-            commentAlarm = this.commentAlarm,
-            quotationAlarm = this.quotationAlarm,
-            quotationAlarmTimes = this.quotationAlarmTimes,
-            createdTime = this.createdTime,
-            lastModifiedTime = this.lastModifiedTime,
-            identityVerificationQuestion = this.identityVerificationQuestion,
-            identityVerificationAnswer = this.identityVerificationAnswer,
-        )
-    }
-
     fun encryptPassword(password: String): User {
         return this.copy(
             password = BCrypt.hashpw(password, BCrypt.gensalt()),

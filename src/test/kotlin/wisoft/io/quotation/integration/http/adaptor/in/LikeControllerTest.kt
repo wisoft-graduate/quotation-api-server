@@ -15,10 +15,12 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
+import wisoft.io.quotation.adaptor.out.persistence.repository.AuthorRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.LikeRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.like.CreateLikeUseCase
+import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getLikeEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
@@ -32,12 +34,14 @@ class LikeControllerTest(
     val userRepository: UserRepository,
     val quotationRepository: QuotationRepository,
     val likeRepository: LikeRepository,
+    val authorRepository: AuthorRepository,
     val mockMvc: MockMvc,
 ) : FunSpec({
 
         afterEach {
             likeRepository.deleteAll()
             quotationRepository.deleteAll()
+            authorRepository.deleteAll()
             userRepository.deleteAll()
         }
 
@@ -47,7 +51,8 @@ class LikeControllerTest(
             test("createLike 성공") {
                 // given
                 val user = userRepository.save(getUserEntityFixture())
-                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
                 val request =
                     CreateLikeUseCase.CreateLikeRequest(
                         userId = user.id,

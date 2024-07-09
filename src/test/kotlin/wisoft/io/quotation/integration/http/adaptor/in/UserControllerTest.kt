@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
 import wisoft.io.quotation.DatabaseContainerConfig
+import wisoft.io.quotation.adaptor.out.persistence.mapeer.UserMapper
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.user.*
 import wisoft.io.quotation.exception.error.ErrorData
@@ -28,6 +29,7 @@ import wisoft.io.quotation.util.JWTUtil
 class UserControllerTest(
     val mockMvc: MockMvc,
     val repository: UserRepository,
+    val userMapper: UserMapper,
 ) : FunSpec({
 
         val objectMapper = ObjectMapper().registerKotlinModule()
@@ -130,7 +132,7 @@ class UserControllerTest(
             test("RefreshToken 성공") {
                 // given
                 val existUser = repository.save(getUserEntityFixture())
-                val refreshToken = JWTUtil.generateRefreshToken(existUser.toDomain())
+                val refreshToken = JWTUtil.generateRefreshToken(userMapper.toDomain(existUser))
 
                 // when
                 val result =
@@ -155,7 +157,7 @@ class UserControllerTest(
             test("deleteUser 성공") {
                 // given
                 val existUserEntity = repository.save(getUserEntityFixture())
-                val existUser = existUserEntity.toDomain()
+                val existUser = userMapper.toDomain(existUserEntity)
                 val accessToken = JWTUtil.generateAccessToken(existUser)
 
                 mockMvc.perform(
@@ -196,7 +198,7 @@ class UserControllerTest(
             test("getUserMyPage 성공") {
                 // given
                 val existUser = repository.save(getUserEntityFixture())
-                val accessToken = JWTUtil.generateAccessToken(existUser.toDomain())
+                val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
                 // when
                 val result =
                     mockMvc.perform(
@@ -289,7 +291,7 @@ class UserControllerTest(
                         identityVerificationQuestion = expectedIdentityVerificationQuestion,
                         identityVerificationAnswer = expectedIdentityVerificationAnswer,
                     )
-                val accessToken = JWTUtil.generateAccessToken(existUser.toDomain())
+                val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
                 // when
                 val requestToJson = objectMapper.writeValueAsString(request)
                 val result =
@@ -488,7 +490,7 @@ class UserControllerTest(
         context("resetPasswordUser Test") {
             test("resetPasswordUser 성공") {
                 // given
-                val existUser = repository.save(getUserEntityFixture()).toDomain()
+                val existUser = repository.save(getUserEntityFixture()).let { userMapper.toDomain(it) }
                 val expectedPassword = "resetPassword"
                 val request =
                     ResetPasswordUserUseCase.ResetPasswordUserRequestBody(
@@ -514,13 +516,13 @@ class UserControllerTest(
                     objectMapper.readValue(result, ResetPasswordUserUseCase.ResetPasswordUserResponse::class.java)
 
                 actual.data.id shouldBe existUser.id
-                val actualUser = repository.findById(existUser.id).get().toDomain()
+                val actualUser = repository.findById(existUser.id).get().let { userMapper.toDomain(it) }
                 actualUser.isCorrectPassword(expectedPassword) shouldBe true
             }
 
             test("resetPasswordUser 실패 - RefreshToken이 없는 경우") {
                 // given
-                val existUser = repository.save(getUserEntityFixture()).toDomain()
+                val existUser = repository.save(getUserEntityFixture()).let { userMapper.toDomain(it) }
                 val expectedStatus = HttpMessage.HTTP_401.status
                 val expectedPath = "/users/${existUser.id}/reset-password"
 
@@ -551,7 +553,7 @@ class UserControllerTest(
 
             test("resetPasswordUser 실패 - RefreshToken이 아닌 다른 토큰이 온 경우") {
                 // given
-                val existUser = repository.save(getUserEntityFixture()).toDomain()
+                val existUser = repository.save(getUserEntityFixture()).let { userMapper.toDomain(it) }
                 val expectedStatus = HttpMessage.HTTP_403.status
                 val expectedPath = "/users/${existUser.id}/reset-password"
                 val accessToken = JWTUtil.generateAccessToken(existUser)
