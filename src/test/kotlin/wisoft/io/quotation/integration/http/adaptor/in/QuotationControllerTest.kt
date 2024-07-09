@@ -97,12 +97,13 @@ class QuotationControllerTest(
                 // then
                 val actual = objectMapper.readValue(result, GetQuotationUseCase.GetQuotationResponse::class.java).data
                 actual.id shouldBe quotation.id
-                actual.authorId shouldBe author.id
+                actual.author.id shouldBe author.id
                 actual.content shouldBe quotation.content
                 actual.likeCount shouldBe quotation.likeCount
                 actual.shareCount shouldBe quotation.shareCount
                 actual.commentCount shouldBe quotation.commentCount
                 actual.backgroundImagePath shouldBe quotation.backgroundImagePath
+                actual.author.name shouldBe author.name
             }
 
             test("getQuotation 실패") {
@@ -166,12 +167,13 @@ class QuotationControllerTest(
                     ).data.quotationList.first()
 
                 actual.id shouldBe quotation.id
-                actual.authorId shouldBe author.id
+                actual.author.id shouldBe author.id
                 actual.content shouldBe quotation.content
                 actual.likeCount shouldBe quotation.likeCount
                 actual.shareCount shouldBe quotation.shareCount
                 actual.commentCount shouldBe quotation.commentCount
                 actual.backgroundImagePath shouldBe quotation.backgroundImagePath
+                actual.author.name shouldBe author.name
             }
         }
     })

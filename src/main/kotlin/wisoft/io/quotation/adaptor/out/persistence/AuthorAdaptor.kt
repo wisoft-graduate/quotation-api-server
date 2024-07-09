@@ -30,4 +30,8 @@ class AuthorAdaptor(
     override fun getAuthorList(): List<Author> {
         return authorRepository.findAll().map { it.toDomain() }
     }
+
+    override fun getAuthorListById(ids: List<UUID>): List<Author> {
+        return authorRepository.findAllById(ids).map { it.toDomain() }
+    }
 }
