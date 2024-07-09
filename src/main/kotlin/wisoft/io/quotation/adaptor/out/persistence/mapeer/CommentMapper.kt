@@ -52,7 +52,8 @@ class CommentMapper(val commentRepository: CommentRepository) : Mapper<CommentEn
                         createdTime = child.createdTime,
                         lastModifiedTime = child.lastModifiedTime,
                         parentCommentId = child.parentId,
-                        childComments = emptyList(), // 하위 1depth 까지만 제공하기 위함
+                        // 하위 1depth 까지만 제공하기 위함
+                        childComments = emptyList(),
                     )
                 },
         )
