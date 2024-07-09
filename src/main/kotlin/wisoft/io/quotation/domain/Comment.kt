@@ -14,7 +14,7 @@ import java.util.UUID
  * @property createdTime 생성된 시간
  * @property lastModifiedTime 마지막 수정 시간
  * @property parentCommentId 댓글의 상위 댓글 식별자
- * @property childCommentIds 댓글의 하위 댓글 목록
+ * @property childComments 댓글의 하위 댓글 목록
  */
 data class Comment(
     @Id
@@ -26,7 +26,7 @@ data class Comment(
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
     val parentCommentId: UUID? = null,
-    val childCommentIds: List<UUID> = emptyList(),
+    val childComments: List<Comment> = emptyList(),
 ) {
     fun update(dto: UpdateCommentUseCase.UpdateCommentRequest): Comment {
         return this.copy(
