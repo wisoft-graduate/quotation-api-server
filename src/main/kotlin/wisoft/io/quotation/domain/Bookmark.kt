@@ -1,6 +1,5 @@
 package wisoft.io.quotation.domain
 
-import wisoft.io.quotation.adaptor.out.persistence.entity.BookmarkEntity
 import wisoft.io.quotation.application.port.`in`.bookmark.UpdateBookmarkUseCase
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -26,18 +25,6 @@ data class Bookmark(
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
 ) {
-    fun toEntity(): BookmarkEntity {
-        return BookmarkEntity(
-            id = this.id,
-            name = this.name,
-            userId = this.userId,
-            quotationIds = this.quotationIds,
-            visibility = this.visibility,
-            icon = this.icon,
-            createdTime = this.createdTime,
-        )
-    }
-
     fun update(dto: UpdateBookmarkUseCase.UpdateBookmarkRequest): Bookmark {
         return this.copy(
             name = dto.name ?: this.name,

@@ -1,7 +1,6 @@
 package wisoft.io.quotation.domain
 
 import jakarta.persistence.Id
-import wisoft.io.quotation.adaptor.out.persistence.entity.AuthorEntity
 import wisoft.io.quotation.application.port.`in`.author.UpdateAuthorUseCase
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -22,16 +21,6 @@ data class Author(
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
 ) {
-    fun toEntity(): AuthorEntity {
-        return AuthorEntity(
-            id = this.id,
-            name = this.name,
-            countryCode = this.countryCode,
-            createdTime = this.createdTime,
-            lastModifiedTime = this.lastModifiedTime,
-        )
-    }
-
     fun update(dto: UpdateAuthorUseCase.UpdateAuthorRequest): Author {
         return this.copy(
             name = dto.name ?: this.name,

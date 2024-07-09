@@ -3,7 +3,7 @@ package wisoft.io.quotation.adaptor.out.persistence
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.entity.view.QuotationRankView
-import wisoft.io.quotation.adaptor.out.persistence.mapeer.QuotationEntityMapper
+import wisoft.io.quotation.adaptor.out.persistence.mapeer.QuotationMapper
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationCustomRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
@@ -17,12 +17,12 @@ import java.util.*
 class QuotationAdaptor(
     val quotationRepository: QuotationRepository,
     val quotationCustomRepository: QuotationCustomRepository,
-    val quotationEntityMapper: QuotationEntityMapper,
+    val quotationEntityMapper: QuotationMapper,
 ) : GetQuotationListPort,
     GetQuotationPort {
     override fun getQuotation(id: UUID): Quotation? {
         return quotationRepository.findByIdOrNull(id)?.let {
-            quotationEntityMapper.toDomain(quotationEntity = it)
+            quotationEntityMapper.toDomain(entity = it)
         }
     }
 

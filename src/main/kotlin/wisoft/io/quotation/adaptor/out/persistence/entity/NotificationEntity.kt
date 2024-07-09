@@ -3,7 +3,6 @@ package wisoft.io.quotation.adaptor.out.persistence.entity
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import wisoft.io.quotation.domain.Notification
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
@@ -28,16 +27,4 @@ data class NotificationEntity(
     val alarmCheck: Boolean,
     val createdTime: Timestamp = Timestamp.valueOf(LocalDateTime.now()),
     val lastModifiedTime: Timestamp? = null,
-) {
-    fun toDomain(): Notification {
-        return Notification(
-            id = id,
-            commenterId = commenterId,
-            commentedUserId = commentedUserId,
-            commentId = commentId,
-            alarmCheck = alarmCheck,
-            createdTime = createdTime,
-            lastModifiedTime = lastModifiedTime,
-        )
-    }
-}
+)
