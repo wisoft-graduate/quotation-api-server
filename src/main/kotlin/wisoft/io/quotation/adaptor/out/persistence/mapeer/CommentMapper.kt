@@ -41,19 +41,20 @@ class CommentMapper(val commentRepository: CommentRepository) : Mapper<CommentEn
             createdTime = this.createdTime,
             lastModifiedTime = this.lastModifiedTime,
             parentCommentId = this.parentId,
-            childComments = childComments.map { child ->
-                Comment(
-                    id = child.id,
-                    quotationId = child.quotationId,
-                    userId = child.userId,
-                    content = child.content,
-                    commentedUserId = child.commentedUserId,
-                    createdTime = child.createdTime,
-                    lastModifiedTime = child.lastModifiedTime,
-                    parentCommentId = child.parentId,
-                    childComments = emptyList() // 하위 1depth 까지만 제공하기 위함
-                )
-            }
+            childComments =
+                childComments.map { child ->
+                    Comment(
+                        id = child.id,
+                        quotationId = child.quotationId,
+                        userId = child.userId,
+                        content = child.content,
+                        commentedUserId = child.commentedUserId,
+                        createdTime = child.createdTime,
+                        lastModifiedTime = child.lastModifiedTime,
+                        parentCommentId = child.parentId,
+                        childComments = emptyList(), // 하위 1depth 까지만 제공하기 위함
+                    )
+                },
         )
     }
 }
