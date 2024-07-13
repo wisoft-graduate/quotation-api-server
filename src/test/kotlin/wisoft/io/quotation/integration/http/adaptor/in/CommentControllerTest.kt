@@ -20,8 +20,8 @@ import wisoft.io.quotation.adaptor.out.persistence.repository.*
 import wisoft.io.quotation.application.port.`in`.comment.CreateCommentUseCase
 import wisoft.io.quotation.application.port.`in`.comment.GetCommentListUseCase
 import wisoft.io.quotation.application.port.`in`.comment.UpdateCommentUseCase
-import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.application.port.out.push.PushTagNotificationPort
+import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getCommentEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
