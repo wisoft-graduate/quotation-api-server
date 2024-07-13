@@ -50,9 +50,9 @@ class PushDispatcher(
                     .build()
 
             client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    logger.error { response }
-                    throw PushFailException("sendUser:$sendUser, tagUser :$tagUser")
+                val responseBody = response.body?.string()
+                if (!response.isSuccessful || responseBody?.contains("errors") == true) {
+                    throw PushFailException("sendUser:$sendUser, tagUser :$tagUser, response: $responseBody")
                 }
                 response.isSuccessful
             }
