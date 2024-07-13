@@ -25,10 +25,11 @@ class PushDispatcher(
         tagUserId: String,
     ): Boolean {
         return runCatching {
-            val message = "${sendUser}님이 ${tagUser}닝을 언급하셨습니다."
+            val message = "${sendUser}님이 ${tagUser}님을 언급 했습니다."
             val bodyMap =
                 mapOf(
                     "app_id" to appId,
+                    "headings" to mapOf("en" to "Comment Push"),
                     "contents" to mapOf("en" to message),
                     "target_channel" to "push",
                     "include_aliases" to mapOf("external_id" to listOf(tagUserId)),
@@ -50,6 +51,7 @@ class PushDispatcher(
 
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
+                    logger.error { response }
                     throw PushFailException("sendUser:$sendUser, tagUser :$tagUser")
                 }
                 response.isSuccessful

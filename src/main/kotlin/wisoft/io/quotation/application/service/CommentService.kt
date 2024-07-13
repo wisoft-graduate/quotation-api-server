@@ -8,6 +8,7 @@ import wisoft.io.quotation.application.port.`in`.comment.GetCommentListUseCase
 import wisoft.io.quotation.application.port.`in`.comment.UpdateCommentUseCase
 import wisoft.io.quotation.application.port.out.comment.*
 import wisoft.io.quotation.application.port.out.notification.CreateNotificationPort
+import wisoft.io.quotation.application.port.out.push.PushTagNotificationPort
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
 import wisoft.io.quotation.application.port.out.user.GetUserPort
 import wisoft.io.quotation.domain.Comment
@@ -27,6 +28,7 @@ class CommentService(
     val updateCommentPort: UpdateCommentPort,
     val deleteCommentPort: DeleteCommentPort,
     val createNotificationPort: CreateNotificationPort,
+    val pushTagNotificationPort: PushTagNotificationPort,
 ) : CreateCommentUseCase,
     GetCommentListUseCase,
     UpdateCommentUseCase,
@@ -36,16 +38,19 @@ class CommentService(
     override fun createComment(request: CreateCommentUseCase.CreateCommentRequest): UUID {
         return runCatching {
             // Validation Check
-            getUserPort.getUserById(request.userId)
-                ?: throw UserNotFoundException(request.userId)
+            val sendUser = (
+                getUserPort.getUserById(request.userId)
+                    ?: throw UserNotFoundException(request.userId)
+            )
 
             getQuotationPort.getQuotation(request.quotationId)
                 ?: throw QuotationNotFoundException(request.quotationId.toString())
 
-            request.commentedUserId?.let {
-                getUserPort.getUserById(it)
-                    ?: throw UserNotFoundException(it)
-            }
+            val tagUser =
+                request.commentedUserId?.let {
+                    getUserPort.getUserById(it)
+                        ?: throw UserNotFoundException(it)
+                }
 
             // Create Comment
             val commentId =
@@ -64,6 +69,15 @@ class CommentService(
                     Notification.createNotification(request.userId, it, commentId),
                 )
             }
+
+            tagUser?.let {
+                pushTagNotificationPort.sendTagPushNotification(
+                    sendUser = sendUser.nickname,
+                    tagUser = it.nickname,
+                    tagUserId = it.id,
+                )
+            }
+
             commentId
         }.onFailure {
             logger.error { "createComment fail: param[$request]" }

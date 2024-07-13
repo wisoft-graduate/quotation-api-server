@@ -5,7 +5,7 @@ import wisoft.io.quotation.application.port.out.push.PushTagNotificationPort
 
 @Component
 class PushAdapter(
-    val pushDispatcher: PushDispatcher,
+    val pushDispatcher: PushDispatcherImpl,
 ) : PushTagNotificationPort {
     override fun sendTagPushNotification(
         sendUser: String,
