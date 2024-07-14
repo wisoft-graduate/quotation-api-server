@@ -164,7 +164,7 @@ class QuotationControllerTest(
                     objectMapper.readValue(
                         result,
                         GetQuotationListUseCase.GetQuotationListResponse::class.java,
-                    ).data.quotationList.first()
+                    ).data.first()
 
                 actual.id shouldBe quotation.id
                 actual.author.id shouldBe author.id

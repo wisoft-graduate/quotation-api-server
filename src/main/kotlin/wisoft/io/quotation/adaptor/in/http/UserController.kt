@@ -61,7 +61,7 @@ class UserController(
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(
-                GetUserListUseCase.GetUserListResponse(data = GetUserListUseCase.Data(users = response)),
+                GetUserListUseCase.GetUserListResponse(data = response),
             )
     }
 

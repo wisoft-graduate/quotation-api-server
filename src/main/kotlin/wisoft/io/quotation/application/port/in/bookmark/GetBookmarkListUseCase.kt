@@ -12,10 +12,6 @@ interface GetBookmarkListUseCase {
     )
 
     data class GetBookmarkListResponse(
-        val data: Data,
-    )
-
-    data class Data(
-        val bookmarks: List<Bookmark>,
+        val data: List<Bookmark>,
     )
 }

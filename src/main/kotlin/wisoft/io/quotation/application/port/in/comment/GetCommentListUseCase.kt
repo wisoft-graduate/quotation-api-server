@@ -14,10 +14,6 @@ interface GetCommentListUseCase {
     )
 
     data class GetCommentListResponse(
-        val data: Data,
-    )
-
-    data class Data(
-        val commentList: List<Comment>,
+        val data: List<Comment>,
     )
 }

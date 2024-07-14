@@ -344,7 +344,7 @@ class UserControllerTest(
 
                 // then
                 val actual = objectMapper.readValue(result, GetUserListUseCase.GetUserListResponse::class.java)
-                val actualUserDto = actual.data.users[0]
+                val actualUserDto = actual.data.first()
 
                 actualUserDto.id shouldBe existUser.id
                 actualUserDto.nickname shouldBe existUser.nickname
@@ -371,7 +371,7 @@ class UserControllerTest(
 
                 // then
                 val actual = objectMapper.readValue(result, GetUserListUseCase.GetUserListResponse::class.java)
-                val actualUserDto = actual.data.users[0]
+                val actualUserDto = actual.data.first()
 
                 actualUserDto.id shouldBe existUser.id
                 actualUserDto.nickname shouldBe existUser.nickname
@@ -398,7 +398,7 @@ class UserControllerTest(
 
                 // then
                 val actual = objectMapper.readValue(result, GetUserListUseCase.GetUserListResponse::class.java)
-                val actualUserDto = actual.data.users[0]
+                val actualUserDto = actual.data.first()
 
                 actualUserDto.id shouldBe existUser.id
                 actualUserDto.nickname shouldBe existUser.nickname

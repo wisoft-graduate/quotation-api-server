@@ -22,10 +22,7 @@ class NotificationController(
             .status(HttpStatus.OK)
             .body(
                 GetNotificationListUseCase.GetNotificationListResponse(
-                    data =
-                        GetNotificationListUseCase.Data(
-                            notificationList = getNotificationListUseCase.getNotificationList(userId),
-                        ),
+                    data = getNotificationListUseCase.getNotificationList(userId),
                 ),
             )
     }
