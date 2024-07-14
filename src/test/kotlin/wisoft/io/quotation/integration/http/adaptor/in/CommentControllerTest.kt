@@ -271,7 +271,7 @@ class CommentControllerTest(
                 actual.userId shouldBe comment.userId
                 actual.commentedUserId shouldBe comment.commentedUserId
                 actual.quotationId shouldBe comment.quotationId
-                actual.childCommentIds shouldContain childComment.id
+                actual.childComments.map { it.id } shouldContain childComment.id
             }
 
             test("getCommentList 성공 - commentId 목록으로 댓글을 조회 할 수 있다.") {
