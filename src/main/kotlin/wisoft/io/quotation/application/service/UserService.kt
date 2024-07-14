@@ -12,8 +12,10 @@ import wisoft.io.quotation.exception.error.InvalidRequestParameterException
 import wisoft.io.quotation.exception.error.InvalidUserException
 import wisoft.io.quotation.exception.error.UserDuplicateException
 import wisoft.io.quotation.exception.error.UserNotFoundException
+import wisoft.io.quotation.exception.error.http.BadRequestException
 import wisoft.io.quotation.util.JWTUtil
 import wisoft.io.quotation.util.SaltUtil
+import java.sql.Timestamp
 import java.time.Instant
 
 @Service
@@ -35,7 +37,10 @@ class UserService(
     UpdateUserUseCase,
     GetUserListUseCase,
     ValidateUserUesCase,
-    ResetPasswordUserUseCase {
+    ResetPasswordUserUseCase,
+    CreateQuotationAlarmTimeUseCase,
+    PatchQuotationAlarmTimeUseCase,
+    GetQuotationAlarmTimeUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -210,6 +215,80 @@ class UserService(
             updateUserPort.updateUser(updatedUser)
         }.onFailure {
             logger.error { "resetPasswordUser fail: param[request:$request" }
+        }.getOrThrow()
+    }
+
+    override fun createQuotationAlarmTime(
+        userId: String,
+        request: CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeRequest,
+    ): String {
+        return runCatching {
+            val user = getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
+
+            val newAlarmTime = request.quotationAlarmTime.toLocalDateTime()
+            val updatedTimes = user.quotationAlarmTimes.toMutableList()
+
+            val existingTime =
+                updatedTimes.find {
+                    val existLocalDateTime = it.toLocalDateTime()
+                    existLocalDateTime.hour == newAlarmTime.hour && existLocalDateTime.minute == newAlarmTime.minute
+                }
+
+            if (existingTime != null) {
+                throw BadRequestException("Time Duplication Exception")
+            } else {
+                updatedTimes.add(request.quotationAlarmTime)
+            }
+
+            // 사용자 정보 업데이트
+            val updatedUser = user.updateQuotationAlarmTimes(updatedTimes.toList())
+            updateUserPort.updateUser(updatedUser)
+
+            user.id
+        }.onFailure {
+            logger.error { "createQuotationAlarmTime fail: param[userId: $userId, request:$request]" }
+        }.getOrThrow()
+    }
+
+    @Transactional
+    override fun patchQuotationAlarmTime(
+        userId: String,
+        request: PatchQuotationAlarmTimeUseCase.PatchQuotationAlarmTimeRequest,
+    ): String {
+        return runCatching {
+            val user = getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
+
+            val newAlarmTime = request.quotationAlarmTime.toLocalDateTime()
+            val updatedTimes = user.quotationAlarmTimes.toMutableList()
+
+            val existingTime =
+                updatedTimes.find {
+                    val existLocalDateTime = it.toLocalDateTime()
+                    existLocalDateTime.hour == newAlarmTime.hour && existLocalDateTime.minute == newAlarmTime.minute
+                }
+
+            if (existingTime != null) {
+                updatedTimes.remove(existingTime)
+            } else {
+                throw BadRequestException("Time Not Found Exception")
+            }
+
+            // 사용자 정보 업데이트
+            val updatedUser = user.updateQuotationAlarmTimes(updatedTimes.toList())
+            updateUserPort.updateUser(updatedUser)
+
+            user.id
+        }.onFailure {
+            logger.error { "createQuotationAlarmTime fail: param[userId: $userId, request:$request]" }
+        }.getOrThrow()
+    }
+
+    override fun getQuotationAlarmTime(userId: String): List<Timestamp> {
+        return runCatching {
+            val user = getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
+            user.quotationAlarmTimes
+        }.onFailure {
+            logger.error { "getQuotationAlarmTime fail: param[userId: $userId]" }
         }.getOrThrow()
     }
 }
