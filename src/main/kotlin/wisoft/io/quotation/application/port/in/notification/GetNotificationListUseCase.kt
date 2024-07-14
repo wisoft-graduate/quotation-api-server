@@ -6,10 +6,6 @@ interface GetNotificationListUseCase {
     fun getNotificationList(userId: String): List<Notification>
 
     data class GetNotificationListResponse(
-        val data: Data,
-    )
-
-    data class Data(
-        val notificationList: List<Notification>,
+        val data: List<Notification>,
     )
 }

@@ -40,7 +40,7 @@ class CommentController(
             .status(HttpStatus.OK)
             .body(
                 GetCommentListUseCase.GetCommentListResponse(
-                    GetCommentListUseCase.Data(result),
+                    data = result,
                 ),
             )
     }

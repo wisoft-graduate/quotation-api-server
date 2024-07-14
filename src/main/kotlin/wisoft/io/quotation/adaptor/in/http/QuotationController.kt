@@ -59,8 +59,9 @@ class QuotationController(
                     ids = ids,
                 ),
             )
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(GetQuotationListUseCase.GetQuotationListResponse(data = GetQuotationListUseCase.Data(quotationList = response)))
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(GetQuotationListUseCase.GetQuotationListResponse(data = response))
     }
 
     @GetMapping("/{id}")

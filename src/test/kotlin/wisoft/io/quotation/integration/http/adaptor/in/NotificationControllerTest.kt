@@ -76,7 +76,7 @@ class NotificationControllerTest(
                     objectMapper.readValue(
                         result,
                         GetNotificationListUseCase.GetNotificationListResponse::class.java,
-                    ).data.notificationList.first()
+                    ).data.first()
 
                 // then
                 actual.commenterId shouldBe user.id

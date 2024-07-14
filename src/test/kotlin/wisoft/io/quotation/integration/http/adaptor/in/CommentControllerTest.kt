@@ -263,7 +263,7 @@ class CommentControllerTest(
                     objectMapper.readValue(
                         result,
                         GetCommentListUseCase.GetCommentListResponse::class.java,
-                    ).data.commentList.first()
+                    ).data.first()
 
                 // then
                 actual.id shouldBe comment.id
@@ -294,7 +294,7 @@ class CommentControllerTest(
                     objectMapper.readValue(
                         result,
                         GetCommentListUseCase.GetCommentListResponse::class.java,
-                    ).data.commentList.first()
+                    ).data.first()
 
                 // then
                 actual.id shouldBe comment.id
@@ -325,7 +325,7 @@ class CommentControllerTest(
                     objectMapper.readValue(
                         result,
                         GetCommentListUseCase.GetCommentListResponse::class.java,
-                    ).data.commentList.first()
+                    ).data.first()
 
                 // then
                 actual.id shouldBe childComment.id

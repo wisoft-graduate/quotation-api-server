@@ -132,7 +132,7 @@ class BookmarkControllerTest(
                     objectMapper.readValue(
                         result,
                         GetBookmarkListUseCase.GetBookmarkListResponse::class.java,
-                    ).data.bookmarks.first()
+                    ).data.first()
 
                 actual.id shouldBe bookmark.id
                 actual.name shouldBe bookmark.name

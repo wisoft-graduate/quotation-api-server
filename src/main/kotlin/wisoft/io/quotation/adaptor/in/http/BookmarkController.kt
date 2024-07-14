@@ -49,9 +49,7 @@ class BookmarkController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(
-                GetBookmarkListUseCase.GetBookmarkListResponse(
-                    GetBookmarkListUseCase.Data(bookmarks = result),
-                ),
+                GetBookmarkListUseCase.GetBookmarkListResponse(data = result),
             )
     }
 
