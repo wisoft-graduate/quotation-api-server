@@ -64,13 +64,10 @@ class CommentService(
                     ),
                 )
 
-            request.commentedUserId?.let {
-                createNotificationPort.createNotification(
-                    Notification.createNotification(request.userId, it, commentId),
-                )
-            }
-
             tagUser?.let {
+                createNotificationPort.createNotification(
+                    Notification.createNotification(request.userId, tagUser.id, commentId),
+                )
                 pushTagNotificationPort.sendTagPushNotification(
                     sendUser = sendUser.nickname,
                     tagUser = it.nickname,
