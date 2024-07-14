@@ -1,11 +1,14 @@
 package wisoft.io.quotation.util
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 
 data class YmlConfig(
     @JsonProperty("server") val server: ServerConfig,
     @JsonProperty("spring") val spring: SpringConfig,
     @JsonProperty("environment") val environment: EnvironmentConfig,
+    @JsonProperty("one-signal") val oneSignal: OneSignalConfig,
 ) {
     data class ServerConfig(
         @JsonProperty("port") val port: Long,
@@ -76,5 +79,19 @@ data class YmlConfig(
             @JsonProperty("password-refresh-token-expiration-time")
             val passwordRefreshTokenExpirationTime: Long,
         )
+    }
+
+    data class OneSignalConfig(
+        @JsonProperty("api-key") val apiKey: String,
+        @JsonProperty("app-id") val appId: String,
+    )
+
+    companion object {
+        fun readYmlFile(): YmlConfig {
+            val objectMapper = ObjectMapper(YAMLFactory())
+            val file = object {}.javaClass.getResource("/application.yaml")
+
+            return objectMapper.readValue(file, YmlConfig::class.java)
+        }
     }
 }

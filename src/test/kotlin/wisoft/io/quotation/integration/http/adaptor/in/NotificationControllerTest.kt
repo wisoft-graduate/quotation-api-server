@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
@@ -18,6 +19,7 @@ import wisoft.io.quotation.adaptor.out.persistence.repository.*
 import wisoft.io.quotation.application.port.`in`.comment.CreateCommentUseCase
 import wisoft.io.quotation.application.port.`in`.notification.GetNotificationListUseCase
 import wisoft.io.quotation.application.port.`in`.notification.UpdateNotificationUseCase
+import wisoft.io.quotation.application.port.out.push.PushTagNotificationPort
 import wisoft.io.quotation.application.service.CommentService
 import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getNotificationEntityFixture
@@ -151,4 +153,7 @@ class NotificationControllerTest(
                     .andExpect(MockMvcResultMatchers.status().isNotFound)
             }
         }
-    })
+    }) {
+    @MockBean
+    lateinit var pushTagNotificationPort: PushTagNotificationPort
+}

@@ -40,3 +40,7 @@ environment:
     refresh-token-expiration-time: 2592000000
     # 토큰 만료 시간 (5분)
     password-refresh-token-expiration-time: 300000
+
+one-signal:
+  api-key: ${ONESIGNAL_API_KEY}
+  app-id: ${ONESIGNAL_APP_ID}
