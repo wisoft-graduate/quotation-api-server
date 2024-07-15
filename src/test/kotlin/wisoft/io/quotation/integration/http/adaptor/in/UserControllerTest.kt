@@ -20,7 +20,10 @@ import wisoft.io.quotation.application.port.`in`.user.*
 import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
+import wisoft.io.quotation.fixture.entity.getUserEntityFixtureIncludeQuotationAlarmTimes
 import wisoft.io.quotation.util.JWTUtil
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @SpringBootTest
 @ContextConfiguration(classes = [DatabaseContainerConfig::class])
@@ -557,7 +560,6 @@ class UserControllerTest(
                 val expectedStatus = HttpMessage.HTTP_403.status
                 val expectedPath = "/users/${existUser.id}/reset-password"
                 val accessToken = JWTUtil.generateAccessToken(existUser)
-
                 val expectedPassword = "resetPassword"
                 val request =
                     ResetPasswordUserUseCase.ResetPasswordUserRequestBody(
@@ -579,6 +581,157 @@ class UserControllerTest(
 
                 // then
                 val actual = objectMapper.readValue(result, ErrorData::class.java).data
+                actual.status shouldBe expectedStatus.value()
+                actual.error shouldBe expectedStatus.reasonPhrase
+                actual.path shouldBe expectedPath
+            }
+        }
+
+        context("createQuotationAlarmTimes Test") {
+            test("createQuotationAlarmTimes 성공 ") {
+                // given
+                val existUser = repository.save(getUserEntityFixture())
+                val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
+                val request =
+                    CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeRequest(
+                        quotationAlarmTime = Timestamp.valueOf(LocalDateTime.now()),
+                    )
+
+                // when
+                val validateUserRequestJson = objectMapper.writeValueAsString(request)
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.post("/users/${existUser.id}/quotation-alarm-time")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer $accessToken")
+                            .content(validateUserRequestJson),
+                    ).andExpect(MockMvcResultMatchers.status().isCreated)
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual =
+                    objectMapper.readValue(
+                        result,
+                        CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeResponse::class.java,
+                    )
+                actual.data.id shouldBe existUser.id
+            }
+            test("createQuotationAlarmTimes 실패 - 중복된 Alarm 설정 ") {
+                // given
+                val existUser = repository.save(getUserEntityFixtureIncludeQuotationAlarmTimes())
+                val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
+                val expectedStatus = HttpMessage.HTTP_400.status
+                val expectedPath = "/users/${existUser.id}/quotation-alarm-time"
+                val request =
+                    CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeRequest(
+                        quotationAlarmTime = Timestamp.valueOf(LocalDateTime.now()),
+                    )
+
+                // when
+                val validateUserRequestJson = objectMapper.writeValueAsString(request)
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.post("/users/${existUser.id}/quotation-alarm-time")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer $accessToken")
+                            .content(validateUserRequestJson),
+                    ).andExpect(MockMvcResultMatchers.status().isBadRequest)
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(result, ErrorData::class.java).data
+
+                actual.status shouldBe expectedStatus.value()
+                actual.error shouldBe expectedStatus.reasonPhrase
+                actual.path shouldBe expectedPath
+            }
+        }
+
+        context("getQuotationAlarmTimes Test") {
+            test("getQuotationAlarmTimes 성공 ") {
+                // given
+                val existUser = repository.save(getUserEntityFixtureIncludeQuotationAlarmTimes())
+                val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
+
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.get("/users/${existUser.id}/quotation-alarm-time")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer $accessToken"),
+                    ).andExpect(MockMvcResultMatchers.status().isOk)
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual =
+                    objectMapper.readValue(result, GetQuotationAlarmTimeUseCase.GetQuotationAlarmTimeResponse::class.java)
+                actual.data.quotationAlarmTimes.first() shouldBe existUser.quotationAlarmTimes.first()
+            }
+        }
+
+        context("deleteQuotationAlarmTimes Test") {
+            test("deleteQuotationAlarmTimes 성공 ") {
+                // given
+                val existUser = repository.save(getUserEntityFixtureIncludeQuotationAlarmTimes())
+                val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
+
+                val request =
+                    PatchQuotationAlarmTimeUseCase.PatchQuotationAlarmTimeRequest(
+                        quotationAlarmTime = existUser.quotationAlarmTimes.first(),
+                    )
+                val validateUserRequestJson = objectMapper.writeValueAsString(request)
+
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/users/${existUser.id}/quotation-alarm-time")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer $accessToken")
+                            .content(validateUserRequestJson),
+                    ).andExpect(MockMvcResultMatchers.status().isCreated)
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual =
+                    objectMapper.readValue(
+                        result,
+                        PatchQuotationAlarmTimeUseCase.PatchQuotationAlarmTimeResponse::class.java,
+                    )
+                actual.data.id shouldBe existUser.id
+            }
+            test("deleteQuotationAlarmTimes 실패 - 존재하지 않는 시간 삭제 ") {
+                // given
+                val existUser = repository.save(getUserEntityFixtureIncludeQuotationAlarmTimes())
+                val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
+                val expectedStatus = HttpMessage.HTTP_404.status
+                val expectedPath = "/users/${existUser.id}/quotation-alarm-time"
+                val existTime = existUser.quotationAlarmTimes.first()
+                val updatedTime = Timestamp.valueOf(existTime.toLocalDateTime().plusHours(1))
+
+                val request =
+                    PatchQuotationAlarmTimeUseCase.PatchQuotationAlarmTimeRequest(
+                        quotationAlarmTime = updatedTime,
+                    )
+                val validateUserRequestJson = objectMapper.writeValueAsString(request)
+
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/users/${existUser.id}/quotation-alarm-time")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer $accessToken")
+                            .content(validateUserRequestJson),
+                    ).andExpect(MockMvcResultMatchers.status().isNotFound)
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(result, ErrorData::class.java).data
+
                 actual.status shouldBe expectedStatus.value()
                 actual.error shouldBe expectedStatus.reasonPhrase
                 actual.path shouldBe expectedPath

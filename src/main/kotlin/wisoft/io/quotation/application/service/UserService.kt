@@ -8,11 +8,7 @@ import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.application.port.out.bookmark.GetBookmarkListPort
 import wisoft.io.quotation.application.port.out.user.*
 import wisoft.io.quotation.domain.User
-import wisoft.io.quotation.exception.error.InvalidRequestParameterException
-import wisoft.io.quotation.exception.error.InvalidUserException
-import wisoft.io.quotation.exception.error.UserDuplicateException
-import wisoft.io.quotation.exception.error.UserNotFoundException
-import wisoft.io.quotation.exception.error.http.BadRequestException
+import wisoft.io.quotation.exception.error.*
 import wisoft.io.quotation.util.JWTUtil
 import wisoft.io.quotation.util.SaltUtil
 import java.sql.Timestamp
@@ -235,7 +231,7 @@ class UserService(
                 }
 
             if (existingTime != null) {
-                throw BadRequestException("Time Duplication Exception")
+                throw QuotationAlarmTimeDuplicateException("timestamp: ${request.quotationAlarmTime}")
             } else {
                 updatedTimes.add(request.quotationAlarmTime)
             }
@@ -270,7 +266,7 @@ class UserService(
             if (existingTime != null) {
                 updatedTimes.remove(existingTime)
             } else {
-                throw BadRequestException("Time Not Found Exception")
+                throw QuotationAlarmTimeNotFoundException("timestamp: ${request.quotationAlarmTime}")
             }
 
             // 사용자 정보 업데이트

@@ -20,3 +20,20 @@ fun getUserEntityFixture(
         createdTime = Timestamp.valueOf(LocalDateTime.now()),
     )
 }
+
+fun getUserEntityFixtureIncludeQuotationAlarmTimes(
+    id: String? = null,
+    nickname: String? = null,
+): UserEntity {
+    return UserEntity(
+        id = id ?: "testUser",
+        nickname = nickname ?: "testNickname",
+        password = BCrypt.hashpw("password", BCrypt.gensalt()),
+        identityVerificationQuestion = "question",
+        identityVerificationAnswer = "answer",
+        commentAlarm = false,
+        quotationAlarm = true,
+        createdTime = Timestamp.valueOf(LocalDateTime.now()),
+        quotationAlarmTimes = listOf(Timestamp.valueOf(LocalDateTime.now().withSecond(0).withNano(0))),
+    )
+}
