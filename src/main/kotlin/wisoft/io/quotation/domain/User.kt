@@ -69,4 +69,10 @@ data class User(
             identityVerificationAnswer = dto.identityVerificationAnswer ?: this.identityVerificationAnswer,
         )
     }
+
+    fun updateQuotationAlarmTimes(updatedQuotationAlarmTimes: List<Timestamp>): User {
+        return this.copy(
+            quotationAlarmTimes = updatedQuotationAlarmTimes,
+        )
+    }
 }

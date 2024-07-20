@@ -30,6 +30,9 @@ class UserController(
     val updateUserUseCase: UpdateUserUseCase,
     val validateUserUesCase: ValidateUserUesCase,
     val resetPasswordUserUseCase: ResetPasswordUserUseCase,
+    val createQuotationAlarmTimeUseCase: CreateQuotationAlarmTimeUseCase,
+    val getQuotationAlarmTimeUseCase: GetQuotationAlarmTimeUseCase,
+    val patchQuotationAlarmTimeUseCase: PatchQuotationAlarmTimeUseCase,
 ) {
     @PostMapping("/users")
     fun createUser(
@@ -180,5 +183,56 @@ class UserController(
     ): ResponseEntity<DeleteUserUseCase> {
         deleteUserUseCase.deleteUser(id)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+    }
+
+    @PostMapping("/users/{userId}/quotation-alarm-time")
+    @LoginAuthenticated
+    fun createQuotationAlarmTimes(
+        @PathVariable("userId") userId: String,
+        @RequestBody @Valid request: CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeRequest,
+    ): ResponseEntity<CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeResponse> {
+        val response = createQuotationAlarmTimeUseCase.createQuotationAlarmTime(userId, request)
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED).body(
+                CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeResponse(
+                    data = CreateQuotationAlarmTimeUseCase.Data(response),
+                ),
+            )
+    }
+
+    @GetMapping("/users/{userId}/quotation-alarm-time")
+    @LoginAuthenticated
+    fun getQuotationAlarmTimes(
+        @PathVariable("userId") userId: String,
+    ): ResponseEntity<GetQuotationAlarmTimeUseCase.GetQuotationAlarmTimeResponse> {
+        val response = getQuotationAlarmTimeUseCase.getQuotationAlarmTime(userId)
+
+        return ResponseEntity
+            .status(HttpStatus.OK).body(
+                GetQuotationAlarmTimeUseCase.GetQuotationAlarmTimeResponse(
+                    data =
+                        GetQuotationAlarmTimeUseCase.Data(
+                            quotationAlarmTimes = response,
+                        ),
+                ),
+            )
+    }
+
+    // FIXME: Id를 이용한 삭제가 불가능해서, Body의 값에 따라서 처리하도록 변경
+    @PatchMapping("/users/{userId}/quotation-alarm-time")
+    @LoginAuthenticated
+    fun deleteQuotationAlarmTimes(
+        @PathVariable("userId") userId: String,
+        @RequestBody @Valid request: PatchQuotationAlarmTimeUseCase.PatchQuotationAlarmTimeRequest,
+    ): ResponseEntity<PatchQuotationAlarmTimeUseCase.PatchQuotationAlarmTimeResponse> {
+        val response = patchQuotationAlarmTimeUseCase.patchQuotationAlarmTime(userId, request)
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED).body(
+                PatchQuotationAlarmTimeUseCase.PatchQuotationAlarmTimeResponse(
+                    data = PatchQuotationAlarmTimeUseCase.Data(response),
+                ),
+            )
     }
 }
