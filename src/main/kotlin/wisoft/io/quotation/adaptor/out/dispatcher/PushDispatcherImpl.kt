@@ -72,7 +72,7 @@ class PushDispatcherImpl(
             val bodyMap =
                 mapOf(
                     "app_id" to appId,
-                    "headings" to mapOf("en" to "Comment Push"),
+                    "headings" to mapOf("en" to "명언 Alarm Push"),
                     "contents" to mapOf("en" to message),
                     "target_channel" to "push",
                     "include_aliases" to mapOf("external_id" to listOf(userId)),
