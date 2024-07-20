@@ -23,7 +23,7 @@ import wisoft.io.quotation.fixture.entity.getUserEntityFixture
 import wisoft.io.quotation.fixture.entity.getUserEntityFixtureIncludeQuotationAlarmTimes
 import wisoft.io.quotation.util.JWTUtil
 import java.sql.Timestamp
-import java.time.LocalDateTime
+import java.time.LocalTime
 
 @SpringBootTest
 @ContextConfiguration(classes = [DatabaseContainerConfig::class])
@@ -592,9 +592,11 @@ class UserControllerTest(
                 // given
                 val existUser = repository.save(getUserEntityFixture())
                 val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
+                val localTime = LocalTime.now()
                 val request =
                     CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeRequest(
-                        quotationAlarmTime = Timestamp.valueOf(LocalDateTime.now()),
+                        quotationAlarmHour = localTime.hour,
+                        quotationAlarmMinute = localTime.minute,
                     )
 
                 // when
@@ -623,9 +625,13 @@ class UserControllerTest(
                 val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
                 val expectedStatus = HttpMessage.HTTP_400.status
                 val expectedPath = "/users/${existUser.id}/quotation-alarm-time"
+                val localDateTime = existUser.quotationAlarmTimes.first().toLocalDateTime()
+                val localTime = localDateTime.toLocalTime()
+
                 val request =
                     CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeRequest(
-                        quotationAlarmTime = Timestamp.valueOf(LocalDateTime.now()),
+                        quotationAlarmHour = localTime.hour,
+                        quotationAlarmMinute = localTime.minute,
                     )
 
                 // when
@@ -678,9 +684,13 @@ class UserControllerTest(
                 val existUser = repository.save(getUserEntityFixtureIncludeQuotationAlarmTimes())
                 val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
 
+                val timestamp = existUser.quotationAlarmTimes.first()
+                val requestLocalTime = timestamp.toLocalDateTime().toLocalTime()
+
                 val request =
                     PatchQuotationAlarmTimeUseCase.PatchQuotationAlarmTimeRequest(
-                        quotationAlarmTime = existUser.quotationAlarmTimes.first(),
+                        quotationAlarmHour = requestLocalTime.hour,
+                        quotationAlarmMinute = requestLocalTime.minute,
                     )
                 val validateUserRequestJson = objectMapper.writeValueAsString(request)
 
@@ -711,10 +721,12 @@ class UserControllerTest(
                 val expectedPath = "/users/${existUser.id}/quotation-alarm-time"
                 val existTime = existUser.quotationAlarmTimes.first()
                 val updatedTime = Timestamp.valueOf(existTime.toLocalDateTime().plusHours(1))
+                val requestLocalTime = updatedTime.toLocalDateTime().toLocalTime()
 
                 val request =
                     PatchQuotationAlarmTimeUseCase.PatchQuotationAlarmTimeRequest(
-                        quotationAlarmTime = updatedTime,
+                        quotationAlarmHour = requestLocalTime.hour,
+                        quotationAlarmMinute = requestLocalTime.minute,
                     )
                 val validateUserRequestJson = objectMapper.writeValueAsString(request)
 

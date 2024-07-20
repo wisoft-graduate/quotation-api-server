@@ -1,7 +1,5 @@
 package wisoft.io.quotation.application.port.`in`.user
 
-import java.sql.Timestamp
-
 interface CreateQuotationAlarmTimeUseCase {
     fun createQuotationAlarmTime(
         userId: String,
@@ -9,7 +7,8 @@ interface CreateQuotationAlarmTimeUseCase {
     ): String
 
     data class CreateQuotationAlarmTimeRequest(
-        val quotationAlarmTime: Timestamp,
+        val quotationAlarmHour: Int,
+        val quotationAlarmMinute: Int,
     )
 
     data class CreateQuotationAlarmTimeResponse(

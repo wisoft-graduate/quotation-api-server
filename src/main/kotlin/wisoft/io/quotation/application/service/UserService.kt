@@ -13,6 +13,9 @@ import wisoft.io.quotation.util.JWTUtil
 import wisoft.io.quotation.util.SaltUtil
 import java.sql.Timestamp
 import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Service
 @Transactional(readOnly = true)
@@ -221,7 +224,8 @@ class UserService(
         return runCatching {
             val user = getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
 
-            val newAlarmTime = request.quotationAlarmTime.toLocalDateTime()
+            val localTime = LocalTime.of(request.quotationAlarmHour, request.quotationAlarmMinute)
+            val newAlarmTime = LocalDateTime.of(LocalDate.now(), localTime)
             val updatedTimes = user.quotationAlarmTimes.toMutableList()
 
             val existingTime =
@@ -231,9 +235,9 @@ class UserService(
                 }
 
             if (existingTime != null) {
-                throw QuotationAlarmTimeDuplicateException("timestamp: ${request.quotationAlarmTime}")
+                throw QuotationAlarmTimeDuplicateException("hour: ${request.quotationAlarmHour}, minute: ${request.quotationAlarmMinute}")
             } else {
-                updatedTimes.add(request.quotationAlarmTime)
+                updatedTimes.add(Timestamp.valueOf(newAlarmTime))
             }
 
             // 사용자 정보 업데이트
@@ -254,7 +258,8 @@ class UserService(
         return runCatching {
             val user = getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
 
-            val newAlarmTime = request.quotationAlarmTime.toLocalDateTime()
+            val localTime = LocalTime.of(request.quotationAlarmHour, request.quotationAlarmMinute)
+            val newAlarmTime = LocalDateTime.of(LocalDate.now(), localTime)
             val updatedTimes = user.quotationAlarmTimes.toMutableList()
 
             val existingTime =
@@ -266,7 +271,7 @@ class UserService(
             if (existingTime != null) {
                 updatedTimes.remove(existingTime)
             } else {
-                throw QuotationAlarmTimeNotFoundException("timestamp: ${request.quotationAlarmTime}")
+                throw QuotationAlarmTimeNotFoundException("hour: ${request.quotationAlarmHour}, minute: ${request.quotationAlarmMinute}")
             }
 
             // 사용자 정보 업데이트
