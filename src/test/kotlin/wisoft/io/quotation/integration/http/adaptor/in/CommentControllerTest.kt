@@ -20,6 +20,7 @@ import wisoft.io.quotation.adaptor.out.persistence.repository.*
 import wisoft.io.quotation.application.port.`in`.comment.CreateCommentUseCase
 import wisoft.io.quotation.application.port.`in`.comment.GetCommentListUseCase
 import wisoft.io.quotation.application.port.`in`.comment.UpdateCommentUseCase
+import wisoft.io.quotation.application.port.out.push.PushAlarmNotificationPort
 import wisoft.io.quotation.application.port.out.push.PushTagNotificationPort
 import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getCommentEntityFixture
@@ -340,4 +341,7 @@ class CommentControllerTest(
     }) {
     @MockBean
     lateinit var pushTagNotificationPort: PushTagNotificationPort
+
+    @MockBean
+    lateinit var pushAlarmNotificationPort: PushAlarmNotificationPort
 }
