@@ -57,7 +57,7 @@ class UserAdaptor(
     }
 
     override fun getActiveUserList(): List<User> {
-        val userList = userRepository.findAllByNicknameNotContains("leaved#")
+        val userList = userRepository.findAllByNicknameNotContainsAndQuotationAlarmIsTrue("leaved#")
         return userList.map { userMapper.toDomain(it) }
     }
 }

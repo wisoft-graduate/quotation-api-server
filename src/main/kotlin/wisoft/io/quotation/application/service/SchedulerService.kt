@@ -19,35 +19,27 @@ class SchedulerService(
 
     // 매일 자정을 기준으로, 당일의 Push Notification을 제공함
     @Scheduled(cron = "0 0 0 * * ?")
-    override fun pushQuotationAlarm() {
+    override fun pushQuotationAlarm(): Int {
         return runCatching {
             val userList = getActiveUserListPort.getActiveUserList()
 
+            var count = 0
             userList.forEach { user ->
                 user.quotationAlarmTimes.forEach {
                     val localDateTime = it.toLocalDateTime()
                     val localTime = localDateTime.toLocalTime()
                     val todayAlarmTime = LocalDateTime.of(LocalDate.now(), localTime)
 
-                    logger.info {
-                        println(
-                            "userId: ${user.id}, userNickname: ${user.nickname}, pushTime: ${
-                                Timestamp.valueOf(
-                                    todayAlarmTime,
-                                )
-                            }",
-                        )
-                    }
-
-                    val status =
-                        pushAlarmNotificationPort.sendAlarmPushNotification(
-                            userId = user.id,
-                            userNickname = user.nickname,
-                            pushTime = Timestamp.valueOf(todayAlarmTime),
-                        )
-                    println("status: $status")
+                    pushAlarmNotificationPort.sendAlarmPushNotification(
+                        userId = user.id,
+                        userNickname = user.nickname,
+                        pushTime = Timestamp.valueOf(todayAlarmTime),
+                    )
+                    count++
                 }
             }
+
+            count
         }.onFailure {
             logger.error { "pushQuotationAlarm fail" }
         }.getOrThrow()
