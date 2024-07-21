@@ -8,9 +8,7 @@ import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationCustomRep
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
-import wisoft.io.quotation.application.port.out.quotation.GetQuotationListPort
-import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
-import wisoft.io.quotation.application.port.out.quotation.UpdateQuotationPort
+import wisoft.io.quotation.application.port.out.quotation.*
 import wisoft.io.quotation.domain.Quotation
 import java.util.*
 
@@ -21,7 +19,8 @@ class QuotationAdaptor(
     val quotationEntityMapper: QuotationMapper,
 ) : GetQuotationListPort,
     GetQuotationPort,
-    UpdateQuotationPort {
+    UpdateQuotationPort,
+    ShareQuotationPort {
     override fun getQuotation(id: UUID): Quotation? {
         return quotationRepository.findByIdOrNull(id)?.let {
             quotationEntityMapper.toDomain(entity = it)
@@ -51,5 +50,9 @@ class QuotationAdaptor(
 
     override fun decrementLikeCount(id: UUID) {
         return quotationRepository.decrementLikeCount(id)
+    }
+
+    override fun shareQuotation(id: UUID) {
+        return quotationRepository.incrementShareCount(id)
     }
 }

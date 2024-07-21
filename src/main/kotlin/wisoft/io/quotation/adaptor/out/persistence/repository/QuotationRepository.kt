@@ -24,4 +24,8 @@ interface QuotationRepository : JpaRepository<QuotationEntity, UUID> {
     @Modifying
     @Query(value = "UPDATE QuotationEntity q SET q.likeCount = q.likeCount - 1 WHERE q.id = :id")
     fun decrementLikeCount(id: UUID)
+
+    @Modifying
+    @Query(value = "UPDATE QuotationEntity q SET q.shareCount = q.shareCount + 1 WHERE q.id = :id")
+    fun incrementShareCount(id: UUID)
 }
