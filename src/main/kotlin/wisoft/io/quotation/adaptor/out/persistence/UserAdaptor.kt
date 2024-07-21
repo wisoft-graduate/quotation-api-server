@@ -14,7 +14,7 @@ class UserAdaptor(
     val userRepository: UserRepository,
     val userCustomRepository: UserCustomRepository,
     val userMapper: UserMapper,
-) : GetUserPort, CreateUserPort, UpdateUserPort, DeleteUserPort, GetUserListPort {
+) : GetUserPort, CreateUserPort, UpdateUserPort, DeleteUserPort, GetUserListPort, GetActiveUserListPort {
     override fun create(user: User): String {
         return userRepository.save(userMapper.toEntity(user)).id
     }
@@ -54,5 +54,10 @@ class UserAdaptor(
                 answer,
             )
         return userEntity?.let { userMapper.toDomain(it) }
+    }
+
+    override fun getActiveUserList(): List<User> {
+        val userList = userRepository.findAllByNicknameNotContainsAndQuotationAlarmIsTrue("leaved#")
+        return userList.map { userMapper.toDomain(it) }
     }
 }

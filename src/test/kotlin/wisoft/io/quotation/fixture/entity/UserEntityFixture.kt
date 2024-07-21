@@ -24,6 +24,7 @@ fun getUserEntityFixture(
 fun getUserEntityFixtureIncludeQuotationAlarmTimes(
     id: String? = null,
     nickname: String? = null,
+    quotationAlarm: Boolean = true,
 ): UserEntity {
     return UserEntity(
         id = id ?: "testUser",
@@ -32,7 +33,7 @@ fun getUserEntityFixtureIncludeQuotationAlarmTimes(
         identityVerificationQuestion = "question",
         identityVerificationAnswer = "answer",
         commentAlarm = false,
-        quotationAlarm = true,
+        quotationAlarm = quotationAlarm,
         createdTime = Timestamp.valueOf(LocalDateTime.now()),
         quotationAlarmTimes = listOf(Timestamp.valueOf(LocalDateTime.now().withSecond(0).withNano(0))),
     )
