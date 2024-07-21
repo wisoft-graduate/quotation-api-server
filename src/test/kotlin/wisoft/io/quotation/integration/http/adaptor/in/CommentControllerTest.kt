@@ -54,7 +54,8 @@ class CommentControllerTest(
             test("deleteComment 성공") {
                 // given
                 val user = userRepository.save(getUserEntityFixture())
-                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
                 val comment = commentRepository.save(getCommentEntityFixture(quotation.id, user.id))
 
                 // when, then
@@ -166,6 +167,7 @@ class CommentControllerTest(
                         .andReturn()
                         .response.contentAsString
                 val comment = objectMapper.readValue(result, CreateCommentUseCase.CreateCommentResponse::class.java)
+                val updatedQuotation = quotationRepository.findById(quotation.id).get()
 
                 // then
                 val actual = commentRepository.findById(comment.data.id).get()
@@ -173,6 +175,7 @@ class CommentControllerTest(
                 actual.userId shouldBe request.userId
                 actual.content shouldBe request.content
                 actual.commentedUserId shouldBe request.commentedUserId
+                updatedQuotation.commentCount shouldBe 1
             }
 
             test("createComment 실패 - 등록되지 않은 사용자") {

@@ -10,6 +10,7 @@ import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCa
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationListPort
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
+import wisoft.io.quotation.application.port.out.quotation.UpdateQuotationPort
 import wisoft.io.quotation.domain.Quotation
 import java.util.*
 
@@ -19,7 +20,8 @@ class QuotationAdaptor(
     val quotationCustomRepository: QuotationCustomRepository,
     val quotationEntityMapper: QuotationMapper,
 ) : GetQuotationListPort,
-    GetQuotationPort {
+    GetQuotationPort,
+    UpdateQuotationPort {
     override fun getQuotation(id: UUID): Quotation? {
         return quotationRepository.findByIdOrNull(id)?.let {
             quotationEntityMapper.toDomain(entity = it)
@@ -33,5 +35,13 @@ class QuotationAdaptor(
 
     override fun getQuotationLank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
         return quotationCustomRepository.findQuotationRank(request)
+    }
+
+    override fun incrementComment(id: UUID) {
+        return quotationRepository.incrementCommentCount(id)
+    }
+
+    override fun decrementComment(id: UUID) {
+        return quotationRepository.decrementCommentCount(id)
     }
 }

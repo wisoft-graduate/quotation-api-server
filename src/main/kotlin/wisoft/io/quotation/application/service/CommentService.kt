@@ -11,6 +11,7 @@ import wisoft.io.quotation.application.port.out.comment.*
 import wisoft.io.quotation.application.port.out.notification.CreateNotificationPort
 import wisoft.io.quotation.application.port.out.push.PushTagNotificationPort
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
+import wisoft.io.quotation.application.port.out.quotation.UpdateQuotationPort
 import wisoft.io.quotation.application.port.out.user.GetUserPort
 import wisoft.io.quotation.domain.Comment
 import wisoft.io.quotation.domain.Notification
@@ -30,6 +31,7 @@ class CommentService(
     val deleteCommentPort: DeleteCommentPort,
     val createNotificationPort: CreateNotificationPort,
     val pushTagNotificationPort: PushTagNotificationPort,
+    val updateQuotationPort: UpdateQuotationPort,
 ) : CreateCommentUseCase,
     GetCommentListUseCase,
     UpdateCommentUseCase,
@@ -54,7 +56,8 @@ class CommentService(
                         ?: throw UserNotFoundException(it)
                 }
 
-            // Create Comment
+            updateQuotationPort.incrementComment(request.quotationId)
+
             val commentId =
                 createCommentPort.createComment(
                     Comment(
@@ -123,7 +126,8 @@ class CommentService(
     @Transactional
     override fun deleteComment(id: UUID) {
         return runCatching {
-            getCommentPort.getCommentById(id) ?: throw CommentNotFoundException(id.toString())
+            val comment = getCommentPort.getCommentById(id) ?: throw CommentNotFoundException(id.toString())
+            updateQuotationPort.decrementComment(comment.quotationId)
             deleteCommentPort.deleteComment(id)
         }.onFailure {
             logger.error { "deleteComment fail: param[id: $id]" }
