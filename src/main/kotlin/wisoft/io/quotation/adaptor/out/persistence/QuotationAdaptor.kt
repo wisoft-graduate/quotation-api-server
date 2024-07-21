@@ -1,6 +1,5 @@
 package wisoft.io.quotation.adaptor.out.persistence
 
-import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.entity.view.QuotationRankView
@@ -44,6 +43,7 @@ class QuotationAdaptor(
 
     override fun decrementComment(id: UUID) {
         return quotationRepository.decrementCommentCount(id)
+    }
 
     override fun incrementLikeCount(id: UUID) {
         return quotationRepository.incrementLikeCount(id)
