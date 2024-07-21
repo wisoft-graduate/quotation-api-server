@@ -56,11 +56,30 @@ class CommentControllerTest(
                 val user = userRepository.save(getUserEntityFixture())
                 val author = authorRepository.save(getAuthorEntityFixture())
                 val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
-                val comment = commentRepository.save(getCommentEntityFixture(quotation.id, user.id))
+                val request =
+                    CreateCommentUseCase.CreateCommentRequest(
+                        quotationId = quotation.id,
+                        userId = user.id,
+                        content = "content",
+                    )
+
+                val createCommentRequestJson = objectMapper.writeValueAsString(request)
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.post("/comments")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(createCommentRequestJson),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isCreated)
+                        .andReturn()
+                        .response.contentAsString
+                val comment = objectMapper.readValue(result, CreateCommentUseCase.CreateCommentResponse::class.java)
 
                 // when, then
-                mockMvc.perform(MockMvcRequestBuilders.delete("/comments/${comment.id}"))
+                quotationRepository.findById(quotation.id).get().commentCount shouldBe 1
+                mockMvc.perform(MockMvcRequestBuilders.delete("/comments/${comment.data.id}"))
                     .andExpect(MockMvcResultMatchers.status().isNoContent)
+                quotationRepository.findById(quotation.id).get().commentCount shouldBe 0
             }
 
             test("deleteComment 실패") {
