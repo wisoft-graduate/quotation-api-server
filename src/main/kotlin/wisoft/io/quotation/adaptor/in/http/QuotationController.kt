@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCase
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationUseCase
+import wisoft.io.quotation.application.port.`in`.quotation.ShareQuotationUseCase
+import wisoft.io.quotation.application.port.out.quotation.ShareQuotationPort
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.RankProperty
@@ -18,6 +20,7 @@ class QuotationController(
     val getQuotationsUseCase: GetQuotationListUseCase,
     val getQuotationUseCase: GetQuotationUseCase,
     val getQuotationLankUseCase: GetQuotationRankUseCase,
+    val shareQuotationUseCase: ShareQuotationUseCase,
 ) {
     @GetMapping("/rank")
     fun getQuotationRank(
@@ -71,5 +74,13 @@ class QuotationController(
         val response = getQuotationUseCase.getQuotation(id)
         return ResponseEntity.status(HttpStatus.OK)
             .body(GetQuotationUseCase.GetQuotationResponse(data = response))
+    }
+
+    @PostMapping("/{id}/share")
+    fun shareQuotation(@PathVariable("id") id: UUID): ResponseEntity<Unit> {
+        shareQuotationUseCase.shareQuotation(id)
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .build()
     }
 }
