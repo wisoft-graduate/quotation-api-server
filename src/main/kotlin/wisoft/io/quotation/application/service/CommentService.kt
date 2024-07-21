@@ -1,5 +1,6 @@
 package wisoft.io.quotation.application.service
 
+import jakarta.transaction.Transactional
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import wisoft.io.quotation.application.port.`in`.comment.CreateCommentUseCase
@@ -35,6 +36,7 @@ class CommentService(
     DeleteCommentUseCase {
     val logger = KotlinLogging.logger {}
 
+    @Transactional
     override fun createComment(request: CreateCommentUseCase.CreateCommentRequest): UUID {
         return runCatching {
             // Validation Check
@@ -94,6 +96,7 @@ class CommentService(
         }.getOrThrow()
     }
 
+    @Transactional
     override fun updateComment(
         id: UUID,
         request: UpdateCommentUseCase.UpdateCommentRequest,
@@ -117,6 +120,7 @@ class CommentService(
         }.getOrThrow()
     }
 
+    @Transactional
     override fun deleteComment(id: UUID) {
         return runCatching {
             getCommentPort.getCommentById(id) ?: throw CommentNotFoundException(id.toString())
