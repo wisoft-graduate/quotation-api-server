@@ -3,9 +3,9 @@ package wisoft.io.quotation.fixture.entity
 import wisoft.io.quotation.adaptor.out.persistence.entity.LikeEntity
 import java.util.*
 
-fun getLikeEntityFixture() =
+fun getLikeEntityFixture(quotationId: UUID? = null) =
     LikeEntity(
         id = UUID.randomUUID(),
         userId = "test",
-        quotationId = UUID.randomUUID(),
+        quotationId = quotationId ?: UUID.randomUUID(),
     )

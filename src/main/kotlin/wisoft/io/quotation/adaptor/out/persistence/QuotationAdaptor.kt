@@ -1,5 +1,6 @@
 package wisoft.io.quotation.adaptor.out.persistence
 
+import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.entity.view.QuotationRankView
@@ -10,6 +11,7 @@ import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCa
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationListPort
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
+import wisoft.io.quotation.application.port.out.quotation.UpdateQuotationPort
 import wisoft.io.quotation.domain.Quotation
 import java.util.*
 
@@ -19,7 +21,8 @@ class QuotationAdaptor(
     val quotationCustomRepository: QuotationCustomRepository,
     val quotationEntityMapper: QuotationMapper,
 ) : GetQuotationListPort,
-    GetQuotationPort {
+    GetQuotationPort,
+    UpdateQuotationPort {
     override fun getQuotation(id: UUID): Quotation? {
         return quotationRepository.findByIdOrNull(id)?.let {
             quotationEntityMapper.toDomain(entity = it)
@@ -33,5 +36,15 @@ class QuotationAdaptor(
 
     override fun getQuotationLank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
         return quotationCustomRepository.findQuotationRank(request)
+    }
+
+    @Transactional
+    override fun incrementLikeCount(id: UUID) {
+        return quotationRepository.incrementLikeCount(id)
+    }
+
+    @Transactional
+    override fun decrementLikeCount(id: UUID) {
+        return quotationRepository.decrementLikeCount(id)
     }
 }
