@@ -19,4 +19,6 @@ interface UserRepository : JpaRepository<UserEntity, String> {
         identityVerificationQuestion: String,
         identityVerificationAnswer: String,
     ): UserEntity?
+
+    fun findAllByNicknameNotContainsAndQuotationAlarmIsTrue(prefix: String): List<UserEntity>
 }

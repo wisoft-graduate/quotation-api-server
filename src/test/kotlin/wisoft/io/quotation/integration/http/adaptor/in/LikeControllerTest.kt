@@ -21,7 +21,6 @@ import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepositor
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.like.CreateLikeUseCase
 import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
-import wisoft.io.quotation.fixture.entity.getLikeEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
 import java.util.*
@@ -72,9 +71,11 @@ class LikeControllerTest(
 
                 // then
                 val actual = likeRepository.findById(likeId).get()
+                val updatedQuotation = quotationRepository.findById(quotation.id).get()
                 actual.id shouldBe likeId
                 actual.userId shouldBe request.userId
                 actual.quotationId shouldBe request.quotationId
+                updatedQuotation.likeCount shouldBe 1
             }
 
             test("createLike 실패 - UserNotFoundException") {
@@ -117,10 +118,30 @@ class LikeControllerTest(
         context("deleteLike Test") {
             test("deleteLike 성공") {
                 // given
-                val like = likeRepository.save(getLikeEntityFixture())
+                val user = userRepository.save(getUserEntityFixture())
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+
+                val request =
+                    CreateLikeUseCase.CreateLikeRequest(
+                        userId = user.id,
+                        quotationId = quotation.id,
+                    )
+
+                val like =
+                    mockMvc.post("/likes") {
+                        contentType = MediaType.APPLICATION_JSON
+                        content = objectMapper.writeValueAsString(request)
+                    }.andExpect {
+                        status { isCreated() }
+                    }.andReturn().response.contentAsString
+
+                val likeId = objectMapper.readValue(like, CreateLikeUseCase.CreateLikeResponse::class.java).data.id
 
                 // when, then
-                mockMvc.delete("/likes/${like.id}").andExpect { HttpStatus.NO_CONTENT }
+                quotationRepository.findById(quotation.id).get().likeCount shouldBe 1
+                mockMvc.delete("/likes/$likeId").andExpect { HttpStatus.NO_CONTENT }
+                quotationRepository.findById(quotation.id).get().likeCount shouldBe 0
             }
 
             test("deleteLike 실패") {
