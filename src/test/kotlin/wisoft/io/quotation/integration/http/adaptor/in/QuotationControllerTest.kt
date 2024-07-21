@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.servlet.MockHttpServletRequestDsl
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -41,154 +40,154 @@ class QuotationControllerTest(
     val authorRepository: AuthorRepository,
 ) : FunSpec({
 
-    val objectMapper = ObjectMapper().registerKotlinModule()
+        val objectMapper = ObjectMapper().registerKotlinModule()
 
-    afterEach {
-        authorRepository.deleteAll()
-        quotationRepository.deleteAll()
-    }
-
-    context("getQuotationRank Test") {
-        test("getQuotationRank 성공") {
-            // given
-            val author = authorRepository.save(getAuthorEntityFixture())
-            val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
-
-            // when
-            val result =
-                mockMvc.get("/quotations/rank") {
-                    apply { listOf(quotation.id).forEach { param("ids", it.toString()) } }
-                    param("rankProperty", RankProperty.LIKE.name)
-                    param("page", 1.toString())
-                    param("count", 100.toString())
-                }.andExpect { MockMvcResultMatchers.status().isOk }
-                    .andReturn()
-                    .response.contentAsString
-
-            // then
-            val actual =
-                objectMapper.readValue(
-                    result,
-                    GetQuotationRankUseCase.GetQuotationRankResponse::class.java,
-                ).data.quotationRanks.first()
-
-            println("actual: $actual")
-            actual.id shouldBe quotation.id
-            actual.rank shouldBe 1
-            actual.count shouldBe 0
-            actual.backgroundImagePath shouldBe quotation.backgroundImagePath
-        }
-    }
-
-    context("getQuotation Test") {
-        test("getQuotation 성공") {
-            // given
-            val author = authorRepository.save(getAuthorEntityFixture())
-            val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
-
-            // when
-            val result =
-                mockMvc.perform(
-                    MockMvcRequestBuilders.get("/quotations/${quotation.id}")
-                        .contentType(MediaType.APPLICATION_JSON),
-                )
-                    .andExpect(MockMvcResultMatchers.status().isOk)
-                    .andReturn()
-                    .response.contentAsString
-
-            // then
-            val actual = objectMapper.readValue(result, GetQuotationUseCase.GetQuotationResponse::class.java).data
-            actual.id shouldBe quotation.id
-            actual.author.id shouldBe author.id
-            actual.content shouldBe quotation.content
-            actual.likeCount shouldBe quotation.likeCount
-            actual.shareCount shouldBe quotation.shareCount
-            actual.commentCount shouldBe quotation.commentCount
-            actual.backgroundImagePath shouldBe quotation.backgroundImagePath
-            actual.author.name shouldBe author.name
+        afterEach {
+            authorRepository.deleteAll()
+            quotationRepository.deleteAll()
         }
 
-        test("getQuotation 실패") {
-            // given
-            val status = HttpMessage.HTTP_404.status
-            val id = UUID.randomUUID()
-            val path = "/quotations/$id"
+        context("getQuotationRank Test") {
+            test("getQuotationRank 성공") {
+                // given
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
 
-            // when
-            val result =
-                mockMvc.perform(
-                    MockMvcRequestBuilders.get(path),
-                )
-                    .andExpect(MockMvcResultMatchers.status().isNotFound)
-                    .andReturn()
-                    .response.contentAsString
+                // when
+                val result =
+                    mockMvc.get("/quotations/rank") {
+                        apply { listOf(quotation.id).forEach { param("ids", it.toString()) } }
+                        param("rankProperty", RankProperty.LIKE.name)
+                        param("page", 1.toString())
+                        param("count", 100.toString())
+                    }.andExpect { MockMvcResultMatchers.status().isOk }
+                        .andReturn()
+                        .response.contentAsString
 
-            // then
-            val actual = objectMapper.readValue(result, ErrorData::class.java).data
-            actual.status shouldBe status.value()
-            actual.error shouldBe status.reasonPhrase
-            actual.path shouldBe path
-            actual.message shouldBe id.toString() + HttpMessage.HTTP_404.message
+                // then
+                val actual =
+                    objectMapper.readValue(
+                        result,
+                        GetQuotationRankUseCase.GetQuotationRankResponse::class.java,
+                    ).data.quotationRanks.first()
+
+                println("actual: $actual")
+                actual.id shouldBe quotation.id
+                actual.rank shouldBe 1
+                actual.count shouldBe 0
+                actual.backgroundImagePath shouldBe quotation.backgroundImagePath
+            }
         }
-    }
 
-    context("getQuotationList Test") {
-        test("getQuotationList 성공") {
-            // given
-            val author = authorRepository.save(getAuthorEntityFixture())
-            val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
-            val request =
-                GetQuotationListUseCase.GetQuotationListRequest(
-                    searchWord = quotation.content,
-                    sortTarget = QuotationSortTarget.LIKE,
-                    sortDirection = SortDirection.ASC,
-                    paging = Paging(page = 1, count = 10),
-                    ids = listOf(quotation.id),
-                )
+        context("getQuotation Test") {
+            test("getQuotation 성공") {
+                // given
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
 
-            // when
-            val result =
-                mockMvc.get("/quotations") {
-                    param("searchWord", request.searchWord!!)
-                    param("sortTarget", request.sortTarget?.name!!)
-                    param("sortDirection", request.sortDirection?.name!!)
-                    param("page", request.paging?.page?.toString()!!)
-                    param("count", request.paging?.count?.toString()!!)
-                    request.ids?.forEach { id -> param("ids", id.toString()) }
-                    accept = MediaType.APPLICATION_JSON
-                }
-                    .andExpect { MockMvcResultMatchers.status().isOk }
-                    .andReturn()
-                    .response.contentAsString
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.get("/quotations/${quotation.id}")
+                            .contentType(MediaType.APPLICATION_JSON),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isOk)
+                        .andReturn()
+                        .response.contentAsString
 
-            // then
-            val actual =
-                objectMapper.readValue(
-                    result,
-                    GetQuotationListUseCase.GetQuotationListResponse::class.java,
-                ).data.first()
+                // then
+                val actual = objectMapper.readValue(result, GetQuotationUseCase.GetQuotationResponse::class.java).data
+                actual.id shouldBe quotation.id
+                actual.author.id shouldBe author.id
+                actual.content shouldBe quotation.content
+                actual.likeCount shouldBe quotation.likeCount
+                actual.shareCount shouldBe quotation.shareCount
+                actual.commentCount shouldBe quotation.commentCount
+                actual.backgroundImagePath shouldBe quotation.backgroundImagePath
+                actual.author.name shouldBe author.name
+            }
 
-            actual.id shouldBe quotation.id
-            actual.author.id shouldBe author.id
-            actual.content shouldBe quotation.content
-            actual.likeCount shouldBe quotation.likeCount
-            actual.shareCount shouldBe quotation.shareCount
-            actual.commentCount shouldBe quotation.commentCount
-            actual.backgroundImagePath shouldBe quotation.backgroundImagePath
-            actual.author.name shouldBe author.name
+            test("getQuotation 실패") {
+                // given
+                val status = HttpMessage.HTTP_404.status
+                val id = UUID.randomUUID()
+                val path = "/quotations/$id"
+
+                // when
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.get(path),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isNotFound)
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(result, ErrorData::class.java).data
+                actual.status shouldBe status.value()
+                actual.error shouldBe status.reasonPhrase
+                actual.path shouldBe path
+                actual.message shouldBe id.toString() + HttpMessage.HTTP_404.message
+            }
         }
-    }
 
-    context("shareQuotation Test") {
-        test("shareQuotation 성공") {
-            // given
-            val author = authorRepository.save(getAuthorEntityFixture())
-            val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+        context("getQuotationList Test") {
+            test("getQuotationList 성공") {
+                // given
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+                val request =
+                    GetQuotationListUseCase.GetQuotationListRequest(
+                        searchWord = quotation.content,
+                        sortTarget = QuotationSortTarget.LIKE,
+                        sortDirection = SortDirection.ASC,
+                        paging = Paging(page = 1, count = 10),
+                        ids = listOf(quotation.id),
+                    )
 
-            // when, then
-            mockMvc.post("/quotations/${quotation.id}/share")
-                .andExpect { MockMvcResultMatchers.status().isCreated }
-            quotationRepository.findById(quotation.id).get().shareCount shouldBe 1
+                // when
+                val result =
+                    mockMvc.get("/quotations") {
+                        param("searchWord", request.searchWord!!)
+                        param("sortTarget", request.sortTarget?.name!!)
+                        param("sortDirection", request.sortDirection?.name!!)
+                        param("page", request.paging?.page?.toString()!!)
+                        param("count", request.paging?.count?.toString()!!)
+                        request.ids?.forEach { id -> param("ids", id.toString()) }
+                        accept = MediaType.APPLICATION_JSON
+                    }
+                        .andExpect { MockMvcResultMatchers.status().isOk }
+                        .andReturn()
+                        .response.contentAsString
+
+                // then
+                val actual =
+                    objectMapper.readValue(
+                        result,
+                        GetQuotationListUseCase.GetQuotationListResponse::class.java,
+                    ).data.first()
+
+                actual.id shouldBe quotation.id
+                actual.author.id shouldBe author.id
+                actual.content shouldBe quotation.content
+                actual.likeCount shouldBe quotation.likeCount
+                actual.shareCount shouldBe quotation.shareCount
+                actual.commentCount shouldBe quotation.commentCount
+                actual.backgroundImagePath shouldBe quotation.backgroundImagePath
+                actual.author.name shouldBe author.name
+            }
         }
-    }
-})
+
+        context("shareQuotation Test") {
+            test("shareQuotation 성공") {
+                // given
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+
+                // when, then
+                mockMvc.post("/quotations/${quotation.id}/share")
+                    .andExpect { MockMvcResultMatchers.status().isCreated }
+                quotationRepository.findById(quotation.id).get().shareCount shouldBe 1
+            }
+        }
+    })
