@@ -7,7 +7,6 @@ import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCa
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationUseCase
 import wisoft.io.quotation.application.port.`in`.quotation.ShareQuotationUseCase
-import wisoft.io.quotation.application.port.out.quotation.ShareQuotationPort
 import wisoft.io.quotation.domain.Paging
 import wisoft.io.quotation.domain.QuotationSortTarget
 import wisoft.io.quotation.domain.RankProperty
@@ -77,7 +76,9 @@ class QuotationController(
     }
 
     @PostMapping("/{id}/share")
-    fun shareQuotation(@PathVariable("id") id: UUID): ResponseEntity<Unit> {
+    fun shareQuotation(
+        @PathVariable("id") id: UUID,
+    ): ResponseEntity<Unit> {
         shareQuotationUseCase.shareQuotation(id)
         return ResponseEntity
             .status(HttpStatus.CREATED)
