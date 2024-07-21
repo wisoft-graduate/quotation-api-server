@@ -1,5 +1,6 @@
 package wisoft.io.quotation.application.service
 
+import jakarta.transaction.Transactional
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import wisoft.io.quotation.application.port.`in`.like.CreateLikeUseCase
@@ -28,6 +29,7 @@ class LikeService(
     DeleteLikeUseCase {
     val logger = KotlinLogging.logger { }
 
+    @Transactional
     override fun createLike(request: CreateLikeUseCase.CreateLikeRequest): UUID {
         return runCatching {
             getUserPort.getUserById(request.userId) ?: throw UserNotFoundException(request.userId)
@@ -40,6 +42,7 @@ class LikeService(
         }.getOrThrow()
     }
 
+    @Transactional
     override fun deleteLike(id: UUID) {
         return runCatching {
             val like = getLikePort.getLikeById(id) ?: throw LikeNotFoundException(id.toString())
