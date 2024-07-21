@@ -55,12 +55,32 @@ class CommentControllerTest(
             test("deleteComment 성공") {
                 // given
                 val user = userRepository.save(getUserEntityFixture())
-                val quotation = quotationRepository.save(getQuotationEntityFixture(UUID.randomUUID()))
-                val comment = commentRepository.save(getCommentEntityFixture(quotation.id, user.id))
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+                val request =
+                    CreateCommentUseCase.CreateCommentRequest(
+                        quotationId = quotation.id,
+                        userId = user.id,
+                        content = "content",
+                    )
+
+                val createCommentRequestJson = objectMapper.writeValueAsString(request)
+                val result =
+                    mockMvc.perform(
+                        MockMvcRequestBuilders.post("/comments")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(createCommentRequestJson),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isCreated)
+                        .andReturn()
+                        .response.contentAsString
+                val comment = objectMapper.readValue(result, CreateCommentUseCase.CreateCommentResponse::class.java)
 
                 // when, then
-                mockMvc.perform(MockMvcRequestBuilders.delete("/comments/${comment.id}"))
+                quotationRepository.findById(quotation.id).get().commentCount shouldBe 1
+                mockMvc.perform(MockMvcRequestBuilders.delete("/comments/${comment.data.id}"))
                     .andExpect(MockMvcResultMatchers.status().isNoContent)
+                quotationRepository.findById(quotation.id).get().commentCount shouldBe 0
             }
 
             test("deleteComment 실패") {
@@ -167,6 +187,7 @@ class CommentControllerTest(
                         .andReturn()
                         .response.contentAsString
                 val comment = objectMapper.readValue(result, CreateCommentUseCase.CreateCommentResponse::class.java)
+                val updatedQuotation = quotationRepository.findById(quotation.id).get()
 
                 // then
                 val actual = commentRepository.findById(comment.data.id).get()
@@ -174,6 +195,7 @@ class CommentControllerTest(
                 actual.userId shouldBe request.userId
                 actual.content shouldBe request.content
                 actual.commentedUserId shouldBe request.commentedUserId
+                updatedQuotation.commentCount shouldBe 1
             }
 
             test("createComment 실패 - 등록되지 않은 사용자") {
