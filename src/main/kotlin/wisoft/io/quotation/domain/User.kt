@@ -67,6 +67,7 @@ data class User(
             commentAlarm = dto.commentAlarm ?: this.commentAlarm,
             identityVerificationQuestion = dto.identityVerificationQuestion ?: this.identityVerificationQuestion,
             identityVerificationAnswer = dto.identityVerificationAnswer ?: this.identityVerificationAnswer,
+            lastModifiedTime = Timestamp.valueOf(LocalDateTime.now()),
         )
     }
 

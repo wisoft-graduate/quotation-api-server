@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -116,10 +117,12 @@ class CommentControllerTest(
                     .andExpect(MockMvcResultMatchers.status().isOk)
                     .andReturn()
                 val updatedComment = commentRepository.findByIdOrNull(comment.id)
+                println("updatedComment: $updatedComment")
 
                 // then
                 updatedComment?.content shouldBe request.content
                 updatedComment?.commentedUserId shouldBe request.commentedUserId
+                updatedComment?.lastModifiedTime shouldNotBe null
             }
 
             test("updateComment 실패 - 태그된 사용자 존재 x") {

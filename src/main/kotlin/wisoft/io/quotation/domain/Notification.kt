@@ -28,6 +28,7 @@ data class Notification(
     fun update(dto: UpdateNotificationUseCase.UpdateNotificationRequest): Notification {
         return this.copy(
             alarmCheck = dto.alarmCheck,
+            lastModifiedTime = Timestamp.valueOf(LocalDateTime.now()),
         )
     }
 

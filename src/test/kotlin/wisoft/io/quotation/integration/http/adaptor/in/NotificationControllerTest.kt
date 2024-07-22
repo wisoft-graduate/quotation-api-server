@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -119,6 +120,7 @@ class NotificationControllerTest(
                 // then
                 updatedNotification.id shouldBe notification.id
                 updatedNotification.alarmCheck shouldBe true
+                updatedNotification.lastModifiedTime shouldNotBe null
             }
 
             test("updateNotification 실패") {

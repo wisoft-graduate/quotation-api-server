@@ -31,6 +31,7 @@ data class Bookmark(
             quotationIds = dto.quotationIds ?: this.quotationIds,
             visibility = dto.visibility ?: this.visibility,
             icon = dto.icon ?: this.icon,
+            lastModifiedTime = Timestamp.valueOf(LocalDateTime.now()),
         )
     }
 }

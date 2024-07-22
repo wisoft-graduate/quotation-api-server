@@ -15,6 +15,7 @@ class BookmarkMapper : Mapper<BookmarkEntity, Bookmark> {
             visibility = entity.visibility,
             icon = entity.icon,
             createdTime = entity.createdTime,
+            lastModifiedTime = entity.lastModifiedTime,
         )
     }
 
@@ -27,6 +28,7 @@ class BookmarkMapper : Mapper<BookmarkEntity, Bookmark> {
             visibility = domain.visibility,
             icon = domain.icon,
             createdTime = domain.createdTime,
+            lastModifiedTime = domain.lastModifiedTime,
         )
     }
 }
