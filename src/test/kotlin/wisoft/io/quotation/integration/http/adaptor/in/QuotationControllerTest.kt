@@ -10,6 +10,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -174,6 +175,19 @@ class QuotationControllerTest(
                 actual.commentCount shouldBe quotation.commentCount
                 actual.backgroundImagePath shouldBe quotation.backgroundImagePath
                 actual.author.name shouldBe author.name
+            }
+        }
+
+        context("shareQuotation Test") {
+            test("shareQuotation 성공") {
+                // given
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+
+                // when, then
+                mockMvc.post("/quotations/${quotation.id}/share")
+                    .andExpect { MockMvcResultMatchers.status().isCreated }
+                quotationRepository.findById(quotation.id).get().shareCount shouldBe 1
             }
         }
     })
