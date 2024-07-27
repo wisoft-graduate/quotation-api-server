@@ -71,6 +71,12 @@ data class User(
         )
     }
 
+    fun updateProfilePath(profilePath: String?): User {
+        return this.copy(
+            profilePath = profilePath,
+        )
+    }
+
     fun updateQuotationAlarmTimes(updatedQuotationAlarmTimes: List<Timestamp>): User {
         return this.copy(
             quotationAlarmTimes = updatedQuotationAlarmTimes,
