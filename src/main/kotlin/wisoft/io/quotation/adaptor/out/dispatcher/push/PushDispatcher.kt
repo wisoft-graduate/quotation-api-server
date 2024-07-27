@@ -1,4 +1,4 @@
-package wisoft.io.quotation.adaptor.out.dispatcher
+package wisoft.io.quotation.adaptor.out.dispatcher.push
 
 import java.sql.Timestamp
 

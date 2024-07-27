@@ -1,4 +1,4 @@
-package wisoft.io.quotation.adaptor.out.dispatcher
+package wisoft.io.quotation.adaptor.out.dispatcher.push
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -15,11 +15,12 @@ import java.sql.Timestamp
 @Component
 class PushDispatcherImpl(
     private val client: OkHttpClient = OkHttpClient(),
-    private val logger: mu.KLogger = KotlinLogging.logger { },
     private val objectMapper: ObjectMapper = jacksonObjectMapper(),
     private val apiKey: String = readYmlFile().oneSignal.apiKey,
     private val appId: String = readYmlFile().oneSignal.appId,
 ) : PushDispatcher {
+    val logger = KotlinLogging.logger {}
+
     override fun sendTagPushNotification(
         sendUser: String,
         tagUser: String,
