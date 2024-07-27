@@ -65,6 +65,10 @@ jobs:
           docker service update --image ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }} \
             --env-add ONESIGNAL_APP_ID=${ONESIGNAL_APP_ID} \
             --env-add ONESIGNAL_API_KEY=${ONESIGNAL_API_KEY} \
+            --env-add AWS_ACCESS_KEY=${AWS_ACCESS_KEY} \
+            --env-add AWS_SECRET_KEY=${AWS_SECRET_KEY} \
+            --env-add AWS_REGION=${AWS_REGION} \
+            --env-add S3_BUCKET_NAME=${S3_BUCKET_NAME} \
             things
           EOF
           rm /tmp/ec2-key.pem
