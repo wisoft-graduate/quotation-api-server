@@ -23,6 +23,19 @@ class ExceptionHandler {
             .body(errorMessage)
     }
 
+    @ExceptionHandler(InternalServerErrorException::class)
+    fun internalServerErrorExceptionHandler(
+        e: BadRequestException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorData> {
+        val status = HttpMessage.HTTP_500.status
+        val errorMessage = ErrorData(ErrorMessage.from(status, e, request))
+
+        return ResponseEntity
+            .status(status)
+            .body(errorMessage)
+    }
+
     @ExceptionHandler(BadRequestException::class)
     fun badRequestExceptionHandler(
         e: BadRequestException,
