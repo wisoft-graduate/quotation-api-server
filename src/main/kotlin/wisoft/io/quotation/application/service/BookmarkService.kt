@@ -7,6 +7,7 @@ import wisoft.io.quotation.application.port.`in`.bookmark.DeleteBookmarkUseCase
 import wisoft.io.quotation.application.port.`in`.bookmark.GetBookmarkListUseCase
 import wisoft.io.quotation.application.port.`in`.bookmark.UpdateBookmarkUseCase
 import wisoft.io.quotation.application.port.out.bookmark.*
+import wisoft.io.quotation.application.port.out.quotation.GetQuotationListPort
 import wisoft.io.quotation.application.port.out.user.GetUserPort
 import wisoft.io.quotation.domain.Bookmark
 import wisoft.io.quotation.exception.error.BookmarkNotFoundException
@@ -21,6 +22,7 @@ class BookmarkService(
     val getBookmarkPort: GetBookmarkPort,
     val updateBookmarkPort: UpdateBookmarkPort,
     val deleteBookmarkPort: DeleteBookmarkPort,
+    val getQuotationListPort: GetQuotationListPort,
 ) : CreateBookmarkUseCase,
     GetBookmarkListUseCase,
     UpdateBookmarkUseCase,
@@ -51,7 +53,11 @@ class BookmarkService(
     ): UUID {
         return runCatching {
             val bookmark = getBookmarkPort.getBookmark(id) ?: throw BookmarkNotFoundException(id.toString())
-            updateBookmarkPort.updateBookmark(bookmark.update(request))
+            val quotations =
+                request.quotationIds?.let {
+                    getQuotationListPort.getQuotationListByIds(it)
+                } ?: emptyList()
+            updateBookmarkPort.updateBookmark(bookmark.update(request, quotations))
         }.onFailure {
             logger.error { "updateBookmark fail: param[$request]" }
         }.getOrThrow()

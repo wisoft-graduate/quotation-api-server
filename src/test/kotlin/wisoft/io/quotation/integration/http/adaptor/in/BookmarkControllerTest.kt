@@ -138,7 +138,7 @@ class BookmarkControllerTest(
                 actual.name shouldBe bookmark.name
                 actual.icon shouldBe bookmark.icon
                 actual.visibility shouldBe bookmark.visibility
-                actual.quotationIds shouldBe bookmark.quotationIds
+                actual.quotations.map { it.id } shouldBe bookmark.quotationIds
             }
         }
 

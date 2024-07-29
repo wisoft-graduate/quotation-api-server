@@ -32,6 +32,10 @@ class QuotationAdaptor(
         return quotationEntityMapper.toDomains(result)
     }
 
+    override fun getQuotationListByIds(ids: List<UUID>): List<Quotation> {
+        return quotationEntityMapper.toDomains(quotationRepository.findAllById(ids))
+    }
+
     override fun getQuotationLank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
         return quotationCustomRepository.findQuotationRank(request)
     }
