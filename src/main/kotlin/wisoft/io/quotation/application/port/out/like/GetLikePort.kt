@@ -5,4 +5,9 @@ import java.util.UUID
 
 interface GetLikePort {
     fun getLikeById(id: UUID): Like?
+
+    fun getLikeByUserIdAndQuotationId(
+        userId: String,
+        quotationId: UUID,
+    ): Like?
 }

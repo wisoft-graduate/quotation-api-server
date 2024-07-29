@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import wisoft.io.quotation.application.port.`in`.like.CreateLikeUseCase
 import wisoft.io.quotation.application.port.`in`.like.DeleteLikeUseCase
+import wisoft.io.quotation.application.port.`in`.like.GetLikeUseCase
 import wisoft.io.quotation.application.port.out.like.CreateLikePort
 import wisoft.io.quotation.application.port.out.like.DeleteLikePort
 import wisoft.io.quotation.application.port.out.like.GetLikePort
@@ -26,7 +27,8 @@ class LikeService(
     val getLikePort: GetLikePort,
     val updateQuotationPort: UpdateQuotationPort,
 ) : CreateLikeUseCase,
-    DeleteLikeUseCase {
+    DeleteLikeUseCase,
+    GetLikeUseCase {
     val logger = KotlinLogging.logger { }
 
     @Transactional
@@ -50,6 +52,20 @@ class LikeService(
             deleteLikePort.deleteLike(id)
         }.onFailure {
             logger.error { "deleteLike fail: param[id: $id]" }
+        }.getOrThrow()
+    }
+
+    override fun getLike(
+        userId: String,
+        quotationId: UUID,
+    ): Like? {
+        return runCatching {
+            getUserPort.getUserById(userId) ?: throw UserNotFoundException(userId)
+            getQuotationPort.getQuotation(quotationId)
+                ?: throw QuotationNotFoundException(quotationId.toString())
+            getLikePort.getLikeByUserIdAndQuotationId(userId, quotationId)
+        }.onFailure {
+            logger.error { "getLike fail: param[userId: $userId, quotationId: $quotationId]" }
         }.getOrThrow()
     }
 }

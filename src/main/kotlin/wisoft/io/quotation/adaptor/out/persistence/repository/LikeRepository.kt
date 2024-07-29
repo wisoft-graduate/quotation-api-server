@@ -6,4 +6,9 @@ import java.util.*
 
 interface LikeRepository : JpaRepository<LikeEntity, UUID> {
     fun countAllByUserId(userId: String): Long
+
+    fun findByUserIdAndQuotationId(
+        userId: String,
+        quotationId: UUID,
+    ): LikeEntity?
 }
