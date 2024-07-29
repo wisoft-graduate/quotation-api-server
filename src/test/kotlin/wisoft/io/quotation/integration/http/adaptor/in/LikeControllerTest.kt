@@ -20,6 +20,7 @@ import wisoft.io.quotation.adaptor.out.persistence.repository.LikeRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.like.CreateLikeUseCase
+import wisoft.io.quotation.application.port.`in`.like.GetLikeUseCase
 import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
@@ -150,6 +151,113 @@ class LikeControllerTest(
 
                 // when, then
                 mockMvc.delete("/likes/$likeId").andExpect { HttpStatus.NOT_FOUND }
+            }
+        }
+
+        context("getLike Test") {
+            test("getLike 성공") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+
+                val request =
+                    CreateLikeUseCase.CreateLikeRequest(
+                        userId = user.id,
+                        quotationId = quotation.id,
+                    )
+
+                mockMvc.post("/likes") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(request)
+                }
+
+                // when
+                val like =
+                    mockMvc.get("/likes/${request.userId}") {
+                        param("quotationId", "${quotation.id}")
+                    }.andExpect {
+                        HttpStatus.OK
+                    }.andReturn().response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(like, GetLikeUseCase.GetLikeResponse::class.java).data!!
+                actual.userId shouldBe user.id
+                actual.quotationId shouldBe quotation.id
+            }
+
+            test("getLike 실패 - Bad Request") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+
+                val request =
+                    CreateLikeUseCase.CreateLikeRequest(
+                        userId = user.id,
+                        quotationId = quotation.id,
+                    )
+
+                mockMvc.post("/likes") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(request)
+                }
+
+                // when, then
+                mockMvc.get("/likes/${request.userId}") {
+                }.andExpect {
+                    HttpStatus.BAD_REQUEST
+                }
+            }
+
+            test("getLike 실패 - UserNotFoundException") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+
+                val request =
+                    CreateLikeUseCase.CreateLikeRequest(
+                        userId = user.id,
+                        quotationId = quotation.id,
+                    )
+
+                mockMvc.post("/likes") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(request)
+                }
+
+                // when, then
+                mockMvc.get("/likes/notExistsUser") {
+                    param("quotationId", "${quotation.id}")
+                }.andExpect {
+                    HttpStatus.NOT_FOUND
+                }
+            }
+
+            test("getLike 실패 - QuotationNotFoundException") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation = quotationRepository.save(getQuotationEntityFixture(author.id))
+
+                val request =
+                    CreateLikeUseCase.CreateLikeRequest(
+                        userId = user.id,
+                        quotationId = quotation.id,
+                    )
+
+                mockMvc.post("/likes") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(request)
+                }
+
+                // when, then
+                mockMvc.get("/likes/${user.id}") {
+                    param("quotationId", "${UUID.randomUUID()}")
+                }.andExpect {
+                    HttpStatus.NOT_FOUND
+                }
             }
         }
     })
