@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
@@ -99,6 +100,7 @@ class AuthorControllerTest(
                 actualAuthor.id shouldBe id
                 actualAuthor.name shouldBe request.name
                 actualAuthor.countryCode shouldBe request.countryCode
+                actualAuthor.lastModifiedTime shouldNotBe null
             }
 
             test("updateAuthor 실패 - id가 존재하지 않는 경우") {

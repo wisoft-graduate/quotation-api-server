@@ -34,6 +34,7 @@ data class Bookmark(
             quotations = quotations.ifEmpty { this.quotations },
             visibility = dto.visibility ?: this.visibility,
             icon = dto.icon ?: this.icon,
+            lastModifiedTime = Timestamp.valueOf(LocalDateTime.now()),
         )
     }
 }

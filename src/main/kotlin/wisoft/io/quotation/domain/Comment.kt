@@ -32,6 +32,7 @@ data class Comment(
         return this.copy(
             content = dto.content ?: this.content,
             commentedUserId = dto.commentedUserId ?: this.commentedUserId,
+            lastModifiedTime = Timestamp.valueOf(LocalDateTime.now()),
         )
     }
 }

@@ -25,6 +25,7 @@ data class Author(
         return this.copy(
             name = dto.name ?: this.name,
             countryCode = dto.countryCode ?: countryCode,
+            lastModifiedTime = Timestamp.valueOf(LocalDateTime.now()),
         )
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
@@ -174,6 +175,7 @@ class BookmarkControllerTest(
                 actual.quotationIds shouldBe request.quotationIds
                 actual.visibility shouldBe request.visibility
                 actual.icon shouldBe request.icon
+                actual.lastModifiedTime shouldNotBe null
             }
 
             test("updateBookmark 실패") {

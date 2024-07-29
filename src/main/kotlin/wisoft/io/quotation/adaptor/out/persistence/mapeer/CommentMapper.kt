@@ -16,6 +16,7 @@ class CommentMapper(val commentRepository: CommentRepository) : Mapper<CommentEn
             commentedUserId = domain.commentedUserId,
             createdTime = domain.createdTime,
             parentId = domain.parentCommentId,
+            lastModifiedTime = domain.lastModifiedTime,
         )
     }
 
