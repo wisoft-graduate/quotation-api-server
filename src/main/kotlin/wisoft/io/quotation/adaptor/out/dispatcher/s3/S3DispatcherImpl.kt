@@ -6,11 +6,13 @@ import com.amazonaws.services.s3.model.ObjectMetadata
 import mu.KotlinLogging
 import org.apache.commons.codec.binary.Base64
 import org.springframework.stereotype.Component
+import wisoft.io.quotation.exception.error.ProfileMetadataValidationException
 import wisoft.io.quotation.exception.error.S3ObjectException
 import wisoft.io.quotation.exception.error.S3ObjectNotFoundException
 import wisoft.io.quotation.util.YmlConfig.Companion.readYmlFile
 import java.io.ByteArrayInputStream
-import java.util.UUID
+import java.util.*
+import javax.imageio.ImageIO
 
 @Component
 class S3DispatcherImpl(
@@ -22,6 +24,18 @@ class S3DispatcherImpl(
     override fun createProfileImage(base64Image: String): String {
         return runCatching {
             val imageBytes = Base64.decodeBase64(base64Image)
+
+            val maxFileSize = 5 * 1024 * 1024 // 5MB
+            if (imageBytes.size > maxFileSize) {
+                throw ProfileMetadataValidationException("image size:$imageBytes, File size exceeds the 5MB limit.")
+            }
+            val imageFormat = getImageFormat(imageBytes)
+            if (imageFormat !in listOf("image/jpeg", "image/png", "image/gif")) {
+                throw ProfileMetadataValidationException(
+                    "image format: $imageFormat, Invalid file format. Only jpg, png, and gif are allowed.",
+                )
+            }
+
             val metadata = ObjectMetadata()
             metadata.contentLength = imageBytes.size.toLong()
             val imageId = UUID.randomUUID().toString()
@@ -31,6 +45,25 @@ class S3DispatcherImpl(
         }.onFailure {
             logger.error { "uploadS3Image fail" }
         }.getOrThrow()
+    }
+
+    private fun getImageFormat(imageBytes: ByteArray): String {
+        val inputStream = ByteArrayInputStream(imageBytes)
+        val imageInputStream = ImageIO.createImageInputStream(inputStream)
+        val readers = ImageIO.getImageReaders(imageInputStream)
+        if (readers.hasNext()) {
+            val reader = readers.next()
+            reader.input = imageInputStream
+            val formatName = reader.formatName.lowercase(Locale.getDefault())
+            reader.dispose()
+            return when (formatName) {
+                "jpeg", "jpg" -> "image/jpeg"
+                "png" -> "image/png"
+                "gif" -> "image/gif"
+                else -> ""
+            }
+        }
+        return ""
     }
 
     override fun getProfileImage(id: String): String {
