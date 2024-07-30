@@ -12,7 +12,6 @@ import wisoft.io.quotation.application.port.out.s3.GetProfileImagePort
 import wisoft.io.quotation.application.port.out.user.*
 import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.exception.error.*
-import wisoft.io.quotation.exception.error.http.DuplicateException
 import wisoft.io.quotation.util.JWTUtil
 import wisoft.io.quotation.util.SaltUtil
 import java.sql.Timestamp
@@ -47,10 +46,7 @@ class UserService(
     CreateQuotationAlarmTimeUseCase,
     PatchQuotationAlarmTimeUseCase,
     GetQuotationAlarmTimeUseCase,
-    CreateProfileImageUseCase,
-    GetProfileImageUseCase,
-    UpdateProfileImageUseCase,
-    DeleteProfileImageUseCase {
+    GetProfileImageUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -63,6 +59,11 @@ class UserService(
                 throw UserDuplicateException("닉네임")
             }
 
+            var profilePath: String? = null
+            request.profileImageBase64?.let {
+                profilePath = createProfileImagePort.createProfileImage(it)
+            }
+
             val user =
                 request.run {
                     User(
@@ -70,6 +71,7 @@ class UserService(
                         nickname = this.nickname,
                         identityVerificationQuestion = this.identityVerificationQuestion,
                         identityVerificationAnswer = this.identityVerificationAnswer,
+                        profilePath = profilePath,
                     )
                 }
             val encryptPasswordUser = user.encryptPassword(request.password)
@@ -228,27 +230,6 @@ class UserService(
         }.getOrThrow()
     }
 
-    @Transactional
-    override fun createProfileImage(
-        userId: String,
-        request: CreateProfileImageUseCase.CreateProfileImageRequest,
-    ): String {
-        return runCatching {
-            val user = getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
-            if (user.profilePath != null) {
-                throw DuplicateException("profile image already exist. userId: $userId")
-            }
-
-            val profileId = createProfileImagePort.createProfileImage(request.base64Image)
-            val updatedUser = user.updateProfilePath(profileId)
-
-            updateUserPort.updateUser(updatedUser)
-            profileId
-        }.onFailure {
-            logger.error { "createProfileImage fail: param[userId: $userId]" }
-        }.getOrThrow()
-    }
-
     override fun getProfileImage(
         userId: String,
         request: GetProfileImageUseCase.GetProfileImageRequest,
@@ -256,45 +237,7 @@ class UserService(
         return runCatching {
             getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
 
-            val base64String = getProfileImagePort.getProfileImage(request.id)
-            base64String
-        }.onFailure {
-            logger.error { "createProfileImage fail: param[userId: $userId, request:$request]" }
-        }.getOrThrow()
-    }
-
-    @Transactional
-    override fun updateProfileImage(
-        userId: String,
-        request: UpdateProfileImageUseCase.UpdateProfileImageRequest,
-    ): String {
-        return runCatching {
-            val user = getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
-
-            user.profilePath?.let { deleteProfileImagePort.deleteProfileImage(it) }
-
-            val profileId = createProfileImagePort.createProfileImage(request.base64Image)
-            val updatedUser = user.updateProfilePath(profileId)
-            updateUserPort.updateUser(updatedUser)
-
-            profileId
-        }.onFailure {
-            logger.error { "createProfileImage fail: param[userId: $userId]" }
-        }.getOrThrow()
-    }
-
-    @Transactional
-    override fun deleteProfileImage(
-        userId: String,
-        request: DeleteProfileImageUseCase.DeleteProfileImageRequest,
-    ) {
-        return runCatching {
-            val user = getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
-
-            val updatedUser = user.updateProfilePath(null)
-            updateUserPort.updateUser(updatedUser)
-
-            deleteProfileImagePort.deleteProfileImage(request.id)
+            getProfileImagePort.getProfileImage(request.id)
         }.onFailure {
             logger.error { "createProfileImage fail: param[userId: $userId, request:$request]" }
         }.getOrThrow()

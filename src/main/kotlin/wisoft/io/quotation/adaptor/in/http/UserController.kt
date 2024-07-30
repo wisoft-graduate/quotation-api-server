@@ -30,10 +30,7 @@ class UserController(
     val updateUserUseCase: UpdateUserUseCase,
     val validateUserUesCase: ValidateUserUesCase,
     val resetPasswordUserUseCase: ResetPasswordUserUseCase,
-    val createProfileImageUseCase: CreateProfileImageUseCase,
     val getProfileImageUseCase: GetProfileImageUseCase,
-    val updateProfileImageUseCase: UpdateProfileImageUseCase,
-    val deleteProfileImageUseCase: DeleteProfileImageUseCase,
     val createQuotationAlarmTimeUseCase: CreateQuotationAlarmTimeUseCase,
     val getQuotationAlarmTimeUseCase: GetQuotationAlarmTimeUseCase,
     val patchQuotationAlarmTimeUseCase: PatchQuotationAlarmTimeUseCase,
@@ -189,26 +186,6 @@ class UserController(
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
-    @PostMapping("/users/{userId}/profile")
-    @LoginAuthenticated
-    fun createProfileImage(
-        @PathVariable("userId") userId: String,
-        @RequestBody base64Image: String,
-    ): ResponseEntity<CreateProfileImageUseCase.CreateProfileImageResponse> {
-        val response =
-            createProfileImageUseCase.createProfileImage(
-                userId,
-                CreateProfileImageUseCase.CreateProfileImageRequest(base64Image),
-            )
-
-        return ResponseEntity
-            .status(HttpStatus.CREATED).body(
-                CreateProfileImageUseCase.CreateProfileImageResponse(
-                    data = CreateProfileImageUseCase.Data(response),
-                ),
-            )
-    }
-
     @GetMapping("/users/{userId}/profile/{id}")
     @LoginAuthenticated
     fun getProfileImage(
@@ -223,38 +200,6 @@ class UserController(
                     data = GetProfileImageUseCase.Data(response),
                 ),
             )
-    }
-
-    @PutMapping("/users/{userId}/profile/{id}")
-    @LoginAuthenticated
-    fun updateProfileImage(
-        @PathVariable("userId") userId: String,
-        @PathVariable("id") id: String,
-        @RequestBody base64Image: String,
-    ): ResponseEntity<UpdateProfileImageUseCase.UpdateProfileImageResponse> {
-        val response =
-            updateProfileImageUseCase.updateProfileImage(
-                userId,
-                UpdateProfileImageUseCase.UpdateProfileImageRequest(base64Image),
-            )
-
-        return ResponseEntity
-            .status(HttpStatus.CREATED).body(
-                UpdateProfileImageUseCase.UpdateProfileImageResponse(
-                    data = UpdateProfileImageUseCase.Data(response),
-                ),
-            )
-    }
-
-    @DeleteMapping("/users/{userId}/profile/{id}")
-    @LoginAuthenticated
-    fun deleteProfileImage(
-        @PathVariable("userId") userId: String,
-        @PathVariable("id") id: String,
-    ): ResponseEntity<DeleteUserUseCase> {
-        deleteProfileImageUseCase.deleteProfileImage(userId, DeleteProfileImageUseCase.DeleteProfileImageRequest(id))
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
     @PostMapping("/users/{userId}/quotation-alarm-time")
