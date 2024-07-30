@@ -54,13 +54,17 @@ data class User(
     fun resign(identifier: String): User {
         return this.copy(
             nickname = "leaved#$identifier",
+            profilePath = null,
         )
     }
 
-    fun update(dto: UpdateUserUseCase.UpdateUserRequest): User {
+    fun update(
+        dto: UpdateUserUseCase.UpdateUserRequest,
+        profilePath: String?,
+    ): User {
         return this.copy(
             nickname = dto.nickname ?: this.nickname,
-            profilePath = dto.profilePath ?: this.profilePath,
+            profilePath = profilePath ?: this.profilePath,
             favoriteQuotation = dto.favoriteQuotation ?: this.favoriteQuotation,
             favoriteAuthor = dto.favoriteAuthor ?: this.favoriteAuthor,
             quotationAlarm = dto.quotationAlarm ?: this.quotationAlarm,

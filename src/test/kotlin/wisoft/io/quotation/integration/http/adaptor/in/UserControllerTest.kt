@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
@@ -18,6 +19,9 @@ import wisoft.io.quotation.DatabaseContainerConfig
 import wisoft.io.quotation.adaptor.out.persistence.mapeer.UserMapper
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.user.*
+import wisoft.io.quotation.application.port.out.s3.CreateProfileImagePort
+import wisoft.io.quotation.application.port.out.s3.DeleteProfileImagePort
+import wisoft.io.quotation.application.port.out.s3.GetProfileImagePort
 import wisoft.io.quotation.exception.error.ErrorData
 import wisoft.io.quotation.exception.error.http.HttpMessage
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
@@ -52,6 +56,7 @@ class UserControllerTest(
                         nickname = "nickname",
                         identityVerificationQuestion = "question",
                         identityVerificationAnswer = "answer",
+                        profileImageBase64 = null,
                     )
 
                 // when
@@ -82,6 +87,7 @@ class UserControllerTest(
                         nickname = "nickname",
                         identityVerificationQuestion = "question",
                         identityVerificationAnswer = "answer",
+                        profileImageBase64 = null,
                     )
 
                 // when
@@ -277,7 +283,6 @@ class UserControllerTest(
                 // given
                 val existUser = repository.save(getUserEntityFixture())
                 val expectedNickname = "updatedNickname"
-                val expectedProfilePath = "updatedProfile"
                 val expectedFavoriteQuotation = "updatedFavoriteQuotation"
                 val expectedFavoriteAuthor = "updatedFavoriteAuthor"
                 val expectedQuotationAlarm = true
@@ -287,7 +292,7 @@ class UserControllerTest(
                 val request =
                     UpdateUserUseCase.UpdateUserRequest(
                         nickname = expectedNickname,
-                        profilePath = expectedProfilePath,
+                        profileImageBase64 = null,
                         favoriteQuotation = expectedFavoriteQuotation,
                         favoriteAuthor = expectedFavoriteAuthor,
                         quotationAlarm = expectedQuotationAlarm,
@@ -316,7 +321,6 @@ class UserControllerTest(
                 val actualUser = repository.findById(existUser.id).get()
 
                 actualUser.nickname shouldBe expectedNickname
-                actualUser.profilePath shouldBe expectedProfilePath
                 actualUser.favoriteQuotation shouldBe expectedFavoriteQuotation
                 actualUser.favoriteAuthor shouldBe expectedFavoriteAuthor
                 actualUser.quotationAlarm shouldBe expectedQuotationAlarm
@@ -751,4 +755,13 @@ class UserControllerTest(
                 actual.path shouldBe expectedPath
             }
         }
-    })
+    }) {
+    @MockBean
+    lateinit var createProfileImagePort: CreateProfileImagePort
+
+    @MockBean
+    lateinit var getProfileImagePort: GetProfileImagePort
+
+    @MockBean
+    lateinit var deleteProfileImagePort: DeleteProfileImagePort
+}

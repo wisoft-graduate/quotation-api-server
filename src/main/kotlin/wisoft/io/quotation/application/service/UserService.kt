@@ -138,6 +138,8 @@ class UserService(
                 throw UserNotFoundException(id)
             }
 
+            user.profilePath?.let { deleteProfileImagePort.deleteProfileImage(it) }
+
             val identifier = Instant.now().epochSecond.toString() + SaltUtil.generateSalt(4)
             val deletedUser = user.resign(identifier)
 
@@ -194,7 +196,13 @@ class UserService(
     ): String {
         return runCatching {
             val user = getUserPort.getUserById(id) ?: throw UserNotFoundException("id: $id")
-            val updatedUser = user.update(request)
+
+            var profilePath: String? = null
+            request.profileImageBase64?.let {
+                user.profilePath?.let { deleteProfileImagePort.deleteProfileImage(it) }
+                profilePath = createProfileImagePort.createProfileImage(it)
+            }
+            val updatedUser = user.update(request, profilePath)
             updateUserPort.updateUser(updatedUser)
         }.onFailure {
             logger.error { "updateUser fail: param[id: $id, request: $request]" }

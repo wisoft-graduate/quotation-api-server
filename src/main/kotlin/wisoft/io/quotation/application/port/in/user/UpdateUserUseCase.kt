@@ -8,13 +8,13 @@ interface UpdateUserUseCase {
 
     data class UpdateUserRequest(
         val nickname: String?,
-        val profilePath: String?,
         val favoriteQuotation: String?,
         val favoriteAuthor: String?,
         val quotationAlarm: Boolean?,
         val commentAlarm: Boolean?,
         val identityVerificationQuestion: String?,
         val identityVerificationAnswer: String?,
+        val profileImageBase64: String?,
     )
 
     data class UpdateUserResponse(
