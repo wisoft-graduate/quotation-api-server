@@ -34,4 +34,11 @@ class LikeAdapter(
     override fun getLikeById(id: UUID): Like? {
         return likeRepository.findByIdOrNull(id)?.let { likeMapper.toDomain(it) }
     }
+
+    override fun getLikeByUserIdAndQuotationId(
+        userId: String,
+        quotationId: UUID,
+    ): Like? {
+        return likeRepository.findByUserIdAndQuotationId(userId, quotationId)?.let { likeMapper.toDomain(it) }
+    }
 }
