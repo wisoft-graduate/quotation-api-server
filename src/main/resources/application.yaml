@@ -44,3 +44,15 @@ environment:
 one-signal:
   api-key: ${ONESIGNAL_API_KEY}
   app-id: ${ONESIGNAL_APP_ID}
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION}
+    stack:
+      auto: false
+    s3:
+      bucket: ${S3_BUCKET_NAME}

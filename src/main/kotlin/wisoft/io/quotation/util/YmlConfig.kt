@@ -9,6 +9,7 @@ data class YmlConfig(
     @JsonProperty("spring") val spring: SpringConfig,
     @JsonProperty("environment") val environment: EnvironmentConfig,
     @JsonProperty("one-signal") val oneSignal: OneSignalConfig,
+    @JsonProperty("cloud") val cloud: CloudConfig,
 ) {
     data class ServerConfig(
         @JsonProperty("port") val port: Long,
@@ -85,6 +86,34 @@ data class YmlConfig(
         @JsonProperty("api-key") val apiKey: String,
         @JsonProperty("app-id") val appId: String,
     )
+
+    data class CloudConfig(
+        @JsonProperty("aws") val aws: AWSConfig,
+    ) {
+        data class AWSConfig(
+            @JsonProperty("credentials") val credentials: CredentialsConfig,
+            @JsonProperty("region") val region: RegionConfig,
+            @JsonProperty("stack") val stack: StackConfig,
+            @JsonProperty("s3") val s3: S3Config,
+        ) {
+            data class CredentialsConfig(
+                @JsonProperty("accessKey") val accessKey: String,
+                @JsonProperty("secretKey") val secretKey: String,
+            )
+
+            data class RegionConfig(
+                @JsonProperty("static") val static: String,
+            )
+
+            data class StackConfig(
+                @JsonProperty("auto") val auto: Boolean,
+            )
+
+            data class S3Config(
+                @JsonProperty("bucket") val bucket: String,
+            )
+        }
+    }
 
     companion object {
         fun readYmlFile(): YmlConfig {

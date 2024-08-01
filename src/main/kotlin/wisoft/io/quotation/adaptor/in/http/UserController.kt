@@ -30,6 +30,7 @@ class UserController(
     val updateUserUseCase: UpdateUserUseCase,
     val validateUserUesCase: ValidateUserUesCase,
     val resetPasswordUserUseCase: ResetPasswordUserUseCase,
+    val getProfileImageUseCase: GetProfileImageUseCase,
     val createQuotationAlarmTimeUseCase: CreateQuotationAlarmTimeUseCase,
     val getQuotationAlarmTimeUseCase: GetQuotationAlarmTimeUseCase,
     val patchQuotationAlarmTimeUseCase: PatchQuotationAlarmTimeUseCase,
@@ -185,6 +186,22 @@ class UserController(
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
+    @GetMapping("/users/{userId}/profile/{id}")
+    @LoginAuthenticated
+    fun getProfileImage(
+        @PathVariable("userId") userId: String,
+        @PathVariable("id") id: String,
+    ): ResponseEntity<GetProfileImageUseCase.GetProfileImageResponse> {
+        val response = getProfileImageUseCase.getProfileImage(userId, GetProfileImageUseCase.GetProfileImageRequest(id))
+
+        return ResponseEntity
+            .status(HttpStatus.OK).body(
+                GetProfileImageUseCase.GetProfileImageResponse(
+                    data = GetProfileImageUseCase.Data(response),
+                ),
+            )
+    }
+
     @PostMapping("/users/{userId}/quotation-alarm-time")
     @LoginAuthenticated
     fun createQuotationAlarmTimes(
@@ -219,7 +236,6 @@ class UserController(
             )
     }
 
-    // FIXME: Id를 이용한 삭제가 불가능해서, Body의 값에 따라서 처리하도록 변경
     @PatchMapping("/users/{userId}/quotation-alarm-time")
     @LoginAuthenticated
     fun deleteQuotationAlarmTimes(

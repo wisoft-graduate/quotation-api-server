@@ -6,6 +6,9 @@ import org.springframework.transaction.annotation.Transactional
 import wisoft.io.quotation.application.port.`in`.user.*
 import wisoft.io.quotation.application.port.out.*
 import wisoft.io.quotation.application.port.out.bookmark.GetBookmarkListPort
+import wisoft.io.quotation.application.port.out.s3.CreateProfileImagePort
+import wisoft.io.quotation.application.port.out.s3.DeleteProfileImagePort
+import wisoft.io.quotation.application.port.out.s3.GetProfileImagePort
 import wisoft.io.quotation.application.port.out.user.*
 import wisoft.io.quotation.domain.User
 import wisoft.io.quotation.exception.error.*
@@ -27,6 +30,9 @@ class UserService(
     val getBookmarkListPort: GetBookmarkListPort,
     val updateUserPort: UpdateUserPort,
     val deleteUserPort: DeleteUserPort,
+    val createProfileImagePort: CreateProfileImagePort,
+    val getProfileImagePort: GetProfileImagePort,
+    val deleteProfileImagePort: DeleteProfileImagePort,
 ) : CreateUserUseCase,
     SignInUseCase,
     RefreshTokenUserUseCase,
@@ -39,7 +45,8 @@ class UserService(
     ResetPasswordUserUseCase,
     CreateQuotationAlarmTimeUseCase,
     PatchQuotationAlarmTimeUseCase,
-    GetQuotationAlarmTimeUseCase {
+    GetQuotationAlarmTimeUseCase,
+    GetProfileImageUseCase {
     val logger = KotlinLogging.logger {}
 
     @Transactional
@@ -52,6 +59,11 @@ class UserService(
                 throw UserDuplicateException("닉네임")
             }
 
+            var profilePath: String? = null
+            request.profileImageBase64?.let {
+                profilePath = createProfileImagePort.createProfileImage(it)
+            }
+
             val user =
                 request.run {
                     User(
@@ -59,6 +71,7 @@ class UserService(
                         nickname = this.nickname,
                         identityVerificationQuestion = this.identityVerificationQuestion,
                         identityVerificationAnswer = this.identityVerificationAnswer,
+                        profilePath = profilePath,
                     )
                 }
             val encryptPasswordUser = user.encryptPassword(request.password)
@@ -125,6 +138,8 @@ class UserService(
                 throw UserNotFoundException(id)
             }
 
+            user.profilePath?.let { deleteProfileImagePort.deleteProfileImage(it) }
+
             val identifier = Instant.now().epochSecond.toString() + SaltUtil.generateSalt(4)
             val deletedUser = user.resign(identifier)
 
@@ -181,7 +196,13 @@ class UserService(
     ): String {
         return runCatching {
             val user = getUserPort.getUserById(id) ?: throw UserNotFoundException("id: $id")
-            val updatedUser = user.update(request)
+
+            var profilePath: String? = null
+            request.profileImageBase64?.let {
+                user.profilePath?.let { deleteProfileImagePort.deleteProfileImage(it) }
+                profilePath = createProfileImagePort.createProfileImage(it)
+            }
+            val updatedUser = user.update(request, profilePath)
             updateUserPort.updateUser(updatedUser)
         }.onFailure {
             logger.error { "updateUser fail: param[id: $id, request: $request]" }
@@ -217,6 +238,20 @@ class UserService(
         }.getOrThrow()
     }
 
+    override fun getProfileImage(
+        userId: String,
+        request: GetProfileImageUseCase.GetProfileImageRequest,
+    ): String {
+        return runCatching {
+            getUserPort.getUserById(userId) ?: throw UserNotFoundException("id: $userId")
+
+            getProfileImagePort.getProfileImage(request.id)
+        }.onFailure {
+            logger.error { "createProfileImage fail: param[userId: $userId, request:$request]" }
+        }.getOrThrow()
+    }
+
+    @Transactional
     override fun createQuotationAlarmTime(
         userId: String,
         request: CreateQuotationAlarmTimeUseCase.CreateQuotationAlarmTimeRequest,

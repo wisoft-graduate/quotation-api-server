@@ -16,6 +16,7 @@ interface CreateUserUseCase {
         val identityVerificationQuestion: String,
         @field:NotBlank
         val identityVerificationAnswer: String,
+        val profileImageBase64: String?,
     )
 
     data class CreateUserResponse(
