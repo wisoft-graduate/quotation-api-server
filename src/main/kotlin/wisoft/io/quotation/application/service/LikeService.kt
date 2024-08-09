@@ -5,7 +5,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import wisoft.io.quotation.application.port.`in`.like.CreateLikeUseCase
 import wisoft.io.quotation.application.port.`in`.like.DeleteLikeUseCase
-import wisoft.io.quotation.application.port.`in`.like.GetLikeUseCase
+import wisoft.io.quotation.application.port.`in`.like.GetLikeListUseCase
 import wisoft.io.quotation.application.port.out.like.CreateLikePort
 import wisoft.io.quotation.application.port.out.like.DeleteLikePort
 import wisoft.io.quotation.application.port.out.like.GetLikePort
@@ -28,17 +28,18 @@ class LikeService(
     val updateQuotationPort: UpdateQuotationPort,
 ) : CreateLikeUseCase,
     DeleteLikeUseCase,
-    GetLikeUseCase {
+    GetLikeListUseCase {
     val logger = KotlinLogging.logger { }
 
     @Transactional
     override fun createLike(request: CreateLikeUseCase.CreateLikeRequest): UUID {
         return runCatching {
             getUserPort.getUserById(request.userId) ?: throw UserNotFoundException(request.userId)
-            getQuotationPort.getQuotation(request.quotationId)
-                ?: throw QuotationNotFoundException(request.quotationId.toString())
+            val quotation =
+                getQuotationPort.getQuotation(request.quotationId)
+                    ?: throw QuotationNotFoundException(request.quotationId.toString())
             updateQuotationPort.incrementLikeCount(request.quotationId)
-            createLikePort.createLike(Like(userId = request.userId, quotationId = request.quotationId))
+            createLikePort.createLike(Like(userId = request.userId, quotation = quotation))
         }.onFailure {
             logger.error { "createLike fail: param[$request]" }
         }.getOrThrow()
@@ -48,22 +49,25 @@ class LikeService(
     override fun deleteLike(id: UUID) {
         return runCatching {
             val like = getLikePort.getLikeById(id) ?: throw LikeNotFoundException(id.toString())
-            updateQuotationPort.decrementLikeCount(like.quotationId)
+            updateQuotationPort.decrementLikeCount(like.quotation.id)
             deleteLikePort.deleteLike(id)
         }.onFailure {
             logger.error { "deleteLike fail: param[id: $id]" }
         }.getOrThrow()
     }
 
-    override fun getLike(
+    override fun getLikeList(
         userId: String,
-        quotationId: UUID,
-    ): Like? {
+        quotationId: UUID?,
+    ): List<Like> {
         return runCatching {
             getUserPort.getUserById(userId) ?: throw UserNotFoundException(userId)
-            getQuotationPort.getQuotation(quotationId)
-                ?: throw QuotationNotFoundException(quotationId.toString())
-            getLikePort.getLikeByUserIdAndQuotationId(userId, quotationId)
+            if (quotationId != null) {
+                getQuotationPort.getQuotation(quotationId) ?: throw QuotationNotFoundException(userId)
+                getLikePort.getLikeByUserIdAndQuotationId(userId, quotationId)?.let { listOf(it) } ?: emptyList()
+            } else {
+                getLikePort.getLikeByUserId(userId)
+            }
         }.onFailure {
             logger.error { "getLike fail: param[userId: $userId, quotationId: $quotationId]" }
         }.getOrThrow()

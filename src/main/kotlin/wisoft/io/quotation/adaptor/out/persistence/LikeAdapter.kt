@@ -41,4 +41,8 @@ class LikeAdapter(
     ): Like? {
         return likeRepository.findByUserIdAndQuotationId(userId, quotationId)?.let { likeMapper.toDomain(it) }
     }
+
+    override fun getLikeByUserId(userId: String): List<Like> {
+        return likeMapper.toDomains(likeRepository.findByUserId(userId))
+    }
 }

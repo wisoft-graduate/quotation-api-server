@@ -20,7 +20,7 @@ import wisoft.io.quotation.adaptor.out.persistence.repository.LikeRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.QuotationRepository
 import wisoft.io.quotation.adaptor.out.persistence.repository.UserRepository
 import wisoft.io.quotation.application.port.`in`.like.CreateLikeUseCase
-import wisoft.io.quotation.application.port.`in`.like.GetLikeUseCase
+import wisoft.io.quotation.application.port.`in`.like.GetLikeListUseCase
 import wisoft.io.quotation.fixture.entity.getAuthorEntityFixture
 import wisoft.io.quotation.fixture.entity.getQuotationEntityFixture
 import wisoft.io.quotation.fixture.entity.getUserEntityFixture
@@ -154,8 +154,8 @@ class LikeControllerTest(
             }
         }
 
-        context("getLike Test") {
-            test("getLike 성공") {
+        context("getLikeList Test") {
+            test("getLikeList 성공 - user, quotation") {
                 // given
                 val user = userRepository.save(getUserEntityFixture())
                 val author = authorRepository.save(getAuthorEntityFixture())
@@ -181,12 +181,52 @@ class LikeControllerTest(
                     }.andReturn().response.contentAsString
 
                 // then
-                val actual = objectMapper.readValue(like, GetLikeUseCase.GetLikeResponse::class.java).data!!
+                val actual = objectMapper.readValue(like, GetLikeListUseCase.GetLikeListResponse::class.java).data.first()
                 actual.userId shouldBe user.id
-                actual.quotationId shouldBe quotation.id
+                actual.quotation.id shouldBe quotation.id
             }
 
-            test("getLike 실패 - Bad Request") {
+            test("getLikeList 성공 - user") {
+                // given
+                val user = userRepository.save(getUserEntityFixture())
+                val author = authorRepository.save(getAuthorEntityFixture())
+                val quotation1 = quotationRepository.save(getQuotationEntityFixture(author.id))
+                val quotation2 = quotationRepository.save(getQuotationEntityFixture(author.id))
+
+                val request1 =
+                    CreateLikeUseCase.CreateLikeRequest(
+                        userId = user.id,
+                        quotationId = quotation1.id,
+                    )
+
+                mockMvc.post("/likes") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(request1)
+                }
+
+                val request2 =
+                    CreateLikeUseCase.CreateLikeRequest(
+                        userId = user.id,
+                        quotationId = quotation2.id,
+                    )
+
+                mockMvc.post("/likes") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(request2)
+                }
+
+                // when
+                val like =
+                    mockMvc.get("/likes/${user.id}").andExpect {
+                        HttpStatus.OK
+                    }.andReturn().response.contentAsString
+
+                // then
+                val actual = objectMapper.readValue(like, GetLikeListUseCase.GetLikeListResponse::class.java).data
+                actual.size shouldBe 2
+            }
+
+            test("getLikeList 실패 - Bad Request") {
                 // given
                 val user = userRepository.save(getUserEntityFixture())
                 val author = authorRepository.save(getAuthorEntityFixture())
@@ -210,7 +250,7 @@ class LikeControllerTest(
                 }
             }
 
-            test("getLike 실패 - UserNotFoundException") {
+            test("getLikeList 실패 - UserNotFoundException") {
                 // given
                 val user = userRepository.save(getUserEntityFixture())
                 val author = authorRepository.save(getAuthorEntityFixture())
@@ -235,7 +275,7 @@ class LikeControllerTest(
                 }
             }
 
-            test("getLike 실패 - QuotationNotFoundException") {
+            test("getLikeList 실패 - QuotationNotFoundException") {
                 // given
                 val user = userRepository.save(getUserEntityFixture())
                 val author = authorRepository.save(getAuthorEntityFixture())
