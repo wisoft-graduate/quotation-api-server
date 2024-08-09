@@ -11,4 +11,6 @@ interface LikeRepository : JpaRepository<LikeEntity, UUID> {
         userId: String,
         quotationId: UUID,
     ): LikeEntity?
+
+    fun findByUserId(userId: String): List<LikeEntity>
 }

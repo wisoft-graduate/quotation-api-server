@@ -10,4 +10,6 @@ interface GetLikePort {
         userId: String,
         quotationId: UUID,
     ): Like?
+
+    fun getLikeByUserId(userId: String): List<Like>
 }
