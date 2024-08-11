@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import wisoft.io.quotation.application.port.`in`.like.CreateLikeUseCase
 import wisoft.io.quotation.application.port.`in`.like.DeleteLikeUseCase
-import wisoft.io.quotation.application.port.`in`.like.GetLikeUseCase
+import wisoft.io.quotation.application.port.`in`.like.GetLikeListUseCase
 import java.util.UUID
 
 @RestController
@@ -13,7 +13,7 @@ import java.util.UUID
 class LikeController(
     val createLikeUseCase: CreateLikeUseCase,
     val deleteLikeUseCase: DeleteLikeUseCase,
-    val getLikeUseCase: GetLikeUseCase,
+    val getLikeUseCase: GetLikeListUseCase,
 ) {
     @PostMapping
     fun createLike(
@@ -39,16 +39,16 @@ class LikeController(
     }
 
     @GetMapping("/{userId}")
-    fun getLike(
+    fun getLikeList(
         @PathVariable("userId") userId: String,
-        @RequestParam("quotationId") quotationId: UUID,
-    ): ResponseEntity<GetLikeUseCase.GetLikeResponse> {
-        getLikeUseCase.getLike(userId, quotationId)
+        @RequestParam("quotationId") quotationId: UUID?,
+    ): ResponseEntity<GetLikeListUseCase.GetLikeListResponse> {
+        getLikeUseCase.getLikeList(userId, quotationId)
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(
-                GetLikeUseCase.GetLikeResponse(
-                    data = getLikeUseCase.getLike(userId, quotationId),
+                GetLikeListUseCase.GetLikeListResponse(
+                    data = getLikeUseCase.getLikeList(userId, quotationId),
                 ),
             )
     }
