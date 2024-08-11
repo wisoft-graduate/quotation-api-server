@@ -56,7 +56,12 @@ class CommentService(
                         ?: throw UserNotFoundException(it)
                 }
 
-            updateQuotationPort.incrementComment(request.quotationId)
+            if (request.parentCommentId != null) {
+                getCommentPort.getCommentById(request.parentCommentId)
+                    ?: throw CommentNotFoundException(request.parentCommentId.toString())
+            } else {
+                updateQuotationPort.incrementComment(request.quotationId)
+            }
 
             val commentId =
                 createCommentPort.createComment(
