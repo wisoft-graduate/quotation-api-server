@@ -53,8 +53,9 @@ class PushDispatcherImpl(
 
             client.newCall(request).execute().use { response ->
                 val responseBody = response.body?.string()
-                if (!response.isSuccessful || responseBody?.contains("errors") == true) {
-                    throw PushFailException("sendUser:$sendUser, tagUser :$tagUser, response: $responseBody")
+                    ?: throw PushFailException("responseBody is null and sendUser:$sendUser, tagUser :$tagUser")
+                if (!response.isSuccessful || responseBody.contains("errors")) {
+                    throw PushFailException("response is fail sendUser:$sendUser, tagUser :$tagUser, response: $responseBody")
                 }
                 response.isSuccessful
             }
@@ -96,8 +97,9 @@ class PushDispatcherImpl(
 
             client.newCall(request).execute().use { response ->
                 val responseBody = response.body?.string()
-                if (!response.isSuccessful || responseBody?.contains("errors") == true) {
-                    throw PushFailException("userNickname: $userNickname, userId: $userId, pushTime: $pushTime")
+                    ?: throw PushFailException("responseBody is null and userNickname: $userNickname, userId: $userId, pushTime: $pushTime")
+                if (!response.isSuccessful || responseBody.contains("errors")) {
+                    throw PushFailException("response is fail and userNickname: $userNickname, userId: $userId, pushTime: $pushTime")
                 }
                 response.isSuccessful
             }
