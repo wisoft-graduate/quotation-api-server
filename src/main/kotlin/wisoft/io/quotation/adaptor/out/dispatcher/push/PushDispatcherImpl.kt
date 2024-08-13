@@ -57,7 +57,7 @@ class PushDispatcherImpl(
                         ?: throw PushFailException("responseBody is null and sendUser:$sendUser, tagUser :$tagUser")
                 if (!response.isSuccessful || responseBody.contains("errors")) {
                     throw PushFailException(
-                        "response is fail sendUser:$sendUser, tagUser :$tagUser, response: $responseBody"
+                        "response is fail sendUser:$sendUser, tagUser :$tagUser, response: $responseBody",
                     )
                 }
                 response.isSuccessful
