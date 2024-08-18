@@ -48,6 +48,7 @@ class QuotationController(
         @RequestParam searchWord: String?,
         @RequestParam sortTarget: QuotationSortTarget?,
         @RequestParam sortDirection: SortDirection?,
+        @RequestParam rankProperty: RankProperty?,
         @ModelAttribute paging: Paging?,
         @RequestParam ids: List<UUID>?,
     ): ResponseEntity<GetQuotationListUseCase.GetQuotationListResponse> {
@@ -57,6 +58,7 @@ class QuotationController(
                     searchWord = searchWord,
                     sortTarget = sortTarget,
                     sortDirection = sortDirection,
+                    rankProperty = rankProperty,
                     paging = paging,
                     ids = ids,
                 ),

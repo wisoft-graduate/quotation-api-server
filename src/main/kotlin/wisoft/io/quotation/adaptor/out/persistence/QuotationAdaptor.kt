@@ -10,6 +10,7 @@ import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationListUseCa
 import wisoft.io.quotation.application.port.`in`.quotation.GetQuotationRankUseCase
 import wisoft.io.quotation.application.port.out.quotation.*
 import wisoft.io.quotation.domain.Quotation
+import wisoft.io.quotation.domain.QuotationView
 import java.util.*
 
 @Component
@@ -27,16 +28,16 @@ class QuotationAdaptor(
         }
     }
 
-    override fun getQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<Quotation> {
+    override fun getQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<QuotationView> {
         val result = quotationCustomRepository.findQuotationList(request).distinct()
-        return quotationEntityMapper.toDomains(result)
+        return quotationEntityMapper.toQuotationViewDomains(result)
     }
 
     override fun getQuotationListByIds(ids: List<UUID>): List<Quotation> {
-        return quotationEntityMapper.toDomains(quotationRepository.findAllById(ids))
+        return quotationEntityMapper.toQuotationDomains(quotationRepository.findAllById(ids))
     }
 
-    override fun getQuotationLank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
+    override fun getQuotationRank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
         return quotationCustomRepository.findQuotationRank(request)
     }
 

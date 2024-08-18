@@ -143,6 +143,7 @@ class QuotationControllerTest(
                         sortDirection = SortDirection.ASC,
                         paging = Paging(page = 1, count = 10),
                         ids = listOf(quotation.id),
+                        rankProperty = RankProperty.LIKE,
                     )
 
                 // when
@@ -153,6 +154,7 @@ class QuotationControllerTest(
                         param("sortDirection", request.sortDirection?.name!!)
                         param("page", request.paging?.page?.toString()!!)
                         param("count", request.paging?.count?.toString()!!)
+                        param("rankProperty", request.rankProperty?.name!!)
                         request.ids?.forEach { id -> param("ids", id.toString()) }
                         accept = MediaType.APPLICATION_JSON
                     }
@@ -175,6 +177,7 @@ class QuotationControllerTest(
                 actual.commentCount shouldBe quotation.commentCount
                 actual.backgroundImagePath shouldBe quotation.backgroundImagePath
                 actual.author.name shouldBe author.name
+                actual.rank shouldBe 1
             }
         }
 
