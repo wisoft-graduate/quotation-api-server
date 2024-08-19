@@ -56,6 +56,10 @@ jobs:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
           ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
           ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
 
         run: |
           echo "${EC2_SSH_KEY}" > /tmp/ec2-key.pem
