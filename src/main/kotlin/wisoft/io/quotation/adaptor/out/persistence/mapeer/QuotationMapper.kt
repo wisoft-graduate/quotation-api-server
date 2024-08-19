@@ -3,14 +3,39 @@ package wisoft.io.quotation.adaptor.out.persistence.mapeer
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import wisoft.io.quotation.adaptor.out.persistence.entity.QuotationEntity
+import wisoft.io.quotation.adaptor.out.persistence.entity.view.QuotationViewEntity
 import wisoft.io.quotation.adaptor.out.persistence.repository.AuthorRepository
 import wisoft.io.quotation.domain.Quotation
+import wisoft.io.quotation.domain.QuotationView
 import wisoft.io.quotation.exception.error.AuthorNotFoundException
 
 @Component
 class QuotationMapper(val authorRepository: AuthorRepository, val authorMapper: AuthorMapper) :
     Mapper<QuotationEntity, Quotation> {
-    fun toDomains(quotationEntityList: List<QuotationEntity>): List<Quotation> {
+    fun toQuotationViewDomains(quotationViewEntityList: List<QuotationViewEntity>): List<QuotationView> {
+        val authorIds = quotationViewEntityList.map { it.authorId }.toSet()
+        val authorList = authorRepository.findAllById(authorIds)
+        val authorMap = authorList.associateBy { it.id }
+        return quotationViewEntityList.map { entity ->
+            QuotationView(
+                id = entity.id,
+                author =
+                    authorMap[entity.authorId]
+                        ?.let { authorMapper.toDomain(it) }
+                        ?: throw AuthorNotFoundException(entity.authorId.toString()),
+                content = entity.content,
+                likeCount = entity.likeCount,
+                shareCount = entity.shareCount,
+                commentCount = entity.commentCount,
+                backgroundImagePath = entity.backgroundImagePath,
+                createdTime = entity.createdTime,
+                lastModifiedTime = entity.lastModifiedTime,
+                rank = entity.rank,
+            )
+        }
+    }
+
+    fun toQuotationDomains(quotationEntityList: List<QuotationEntity>): List<Quotation> {
         val authorIds = quotationEntityList.map { it.authorId }.toSet()
         val authorList = authorRepository.findAllById(authorIds)
         val authorMap = authorList.associateBy { it.id }

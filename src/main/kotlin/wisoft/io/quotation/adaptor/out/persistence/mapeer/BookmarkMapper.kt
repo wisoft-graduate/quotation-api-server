@@ -15,7 +15,7 @@ class BookmarkMapper(
             id = entity.id,
             name = entity.name,
             userId = entity.userId,
-            quotations = quotationMapper.toDomains(quotationRepository.findAllById(entity.quotationIds)),
+            quotations = quotationMapper.toQuotationDomains(quotationRepository.findAllById(entity.quotationIds)),
             visibility = entity.visibility,
             icon = entity.icon,
             createdTime = entity.createdTime,

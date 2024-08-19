@@ -12,6 +12,7 @@ import wisoft.io.quotation.application.port.out.quotation.GetQuotationListPort
 import wisoft.io.quotation.application.port.out.quotation.GetQuotationPort
 import wisoft.io.quotation.application.port.out.quotation.ShareQuotationPort
 import wisoft.io.quotation.domain.Quotation
+import wisoft.io.quotation.domain.QuotationView
 import wisoft.io.quotation.exception.error.QuotationNotFoundException
 import java.util.*
 
@@ -26,7 +27,7 @@ class QuotationService(
     ShareQuotationUseCase {
     val logger = KotlinLogging.logger {}
 
-    override fun getQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<Quotation> {
+    override fun getQuotationList(request: GetQuotationListUseCase.GetQuotationListRequest): List<QuotationView> {
         return runCatching {
             getQuotationsPort.getQuotationList(request)
         }.onFailure {
@@ -36,7 +37,7 @@ class QuotationService(
 
     override fun getQuotationRank(request: GetQuotationRankUseCase.GetQuotationRankRequest): List<QuotationRankView> {
         return runCatching {
-            getQuotationsPort.getQuotationLank(request)
+            getQuotationsPort.getQuotationRank(request)
         }.onFailure {
             logger.error { "getQuotationRank fail: param[$request]" }
         }.getOrThrow()
