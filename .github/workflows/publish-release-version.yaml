@@ -54,6 +54,8 @@ jobs:
       - name: Deploy to EC2 with Rolling Update
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
           ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
           ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
@@ -64,15 +66,15 @@ jobs:
         run: |
           echo "${EC2_SSH_KEY}" > /tmp/ec2-key.pem
           chmod 600 /tmp/ec2-key.pem
-          ssh -o StrictHostKeyChecking=no -i /tmp/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i /tmp/ec2-key.pem $EC2_USER@$EC2_HOST << 'EOF'
           docker pull ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }}
           docker service update --image ${{ env.REGISTRY_ORGANIZATION }}/${{ env.REGISTRY_REPOSITORY }}:${{ env.TAG }} \
-            --env-add ONESIGNAL_APP_ID=${ONESIGNAL_APP_ID} \
-            --env-add ONESIGNAL_API_KEY=${ONESIGNAL_API_KEY} \
-            --env-add AWS_ACCESS_KEY=${AWS_ACCESS_KEY} \
-            --env-add AWS_SECRET_KEY=${AWS_SECRET_KEY} \
-            --env-add AWS_REGION=${AWS_REGION} \
-            --env-add S3_BUCKET_NAME=${S3_BUCKET_NAME} \
+            --env-add ONESIGNAL_APP_ID=$ONESIGNAL_APP_ID \
+            --env-add ONESIGNAL_API_KEY=$ONESIGNAL_API_KEY \
+            --env-add AWS_ACCESS_KEY=$AWS_ACCESS_KEY \
+            --env-add AWS_SECRET_KEY=$AWS_SECRET_KEY \
+            --env-add AWS_REGION=$AWS_REGION \
+            --env-add S3_BUCKET_NAME=$S3_BUCKET_NAME \
             things
           EOF
           rm /tmp/ec2-key.pem
