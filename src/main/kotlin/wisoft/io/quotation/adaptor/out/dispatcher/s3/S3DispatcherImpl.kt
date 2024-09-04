@@ -27,7 +27,7 @@ class S3DispatcherImpl(
     override fun createProfileImage(base64Image: String): String {
         return runCatching {
             logger.info { "buck: $bucket" }
-            logger.info { "bucketName: $bucketName" }
+            logger.info { "bucketName: $bucket" }
             val imageBytes = Base64.decodeBase64(base64Image)
 
             val maxFileSize = 5 * 1024 * 1024 // 5MB
@@ -73,7 +73,7 @@ class S3DispatcherImpl(
 
     override fun getProfileImage(id: String): String {
         return runCatching {
-            val s3Object = amazonS3Client.getObject(bucketName, id)
+            val s3Object = amazonS3Client.getObject(bucket, id)
             val inputStream = s3Object.objectContent
             println(inputStream)
             val bytes = inputStream.readBytes()
@@ -92,11 +92,11 @@ class S3DispatcherImpl(
 
     override fun deleteProfileImage(id: String) {
         return runCatching {
-            if (!amazonS3Client.doesObjectExist(bucketName, id)) {
+            if (!amazonS3Client.doesObjectExist(bucket, id)) {
                 throw S3ObjectNotFoundException("S3 object not found for deletion: $id")
             }
 
-            amazonS3Client.deleteObject(bucketName, id)
+            amazonS3Client.deleteObject(bucket, id)
         }.onFailure {
             logger.error { "deleteS3Image fail: param[id: $id]" }
         }.getOrThrow()
