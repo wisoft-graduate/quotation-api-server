@@ -48,11 +48,11 @@ one-signal:
 cloud:
   aws:
     credentials:
-      accessKey: ${AWS_ACCESS_KEY}
-      secretKey: ${AWS_SECRET_KEY}
+      accessKey: ${AWS_ACCESS_KEY:dump}
+      secretKey: ${AWS_SECRET_KEY:dump}
     region:
-      static: ${AWS_REGION}
+      static: ${AWS_REGION:dump}
     stack:
       auto: false
     s3:
-      bucket: ${S3_BUCKET_NAME:imsi}
+      bucket: ${S3_BUCKET_NAME:dump}
