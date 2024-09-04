@@ -20,14 +20,11 @@ class S3DispatcherImpl(
     private val amazonS3Client: AmazonS3,
 ) : S3Dispatcher {
     @Value("\${cloud.aws.s3.bucket}")
-    lateinit var bucket: String
     val logger = KotlinLogging.logger {}
     val bucketName: String = readYmlFile().cloud.aws.s3.bucket
 
     override fun createProfileImage(base64Image: String): String {
         return runCatching {
-            logger.info { "buck: $bucket" }
-            logger.info { "bucketName: $bucketName" }
             val imageBytes = Base64.decodeBase64(base64Image)
 
             val maxFileSize = 5 * 1024 * 1024 // 5MB
@@ -45,7 +42,7 @@ class S3DispatcherImpl(
             metadata.contentLength = imageBytes.size.toLong()
             val imageId = UUID.randomUUID().toString()
             val inputStream = ByteArrayInputStream(imageBytes)
-            amazonS3Client.putObject(bucket, imageId, inputStream, metadata)
+            amazonS3Client.putObject(this.bucketName, imageId, inputStream, metadata)
             imageId
         }.onFailure {
             logger.error { "uploadS3Image fail" }
@@ -73,7 +70,7 @@ class S3DispatcherImpl(
 
     override fun getProfileImage(id: String): String {
         return runCatching {
-            val s3Object = amazonS3Client.getObject(bucketName, id)
+            val s3Object = amazonS3Client.getObject(this.bucketName, id)
             val inputStream = s3Object.objectContent
             println(inputStream)
             val bytes = inputStream.readBytes()
@@ -92,11 +89,11 @@ class S3DispatcherImpl(
 
     override fun deleteProfileImage(id: String) {
         return runCatching {
-            if (!amazonS3Client.doesObjectExist(bucketName, id)) {
+            if (!amazonS3Client.doesObjectExist(this.bucketName, id)) {
                 throw S3ObjectNotFoundException("S3 object not found for deletion: $id")
             }
 
-            amazonS3Client.deleteObject(bucketName, id)
+            amazonS3Client.deleteObject(this.bucketName, id)
         }.onFailure {
             logger.error { "deleteS3Image fail: param[id: $id]" }
         }.getOrThrow()
