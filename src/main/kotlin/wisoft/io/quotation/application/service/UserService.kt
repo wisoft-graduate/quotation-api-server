@@ -205,6 +205,7 @@ class UserService(
             val updatedUser = user.update(request, profilePath)
             updateUserPort.updateUser(updatedUser)
         }.onFailure {
+            logger.error { it.printStackTrace() }
             logger.error { "updateUser fail: param[id: $id, request: $request]" }
         }.getOrThrow()
     }

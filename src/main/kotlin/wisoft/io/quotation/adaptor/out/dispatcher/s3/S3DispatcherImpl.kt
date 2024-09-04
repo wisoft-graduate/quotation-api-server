@@ -23,6 +23,7 @@ class S3DispatcherImpl(
 
     override fun createProfileImage(base64Image: String): String {
         return runCatching {
+            logger.info { "bucketName: $bucketName" }
             val imageBytes = Base64.decodeBase64(base64Image)
 
             val maxFileSize = 5 * 1024 * 1024 // 5MB

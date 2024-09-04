@@ -15,7 +15,11 @@ interface UpdateUserUseCase {
         val identityVerificationQuestion: String?,
         val identityVerificationAnswer: String?,
         val profileImageBase64: String?,
-    )
+    ) {
+        override fun toString(): String {
+            return "UpdateUserRequest(identityVerificationAnswer=$identityVerificationAnswer, identityVerificationQuestion=$identityVerificationQuestion, commentAlarm=$commentAlarm, quotationAlarm=$quotationAlarm, favoriteAuthor=$favoriteAuthor, favoriteQuotation=$favoriteQuotation, nickname=$nickname)"
+        }
+    }
 
     data class UpdateUserResponse(
         val data: Data,
