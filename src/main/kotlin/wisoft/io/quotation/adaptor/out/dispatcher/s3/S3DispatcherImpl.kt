@@ -23,9 +23,6 @@ class S3DispatcherImpl(
     val logger = KotlinLogging.logger {}
     val bucketName: String = readYmlFile().cloud.aws.s3.bucket
 
-
-
-
     override fun createProfileImage(base64Image: String): String {
         return runCatching {
             val imageBytes = Base64.decodeBase64(base64Image)
