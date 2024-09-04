@@ -20,7 +20,7 @@ class S3DispatcherImpl(
     private val amazonS3Client: AmazonS3,
 ) : S3Dispatcher {
     @Value("\${cloud.aws.s3.bucket}")
-    val bucket: String = ""
+    lateinit var bucket: String
     val logger = KotlinLogging.logger {}
     val bucketName: String = readYmlFile().cloud.aws.s3.bucket
 
