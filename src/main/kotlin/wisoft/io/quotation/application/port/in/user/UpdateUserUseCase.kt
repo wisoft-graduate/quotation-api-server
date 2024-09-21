@@ -16,7 +16,7 @@ interface UpdateUserUseCase {
         val identityVerificationAnswer: String?,
         val profileImageBase64: String?,
         // 변수 추가
-        val isProfileImageDelete: Boolean?
+        val isProfileImageDelete: Boolean?,
     )
 
     data class UpdateUserResponse(
