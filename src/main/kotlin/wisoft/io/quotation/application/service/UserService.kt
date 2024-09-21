@@ -202,6 +202,9 @@ class UserService(
                 user.profilePath?.let { deleteProfileImagePort.deleteProfileImage(it) }
                 profilePath = createProfileImagePort.createProfileImage(it)
             }
+            request.isProfileImageDelete?.let {
+                user.profilePath?.let { deleteProfileImagePort.deleteProfileImage(it) }
+            }
             val updatedUser = user.update(request, profilePath)
             updateUserPort.updateUser(updatedUser)
         }.onFailure {
