@@ -200,10 +200,11 @@ class UserService(
             var profilePath: String? = null
             request.profileImageBase64?.let {
                 user.profilePath?.let { deleteProfileImagePort.deleteProfileImage(it) }
-                if (!it.equals("null")) {
-                    profilePath = createProfileImagePort.createProfileImage(it)
-                }
+                profilePath = createProfileImagePort.createProfileImage(it)
             }
+            request.isProfileImageDelete?.let {
+                user.profilePath?.let { deleteProfileImagePort.deleteProfileImage(it) }
+            }함
             val updatedUser = user.update(request, profilePath)
             updateUserPort.updateUser(updatedUser)
         }.onFailure {

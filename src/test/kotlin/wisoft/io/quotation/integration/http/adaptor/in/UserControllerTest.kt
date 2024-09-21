@@ -299,6 +299,7 @@ class UserControllerTest(
                         commentAlarm = expectedCommentAlarm,
                         identityVerificationQuestion = expectedIdentityVerificationQuestion,
                         identityVerificationAnswer = expectedIdentityVerificationAnswer,
+                        isProfileImageDelete = null
                     )
                 val accessToken = JWTUtil.generateAccessToken(userMapper.toDomain(existUser))
                 // when
